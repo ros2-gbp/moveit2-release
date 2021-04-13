@@ -3,8 +3,6 @@ import yaml
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-from launch_ros.actions import ComposableNodeContainer
-from launch_ros.descriptions import ComposableNode
 from launch.actions import ExecuteProcess
 import xacro
 
@@ -32,10 +30,6 @@ def load_yaml(package_name, file_path):
 
 
 def generate_launch_description():
-    # Get parameters for the Servo node
-    servo_yaml = load_yaml("moveit_servo", "config/panda_simulated_config.yaml")
-    servo_params = {"moveit_servo": servo_yaml}
-
     # Get URDF and SRDF
     robot_description_config = xacro.process_file(
         os.path.join(
@@ -53,31 +47,76 @@ def generate_launch_description():
         "robot_description_semantic": robot_description_semantic_config
     }
 
+    # Get parameters for the Pose Tracking node
+    pose_tracking_yaml = load_yaml("moveit_servo", "config/pose_tracking_settings.yaml")
+    pose_tracking_params = {"moveit_servo": pose_tracking_yaml}
+
+    # Get parameters for the Servo node
+    servo_yaml = load_yaml(
+        "moveit_servo", "config/panda_simulated_config_pose_tracking.yaml"
+    )
+    servo_params = {"moveit_servo": servo_yaml}
+
+    kinematics_yaml = load_yaml(
+        "moveit_resources_panda_moveit_config", "config/kinematics.yaml"
+    )
+
     # RViz
     rviz_config_file = (
-        get_package_share_directory("moveit_servo") + "/config/demo_rviz_config.rviz"
+        get_package_share_directory("moveit_servo")
+        + "/config/demo_rviz_pose_tracking.rviz"
     )
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
         name="rviz2",
+        # prefix=['xterm -e gdb -ex run --args'],
         output="log",
         arguments=["-d", rviz_config_file],
-        parameters=[robot_description, robot_description_semantic],
+        parameters=[robot_description, robot_description_semantic, kinematics_yaml],
+    )
+
+    # Publishes tf's for the robot
+    robot_state_publisher = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        output="screen",
+        parameters=[robot_description],
+    )
+
+    # A node to publish world -> panda_link0 transform
+    static_tf = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="static_transform_publisher",
+        output="log",
+        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "panda_link0"],
+    )
+
+    pose_tracking_node = Node(
+        package="moveit_servo",
+        executable="servo_pose_tracking_demo",
+        # prefix=['xterm -e gdb -ex run --args'],
+        output="screen",
+        parameters=[
+            robot_description,
+            robot_description_semantic,
+            kinematics_yaml,
+            pose_tracking_params,
+            servo_params,
+        ],
     )
 
     # ros2_control using FakeSystem as hardware
+    ros2_controllers_path = os.path.join(
+        get_package_share_directory("moveit_resources_panda_moveit_config"),
+        "config",
+        "panda_ros_controllers.yaml",
+    )
     ros2_control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[
-            robot_description,
-            os.path.join(
-                get_package_share_directory("moveit_resources_panda_moveit_config"),
-                "config",
-                "panda_ros_controllers.yaml",
-            ),
-        ],
+        parameters=[robot_description, ros2_controllers_path],
         output={
             "stdout": "screen",
             "stderr": "screen",
@@ -95,40 +134,13 @@ def generate_launch_description():
             )
         ]
 
-    # Launch as much as possible in components
-    container = ComposableNodeContainer(
-        name="moveit_servo_demo_container",
-        namespace="/",
-        package="rclcpp_components",
-        executable="component_container",
-        composable_node_descriptions=[
-            ComposableNode(
-                package="robot_state_publisher",
-                plugin="robot_state_publisher::RobotStatePublisher",
-                name="robot_state_publisher",
-                parameters=[robot_description],
-            ),
-            ComposableNode(
-                package="tf2_ros",
-                plugin="tf2_ros::StaticTransformBroadcasterNode",
-                name="static_tf2_broadcaster",
-                parameters=[{"/child_frame_id": "panda_link0", "/frame_id": "world"}],
-            ),
-            ComposableNode(
-                package="moveit_servo",
-                plugin="moveit_servo::ServoServer",
-                name="servo_server",
-                parameters=[
-                    servo_params,
-                    robot_description,
-                    robot_description_semantic,
-                ],
-                extra_arguments=[{"use_intra_process_comms": True}],
-            ),
-        ],
-        output="screen",
-    )
-
     return LaunchDescription(
-        [rviz_node, ros2_control_node, container] + load_controllers
+        [
+            rviz_node,
+            static_tf,
+            pose_tracking_node,
+            ros2_control_node,
+            robot_state_publisher,
+        ]
+        + load_controllers
     )

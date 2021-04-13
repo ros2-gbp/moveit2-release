@@ -1,16 +1,23 @@
 import os
 import yaml
-import launch
+import unittest
+import pytest
+import xacro
+
 import launch_ros
-import launch_testing
+import launch
+import launch_testing.actions
+import launch_testing.asserts
+
 from launch import LaunchDescription
 from launch.some_substitutions_type import SomeSubstitutionsType
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
-from launch_ros.actions import ComposableNodeContainer, Node
-from launch_ros.descriptions import ComposableNode
-from ament_index_python.packages import get_package_share_directory
 from launch.actions import ExecuteProcess, TimerAction
-import xacro
+
+from ament_index_python.packages import get_package_share_directory
+
+from launch_ros.actions import Node, ComposableNodeContainer
+from launch_ros.descriptions import ComposableNode
 
 
 def load_file(package_name, file_path):
@@ -35,38 +42,16 @@ def load_yaml(package_name, file_path):
         return None
 
 
-def generate_servo_test_description(
-    *args,
-    gtest_name: SomeSubstitutionsType,
-    start_position_path: SomeSubstitutionsType = ""
-):
-
-    # Get parameters using the demo config file
-    servo_yaml = load_yaml("moveit_servo", "config/panda_simulated_config.yaml")
-    servo_params = {"moveit_servo": servo_yaml}
+def generate_servo_test_description(*args, gtest_name: SomeSubstitutionsType):
 
     # Get URDF and SRDF
-    if start_position_path:
-        initial_positions_file = os.path.join(
-            os.path.dirname(__file__), start_position_path
+    robot_description_config = xacro.process_file(
+        os.path.join(
+            get_package_share_directory("moveit_resources_panda_moveit_config"),
+            "config",
+            "panda.urdf.xacro",
         )
-        robot_description_config = xacro.process_file(
-            os.path.join(
-                get_package_share_directory("moveit_resources_panda_moveit_config"),
-                "config",
-                "panda.urdf.xacro",
-            ),
-            mappings={"initial_positions_file": initial_positions_file},
-        )
-    else:
-        robot_description_config = xacro.process_file(
-            os.path.join(
-                get_package_share_directory("moveit_resources_panda_moveit_config"),
-                "config",
-                "panda.urdf.xacro",
-            )
-        )
-
+    )
     robot_description = {"robot_description": robot_description_config.toxml()}
 
     robot_description_semantic_config = load_file(
@@ -75,6 +60,20 @@ def generate_servo_test_description(
     robot_description_semantic = {
         "robot_description_semantic": robot_description_semantic_config
     }
+
+    # Get parameters for the Pose Tracking node
+    pose_tracking_yaml = load_yaml("moveit_servo", "config/pose_tracking_settings.yaml")
+    pose_tracking_params = {"moveit_servo": pose_tracking_yaml}
+
+    # Get parameters for the Servo node
+    servo_yaml = load_yaml(
+        "moveit_servo", "config/panda_simulated_config_pose_tracking.yaml"
+    )
+    servo_params = {"moveit_servo": servo_yaml}
+
+    kinematics_yaml = load_yaml(
+        "moveit_resources_panda_moveit_config", "config/kinematics.yaml"
+    )
 
     # ros2_control using FakeSystem as hardware
     ros2_controllers_path = os.path.join(
@@ -105,7 +104,7 @@ def generate_servo_test_description(
 
     # Component nodes for tf and Servo
     test_container = ComposableNodeContainer(
-        name="test_servo_integration_container",
+        name="test_pose_tracking_container",
         namespace="/",
         package="rclcpp_components",
         executable="component_container",
@@ -122,28 +121,21 @@ def generate_servo_test_description(
                 name="static_tf2_broadcaster",
                 parameters=[{"/child_frame_id": "panda_link0", "/frame_id": "world"}],
             ),
-            ComposableNode(
-                package="moveit_servo",
-                plugin="moveit_servo::ServoServer",
-                name="servo_server",
-                parameters=[
-                    servo_params,
-                    robot_description,
-                    robot_description_semantic,
-                ],
-                extra_arguments=[{"use_intra_process_comm": True}],
-            ),
         ],
         output="screen",
     )
 
-    # Unknown how to set timeout
-    # https://github.com/ros2/launch/issues/466
-    servo_gtest = launch_ros.actions.Node(
+    pose_tracking_gtest = launch_ros.actions.Node(
         executable=PathJoinSubstitution(
             [LaunchConfiguration("test_binary_dir"), gtest_name]
         ),
-        parameters=[servo_params],
+        parameters=[
+            robot_description,
+            robot_description_semantic,
+            pose_tracking_params,
+            servo_params,
+            kinematics_yaml,
+        ],
         output="screen",
     )
 
@@ -156,12 +148,31 @@ def generate_servo_test_description(
             ),
             ros2_control_node,
             test_container,
-            TimerAction(period=2.0, actions=[servo_gtest]),
+            TimerAction(period=2.0, actions=[pose_tracking_gtest]),
             launch_testing.actions.ReadyToTest(),
         ]
         + load_controllers
     ), {
         "test_container": test_container,
-        "servo_gtest": servo_gtest,
+        "servo_gtest": pose_tracking_gtest,
         "ros2_control_node": ros2_control_node,
     }
+
+
+def generate_test_description():
+    return generate_servo_test_description(gtest_name="test_servo_pose_tracking")
+
+
+class TestGTestProcessActive(unittest.TestCase):
+    def test_gtest_run_complete(
+        self, proc_info, test_container, servo_gtest, ros2_control_node
+    ):
+        proc_info.assertWaitForShutdown(servo_gtest, timeout=4000.0)
+
+
+@launch_testing.post_shutdown_test()
+class TestGTestProcessPostShutdown(unittest.TestCase):
+    def test_gtest_pass(
+        self, proc_info, test_container, servo_gtest, ros2_control_node
+    ):
+        launch_testing.asserts.assertExitCodes(proc_info, process=servo_gtest)
