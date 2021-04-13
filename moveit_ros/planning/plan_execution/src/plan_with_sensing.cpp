@@ -89,8 +89,7 @@ plan_execution::PlanWithSensing::PlanWithSensing(
   display_cost_sources_ = false;
 
   // load the sensor manager plugin, if needed
-  auto sensor_manager_params = std::make_shared<rclcpp::SyncParametersClient>(node_);
-  if (sensor_manager_params && sensor_manager_params->has_parameter("moveit_sensor_manager"))
+  if (node_->has_parameter("moveit_sensor_manager"))
   {
     try
     {
@@ -107,7 +106,14 @@ plan_execution::PlanWithSensing::PlanWithSensing(
       try
       {
         if (node_->get_parameter("moveit_sensor_manager", manager))
+        {
           sensor_manager_ = sensor_manager_loader_->createUniqueInstance(manager);
+          if (!sensor_manager_->initialize(node_))
+          {
+            RCLCPP_ERROR_STREAM(LOGGER, "Failed to initialize " << manager);
+            sensor_manager_.reset();
+          }
+        }
       }
       catch (const rclcpp::ParameterTypeException& e)
       {
@@ -160,7 +166,7 @@ bool plan_execution::PlanWithSensing::computePlan(ExecutableMotionPlan& plan,
   unsigned int look_attempts = 0;
 
   // this flag is set to true when all conditions for looking around are met, and the command is sent.
-  // the intention is for the planning looop not to terminate when having just looked around
+  // the intention is for the planning loop not to terminate when having just looked around
   bool just_looked_around = false;
 
   // this flag indicates whether the last lookAt() operation failed. If this operation fails once, we assume that
@@ -224,9 +230,7 @@ bool plan_execution::PlanWithSensing::computePlan(ExecutableMotionPlan& plan,
 
       bool looked_at_result = lookAt(cost_sources, plan.planning_scene_->getPlanningFrame());
       if (looked_at_result)
-      {
-        RCLCPP_INFO(LOGGER, "Sensor was succesfully actuated. Attempting to recompute a motion plan.");
-      }
+        RCLCPP_INFO(LOGGER, "Sensor was successfully actuated. Attempting to recompute a motion plan.");
       else
       {
         if (look_around_failed)
