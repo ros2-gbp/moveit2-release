@@ -24,23 +24,11 @@ find_package(rclpy REQUIRED)
 # find_package(PythonInterp REQUIRED)
 # find_package(PythonLibs "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}" REQUIRED)
 
-find_package(Boost REQUIRED)
-#if(Boost_VERSION LESS 106700)
-#  set(BOOST_PYTHON_COMPONENT python)
-#else()
-#  set(BOOST_PYTHON_COMPONENT python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})
-#endif()
-
-find_package(Boost REQUIRED COMPONENTS
-  date_time
-  filesystem
-  program_options
-  #${BOOST_PYTHON_COMPONENT}
-  system
-  thread
-)
 find_package(Eigen3 REQUIRED)
 # find_package(eigenpy REQUIRED)
+
+# Finds Boost Components
+include(ConfigExtras.cmake)
 
 set(THIS_PACKAGE_INCLUDE_DIRS
 #  py_bindings_tools/include
@@ -56,6 +44,7 @@ set(THIS_PACKAGE_LIBRARIES
   moveit_move_group_interface
   moveit_cpp
 #  moveit_py_bindings_tools
+#  moveit_py_bindings_tools_python
 )
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
@@ -86,8 +75,51 @@ add_subdirectory(move_group_interface)
 # add_subdirectory(test)
 add_subdirectory(moveit_cpp)
 
-ament_export_include_directories(include)
-ament_export_libraries(${THIS_PACKAGE_LIBRARIES})
+#############
+## TESTING ##
+#############
+
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  find_package(ros_testing REQUIRED)
+  find_package(Boost REQUIRED COMPONENTS filesystem)
+
+  # Move group interface cpp ompl constrained planning integration test
+  ament_add_gtest_executable(move_group_ompl_constraints_test
+      test/move_group_ompl_constraints_test.cpp
+  )
+
+  target_link_libraries(move_group_ompl_constraints_test ${THIS_PACKAGE_LIBRARIES})
+  ament_target_dependencies(move_group_ompl_constraints_test ${THIS_PACKAGE_INCLUDE_DEPENDS})
+  add_ros_test(test/launch/move_group_ompl_constraints.test.py ARGS "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}")
+  # end move group interface cpp ompl constrained planning integration test
+
+endif()
+
+install(
+  TARGETS ${THIS_PACKAGE_LIBRARIES}
+  EXPORT export_${PROJECT_NAME}
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
-ament_package()
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+
+  # These don't pass yet, disable them for now
+  set(ament_cmake_copyright_FOUND TRUE)
+  set(ament_cmake_cppcheck_FOUND TRUE)
+  set(ament_cmake_cpplint_FOUND TRUE)
+  set(ament_cmake_flake8_FOUND TRUE)
+  set(ament_cmake_uncrustify_FOUND TRUE)
+
+  # Run all lint tests in package.xml except those listed above
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+ament_package(CONFIG_EXTRAS ConfigExtras.cmake)
