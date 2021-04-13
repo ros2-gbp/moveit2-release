@@ -7,30 +7,16 @@ moveit_package()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-# boost::iostreams on Windows depends on boost::zlib
-if(WIN32)
-  set(EXTRA_BOOST_COMPONENTS zlib)
-endif()
-find_package(Boost REQUIRED system filesystem date_time thread iostreams regex ${EXTRA_BOOST_COMPONENTS})
-
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
 
+# Finds Boost Components
+include(ConfigExtras.cmake)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
 
-# TODO(henningkayser): enable bullet once the library is migrated to ROS2
 # TODO: Move collision detection into separate packages
-# find_package(Bullet 2.87)
-#
-# # TODO(j-petit): Version check can be dropped when Xenial reaches end-of-life
-# if(BULLET_FOUND)
-#   set(BULLET_ENABLE "BULLET")
-#   set(BULLET_LIB "moveit_collision_detection_bullet")
-#   set(BULLET_INC "collision_detection_bullet/include")
-#   message(STATUS "Compiling with Bullet")
-# else()
-#   message(STATUS "Version of Bullet too old or not available: disabling Bullet collision detection plugin. Try using Ubuntu 18.04 or later.")
-# endif()
+find_package(Bullet 2.87 REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 
@@ -73,7 +59,7 @@ set(THIS_PACKAGE_INCLUDE_DIRS
     backtrace/include
     collision_detection/include
     collision_detection_fcl/include
-    # ${BULLET_INC}
+    ${BULLET_INC}
     constraint_samplers/include
     controller_manager/include
     distance_field/include
@@ -107,7 +93,7 @@ set(THIS_PACKAGE_LIBRARIES
     moveit_planning_interface
     moveit_collision_detection
     moveit_collision_detection_fcl
-    # ${BULLET_LIB}
+    ${BULLET_LIB}
     moveit_kinematic_constraints
     moveit_planning_scene
     moveit_constraint_samplers
@@ -140,15 +126,14 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   visualization_msgs
   Eigen3
   eigen3_cmake_module
-  Boost
   OCTOMAP
-  # ${BULLET_ENABLE}
+  ${BULLET_ENABLE}
 )
 pluginlib_export_plugin_description_file(moveit_core collision_detector_fcl_description.xml)
 
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIRS}
   ${LIBFCL_INCLUDE_DIRS}
-  # ${BULLET_INCLUDE_DIRS}
+  ${BULLET_INCLUDE_DIRS}
 )
 
 include_directories(${THIS_PACKAGE_INCLUDE_DIRS}
@@ -191,14 +176,35 @@ add_subdirectory(collision_distance_field)
 add_subdirectory(kinematics_metrics)
 add_subdirectory(dynamics_solver)
 # TODO(henningkayser): enable bullet once the library is migrated to ROS2
-# if(BULLET_ENABLE)
-#   add_subdirectory(collision_detection_bullet)
-# else()
-#   install(FILES collision_detection_bullet/empty_description.xml DESTINATION share/${PROJECT_NAME} RENAME collision_detector_bullet_description.xml)
-# endif()
+if(BULLET_ENABLE)
+add_subdirectory(collision_detection_bullet)
+else()
+install(FILES collision_detection_bullet/empty_description.xml DESTINATION share/${PROJECT_NAME} RENAME collision_detector_bullet_description.xml)
+endif()
 
-ament_export_include_directories(include)
-ament_export_libraries(${THIS_PACKAGE_LIBRARIES})
+install(
+  TARGETS ${THIS_PACKAGE_LIBRARIES}
+  EXPORT export_${PROJECT_NAME}
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
-ament_package()
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+
+  # These don't pass yet, disable them for now
+  set(ament_cmake_copyright_FOUND TRUE)
+  set(ament_cmake_cppcheck_FOUND TRUE)
+  set(ament_cmake_cpplint_FOUND TRUE)
+  set(ament_cmake_uncrustify_FOUND TRUE)
+
+  # Run all lint tests in package.xml except those listed above
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+ament_package(CONFIG_EXTRAS ConfigExtras.cmake)
