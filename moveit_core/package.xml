@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>moveit_core</name>
-  <version>2.1.0</version>
+  <version>2.1.1</version>
   <description>Core libraries used by MoveIt</description>
   <author email="isucan@google.com">Ioan Sucan</author>
   <author email="robot.moveit@gmail.com">Sachin Chitta</author>
@@ -14,8 +14,8 @@
 
   <license>BSD</license>
   <url type="website">http://moveit.ros.org</url>
-  <url type="bugtracker">https://github.com/ros-planning/moveit/issues</url>
-  <url type="repository">https://github.com/ros-planning/moveit</url>
+  <url type="bugtracker">https://github.com/ros-planning/moveit2/issues</url>
+  <url type="repository">https://github.com/ros-planning/moveit2</url>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>pkg-config</buildtool_depend>
@@ -58,6 +58,9 @@
   <test_depend>orocos_kdl</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_index_cpp</test_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
