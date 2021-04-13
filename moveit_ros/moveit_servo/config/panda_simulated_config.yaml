@@ -1,7 +1,7 @@
 ###############################################
 # Modify all parameters related to servoing here
 ###############################################
-use_gazebo: true # Whether the robot is started in a Gazebo simulation environment
+use_gazebo: false # Whether the robot is started in a Gazebo simulation environment
 
 ## Properties of incoming commands
 command_in_type: "unitless" # "unitless"> in the range [-1:1], as if from joystick. "speed_units"> cmds are in m/s and rad/s
@@ -14,6 +14,7 @@ scale:
 
 ## Properties of outgoing commands
 publish_period: 0.034  # 1/Nominal publish rate [seconds]
+low_latency_mode: false  # Set this to true to publish as soon as an incoming Twist command is received (publish_period is ignored)
 
 # What type of topic does your robot driver expect?
 # Currently supported are std_msgs/Float64MultiArray or trajectory_msgs/JointTrajectory
@@ -51,7 +52,7 @@ cartesian_command_in_topic: ~/delta_twist_cmds  # Topic for incoming Cartesian t
 joint_command_in_topic: ~/delta_joint_cmds # Topic for incoming joint angle commands
 joint_topic: /joint_states
 status_topic: ~/status # Publish status to this topic
-command_out_topic: /fake_joint_trajectory_controller/joint_trajectory # Publish outgoing commands here
+command_out_topic: /panda_arm_controller/joint_trajectory # Publish outgoing commands here
 
 ## Collision checking for the entire robot body
 check_collisions: true # Check collisions?
