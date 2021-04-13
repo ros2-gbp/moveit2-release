@@ -14,8 +14,8 @@ WORKDIR $ROS_UNDERLAY/../src
 # https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#minimize-the-number-of-layers
 RUN \
     # Download moveit source so that we can get necessary dependencies
-    wget -q https://raw.githubusercontent.com/ros-planning/moveit2/main/moveit2.repos && \
-    vcs import < moveit2.repos && \
+    git clone https://github.com/ros-planning/moveit2.git -b main && \
+    vcs import < moveit2/moveit2.repos && \
     #
     # Update apt package list as cache is cleared in previous container
     # Usually upgrading involves a few packages only (if container builds became out-of-sync)
@@ -27,8 +27,8 @@ RUN \
     rm -rf /var/lib/apt/lists/*
 
 # Build the workspace
-RUN . /opt/ros/${ROS_DISTRO}/setup.sh &&\
+RUN cd $ROS_UNDERLAY/.. && . /opt/ros/${ROS_DISTRO}/setup.sh &&\
     colcon build \
-	        --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-			  --ament-cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-	        --event-handlers desktop_notification- status-
+            --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+              --ament-cmake-args -DCMAKE_BUILD_TYPE=Release \
+            --event-handlers desktop_notification- status-
