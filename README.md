@@ -1,59 +1,37 @@
-<img src="https://moveit.ros.org/assets/logo/moveit2/moveit_logo-black.png" alt="MoveIt 2 Logo" width="200"/>
+<img src="https://github.com/ros-planning/moveit.ros.org/blob/main/assets/logo/moveit2/moveit_logo-black.png" alt="MoveIt 2 Logo" width="300"/>
 
-The MoveIt Motion Planning Framework for **ROS 2**. For ROS 1, see [MoveIt 1](https://github.com/ros-planning/moveit).
+# MoveIt 2 Beta - OMPL Constrained Planning Demo
+## Setup
+Before running the demo add the following lines to `ompl_planning.yaml` in the `panda_config` package
+bellow `panda_arm:`
 
-*Easy-to-use open source robotics manipulation platform for developing commercial applications, prototyping designs, and benchmarking algorithms.*
+```
+enforce_constrained_state_space: true
+projection_evaluator: joints(panda_joint1,panda_joint2)
+```
 
-## Continuous Integration Status
+## Running
+This demo includes a launch configuration for running MoveGroup and a separate demo node.
 
-[![Format](https://github.com/ros-planning/moveit2/actions/workflows/format.yml/badge.svg?branch=main)](https://github.com/ros-planning/moveit2/actions/workflows/format.yml?branch=main) [![BuildAndTest](https://github.com/ros-planning/moveit2/actions/workflows/industrial_ci_action.yml/badge.svg?branch=main)](https://github.com/ros-planning/moveit2/actions/workflows/industrial_ci_action.yml?branch=main) [![codecov](https://codecov.io/gh/ros-planning/moveit2/branch/main/graph/badge.svg?token=W7uHKcY0ly)](https://codecov.io/gh/ros-planning/moveit2)
+- Note: This demo shows how to construct a variety of
+constraints. See [util.cpp](https://github.com/ros-planning/moveit2/blob/main/moveit_core/kinematic_constraints/src/utils.cpp) for helper functions to automate constructing the constraint messages.
 
-## General MoveIt Documentation
+The MoveGroup setup can be started:
+```
+ros2 launch run_ompl_constrained_planning run_move_group.launch.py
+```
 
-- [MoveIt Website](http://moveit.ros.org)
-- [Tutorials and Documentation](https://ros-planning.github.io/moveit_tutorials/)
-- [How to Get Involved](http://moveit.ros.org/about/get_involved/)
-- [Future Release Dates](https://moveit.ros.org/#release-versions)
+This allows you to start planning and executing motions:
+```
+ros2 launch run_move_group run_move_group_interface.launch.py
+```
 
-## MoveIt 2 Specific Documentation
+## Details
+### State space selection process
+There are three options for state space selection.
 
-- [MoveIt 2 Migration Progress](https://docs.google.com/spreadsheets/d/1aPb3hNP213iPHQIYgcnCYh9cGFUlZmi_06E_9iTSsOI/edit?usp=sharing)
-- [MoveIt 2 Migration Guidelines](doc/MIGRATION_GUIDE.md)
-- [MoveIt 2 Development Roadmap](https://moveit.ros.org/documentation/contributing/roadmap/)
+1. Set `enforce_constrained_state_space = true` AND there must be path constraints in the planning request. This overrides all other settings and selects a `ConstrainedPlanningStateSpace` factory. If there are no path constraints in the planning request, this option is ignored, the constrained state space is only usefull for paths constraints. At the moment only a single position constraint is supported.
 
-## Source Build
+2. Set `enforce_joint_model_state_space = true` and option 1. is false, then this overrides the remaining settings and selects `JointModelStateSpace` factory. Some planning problems such as orientation path constraints are represented in `PoseModelStateSpace` and sampled via IK. However, consecutive IK solutions are not checked for proximity at the moment and sometimes happen to be flipped, leading to invalid trajectories. This workaround lets the user prevent this problem by forcing rejection sampling in `JointModelStateSpace`.
 
-See [MoveIt 2 Source Build - Linux](https://moveit.ros.org/install-moveit2/source/)
-
-## Getting Started
-
-We've prepared a simple demo setup that you can use for quickly spinning up a simulated robot environment with MoveItCpp.
-See the [run_moveit_cpp](moveit_demo_nodes/run_moveit_cpp) demo package for further instructions and information.
-
-The package [run_move_group](moveit_demo_nodes/run_move_group) provides a simple launch file for running a MoveGroup setup.
-You can test it using the MotionPlanning display in RViz or by implementing your own MoveGroupInterface application.
-
-## Supporters
-
-This open source project is maintained by supporters from around the world — see [MoveIt maintainers](https://moveit.ros.org/about/). Special thanks to contributor from Intel and Open Robotics.
-
-<a href="https://picknik.ai/">
-  <img src="https://picknik.ai/assets/images/logo.jpg" width="168">
-</a>
-
-[PickNik Inc.](https://picknik.ai/) is leading and organizing the development of MoveIt 2.
-If you would like to support this project, please contact hello@picknik.ai
-
-<a href="http://rosin-project.eu">
-  <img src="http://rosin-project.eu/wp-content/uploads/rosin_ack_logo_wide.png"
-       alt="rosin_logo" height="60" >
-</a>
-
-The port to ROS 2 is supported by ROSIN - ROS-Industrial Quality-Assured Robot Software Components.
-More information: <a href="http://rosin-project.eu">rosin-project.eu</a>
-
-<img src="http://rosin-project.eu/wp-content/uploads/rosin_eu_flag.jpg"
-     alt="eu_flag" height="45" align="left" >
-
-This project has received funding from the European Union’s Horizon 2020
-research and innovation programme under grant agreement no. 732287.
+3. When options 1. and 2. are both set to false, the factory is selected based on the priority each one returns. See [PoseModelStateSpaceFactory::canRepresentProblem](https://github.com/ros-planning/moveit2/blob/b4ff391133c2809e9f697d44593c89a77d1d4c5c/moveit_planners/ompl/ompl_interface/src/parameterization/work_space/pose_model_state_space_factory.cpp#L45) for details on the selection process. In short, it selects `PoseModelStateSpace` if there is an IK solver and a path constraint.
