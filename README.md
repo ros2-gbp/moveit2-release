@@ -1,62 +1,26 @@
-<img src="https://moveit.ros.org/assets/logo/moveit2/moveit_logo-black.png" alt="MoveIt 2 Logo" width="200"/>
+<img src="https://github.com/ros-planning/moveit.ros.org/blob/main/assets/logo/moveit2/moveit_logo-black.png" alt="MoveIt 2 Logo" width="300"/>
 
-The MoveIt Motion Planning Framework for **ROS 2**. For ROS 1, see [MoveIt 1](https://github.com/ros-planning/moveit).
+# MoveIt 2 Beta - Demo Setup
 
-*Easy-to-use open source robotics manipulation platform for developing commercial applications, prototyping designs, and benchmarking algorithms.*
+The `run_moveit_cpp` package provides a simulated robot setup that shows how to get started with MoveIt 2.
+The demo includes examples for:
 
-## Continuous Integration Status
+* Configuring and loading MoveIt using MoveItCpp
+* Running a simulated robot
+* Visualizing robot and planning scene in RViz
+* Planning and execution of robot trajectories
 
+The MoveIt 2 Demo provides all necessary features in order to get a simple robot setup running with ROS 2.
+There are two options and launch files for simulating the robot controllers (the demo is the same):
 
-[![Formatting (pre-commit)](https://github.com/ros-planning/moveit2/actions/workflows/format.yaml/badge.svg?branch=main)](https://github.com/ros-planning/moveit2/actions/workflows/format.yaml?query=branch%3Amain)
-[![Build and Test (Foxy)](https://github.com/ros-planning/moveit2/actions/workflows/build_and_test.yaml/badge.svg?branch=main)](https://github.com/ros-planning/moveit2/actions/workflows/build_and_test.yaml?query=branch%3Amain)
-[![Code Coverage](https://codecov.io/gh/ros-planning/moveit2/branch/main/graph/badge.svg?token=W7uHKcY0ly)](https://codecov.io/gh/ros-planning/moveit2)
+1. ros2_control using a fake_joint driver: `run_moveit_cpp.launch.py`
+1. MoveIt's fake controller: `run_moveit_cpp_fake_controller.launch.py`
 
-## General MoveIt Documentation
+## Running the Demo
 
-- [MoveIt Website](http://moveit.ros.org)
-- [Tutorials and Documentation](https://ros-planning.github.io/moveit_tutorials/)
-- [How to Get Involved](http://moveit.ros.org/about/get_involved/)
-- [Future Release Dates](https://moveit.ros.org/#release-versions)
+The demo can be run using the launch files `run_moveit_cpp.launch.py` or `run_moveit_cpp_fake_controller.launch.py`:
 
-## MoveIt 2 Specific Documentation
+     ros2 launch run_moveit_cpp run_moveit_cpp.launch.py
 
-- [MoveIt 2 Migration Progress](https://docs.google.com/spreadsheets/d/1aPb3hNP213iPHQIYgcnCYh9cGFUlZmi_06E_9iTSsOI/edit?usp=sharing)
-- [MoveIt 2 Migration Guidelines](doc/MIGRATION_GUIDE.md)
-- [MoveIt 2 Development Roadmap](https://moveit.ros.org/documentation/contributing/roadmap/)
-
-## Source Build
-
-See [MoveIt 2 Source Build - Linux](https://moveit.ros.org/install-moveit2/source/)
-
-## Getting Started
-
-We've prepared a simple demo setup that you can use for quickly spinning up a simulated robot environment with MoveItCpp.
-See the [run_moveit_cpp](moveit_demo_nodes/run_moveit_cpp) demo package for further instructions and information.
-
-The package [run_move_group](moveit_demo_nodes/run_move_group) provides a simple launch file for running a MoveGroup setup.
-You can test it using the MotionPlanning display in RViz or by implementing your own MoveGroupInterface application.
-
-## Supporters
-
-This open source project is maintained by supporters from around the world — see [MoveIt maintainers](https://moveit.ros.org/about/). Special thanks to contributor from Intel and Open Robotics.
-
-<a href="https://picknik.ai/">
-  <img src="https://picknik.ai/assets/images/logo.jpg" width="168">
-</a>
-
-[PickNik Inc.](https://picknik.ai/) is leading and organizing the development of MoveIt 2.
-If you would like to support this project, please contact hello@picknik.ai
-
-<a href="http://rosin-project.eu">
-  <img src="http://rosin-project.eu/wp-content/uploads/rosin_ack_logo_wide.png"
-       alt="rosin_logo" height="60" >
-</a>
-
-The port to ROS 2 is supported by ROSIN - ROS-Industrial Quality-Assured Robot Software Components.
-More information: <a href="http://rosin-project.eu">rosin-project.eu</a>
-
-<img src="http://rosin-project.eu/wp-content/uploads/rosin_eu_flag.jpg"
-     alt="eu_flag" height="45" align="left" >
-
-This project has received funding from the European Union’s Horizon 2020
-research and innovation programme under grant agreement no. 732287.
+The demo launches the RViz GUI and demonstrates planning and execution of a simple collision-free motion plan with the panda robot.
+This involves a big range of functioning components: IK solver and collision checking plugins, `PlanningScene`, `RobotModel`, `PlanningPipeline` including adapters, OMPL planner and RViz visualization (`Trajectory` and `PlanningScene` displays).
