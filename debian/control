@@ -1,0 +1,12 @@
+Source: ros-foxy-moveit-core
+Section: misc
+Priority: optional
+Maintainer: Dave Coleman <dave@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libassimp-dev, libboost-all-dev, libbullet-dev, libeigen3-dev, libfcl-dev, pkg-config, ros-foxy-ament-cmake, ros-foxy-ament-cmake-gtest, ros-foxy-ament-index-cpp, ros-foxy-ament-lint-auto, ros-foxy-ament-lint-common, ros-foxy-angles, ros-foxy-common-interfaces, ros-foxy-eigen-stl-containers, ros-foxy-eigen3-cmake-module, ros-foxy-geometric-shapes, ros-foxy-geometry-msgs, ros-foxy-kdl-parser, ros-foxy-moveit-common, ros-foxy-moveit-msgs, ros-foxy-moveit-resources-panda-moveit-config, ros-foxy-moveit-resources-pr2-description, ros-foxy-octomap, ros-foxy-octomap-msgs, ros-foxy-orocos-kdl, ros-foxy-random-numbers, ros-foxy-rclcpp, ros-foxy-sensor-msgs, ros-foxy-shape-msgs, ros-foxy-srdfdom, ros-foxy-std-msgs, ros-foxy-tf2, ros-foxy-tf2-eigen, ros-foxy-tf2-geometry-msgs, ros-foxy-tf2-kdl, ros-foxy-trajectory-msgs, ros-foxy-urdf, ros-foxy-urdfdom, ros-foxy-urdfdom-headers, ros-foxy-visualization-msgs, ros-foxy-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-foxy-moveit-core
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libassimp-dev, libboost-all-dev, libbullet-dev, libeigen3-dev, libfcl-dev, ros-foxy-angles, ros-foxy-common-interfaces, ros-foxy-eigen-stl-containers, ros-foxy-eigen3-cmake-module, ros-foxy-geometric-shapes, ros-foxy-geometry-msgs, ros-foxy-kdl-parser, ros-foxy-moveit-msgs, ros-foxy-octomap, ros-foxy-octomap-msgs, ros-foxy-random-numbers, ros-foxy-rclcpp, ros-foxy-sensor-msgs, ros-foxy-shape-msgs, ros-foxy-srdfdom, ros-foxy-std-msgs, ros-foxy-tf2, ros-foxy-tf2-eigen, ros-foxy-tf2-geometry-msgs, ros-foxy-trajectory-msgs, ros-foxy-urdf, ros-foxy-urdfdom, ros-foxy-urdfdom-headers, ros-foxy-visualization-msgs, ros-foxy-ros-workspace
+Description: Core libraries used by MoveIt
