@@ -1,0 +1,12 @@
+Source: ros-foxy-moveit-kinematics
+Section: misc
+Priority: optional
+Maintainer: Dave Coleman <dave@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libeigen3-dev, ros-foxy-ament-cmake, ros-foxy-ament-cmake-gtest, ros-foxy-ament-lint-auto, ros-foxy-ament-lint-common, ros-foxy-class-loader, ros-foxy-moveit-common, ros-foxy-moveit-core, ros-foxy-moveit-msgs, ros-foxy-moveit-resources-fanuc-description, ros-foxy-moveit-resources-fanuc-moveit-config, ros-foxy-moveit-resources-panda-description, ros-foxy-moveit-resources-panda-moveit-config, ros-foxy-moveit-ros-planning, ros-foxy-orocos-kdl, ros-foxy-pluginlib, ros-foxy-ros-testing, ros-foxy-tf2, ros-foxy-tf2-kdl, ros-foxy-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-foxy-moveit-kinematics
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libeigen3-dev, python-lxml, ros-foxy-class-loader, ros-foxy-moveit-core, ros-foxy-moveit-msgs, ros-foxy-orocos-kdl, ros-foxy-pluginlib, ros-foxy-tf2, ros-foxy-tf2-kdl, ros-foxy-urdfdom, ros-foxy-ros-workspace
+Description: Package for all inverse kinematics solvers in MoveIt
