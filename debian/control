@@ -1,0 +1,12 @@
+Source: ros-galactic-moveit-ros-benchmarks
+Section: misc
+Priority: optional
+Maintainer: Dave Coleman <dave@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libboost-date-time-dev, libboost-dev, libboost-filesystem-dev, ros-galactic-ament-cmake, ros-galactic-ament-lint-auto, ros-galactic-ament-lint-common, ros-galactic-moveit-common, ros-galactic-moveit-ros-planning, ros-galactic-moveit-ros-warehouse, ros-galactic-pluginlib (>= 1.11.2), ros-galactic-rclcpp, ros-galactic-tf2-eigen, ros-galactic-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-galactic-moveit-ros-benchmarks
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libboost-date-time1.71.0, libboost-filesystem1.71.0, ros-galactic-moveit-ros-planning, ros-galactic-moveit-ros-warehouse, ros-galactic-pluginlib (>= 1.11.2), ros-galactic-rclcpp, ros-galactic-tf2-eigen, ros-galactic-ros-workspace
+Description: Enhanced tools for benchmarks in MoveIt
