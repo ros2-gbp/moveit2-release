@@ -1,0 +1,12 @@
+Source: ros-galactic-moveit-ros-perception
+Section: misc
+Priority: optional
+Maintainer: Michael Ferguson <mferguson@fetchrobotics.com>
+Build-Depends: debhelper (>= 9.0.0), freeglut3-dev, libeigen3-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libomp-dev, ros-galactic-ament-cmake, ros-galactic-ament-lint-auto, ros-galactic-ament-lint-common, ros-galactic-cv-bridge, ros-galactic-image-transport, ros-galactic-message-filters, ros-galactic-moveit-common, ros-galactic-moveit-core, ros-galactic-moveit-msgs, ros-galactic-moveit-ros-occupancy-map-monitor, ros-galactic-moveit-ros-planning, ros-galactic-object-recognition-msgs, ros-galactic-pluginlib (>= 1.11.2), ros-galactic-rclcpp, ros-galactic-sensor-msgs, ros-galactic-tf2, ros-galactic-tf2-eigen, ros-galactic-tf2-geometry-msgs, ros-galactic-tf2-ros, ros-galactic-urdf, ros-galactic-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-galactic-moveit-ros-perception
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, freeglut3-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libomp-dev, ros-galactic-cv-bridge, ros-galactic-image-transport, ros-galactic-message-filters, ros-galactic-moveit-core, ros-galactic-moveit-msgs, ros-galactic-moveit-ros-occupancy-map-monitor, ros-galactic-moveit-ros-planning, ros-galactic-object-recognition-msgs, ros-galactic-pluginlib (>= 1.11.2), ros-galactic-rclcpp, ros-galactic-sensor-msgs, ros-galactic-tf2, ros-galactic-tf2-eigen, ros-galactic-tf2-geometry-msgs, ros-galactic-tf2-ros, ros-galactic-urdf, ros-galactic-ros-workspace
+Description: Components of MoveIt connecting to perception
