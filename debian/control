@@ -1,0 +1,12 @@
+Source: ros-galactic-run-move-group
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ros-galactic-ament-cmake, ros-galactic-ament-lint-auto, ros-galactic-ament-lint-common, ros-galactic-moveit-common, ros-galactic-moveit-ros-planning-interface, ros-galactic-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-galactic-run-move-group
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-galactic-moveit-ros-planning-interface, ros-galactic-ros-workspace
+Description: Demo launch file for running a MoveGroup setup
