@@ -1,0 +1,12 @@
+Source: ros-galactic-moveit-core
+Section: misc
+Priority: optional
+Maintainer: Dave Coleman <dave@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libassimp-dev, libboost-all-dev, libbullet-dev, libeigen3-dev, libfcl-dev, pkg-config, ros-galactic-ament-cmake, ros-galactic-ament-cmake-gtest, ros-galactic-ament-index-cpp, ros-galactic-ament-lint-auto, ros-galactic-ament-lint-common, ros-galactic-angles, ros-galactic-common-interfaces, ros-galactic-eigen-stl-containers, ros-galactic-eigen3-cmake-module, ros-galactic-geometric-shapes, ros-galactic-geometry-msgs, ros-galactic-kdl-parser, ros-galactic-moveit-common, ros-galactic-moveit-msgs, ros-galactic-moveit-resources-panda-moveit-config, ros-galactic-moveit-resources-pr2-description, ros-galactic-octomap, ros-galactic-octomap-msgs, ros-galactic-orocos-kdl, ros-galactic-pluginlib, ros-galactic-pybind11-vendor, ros-galactic-random-numbers, ros-galactic-rclcpp, ros-galactic-sensor-msgs, ros-galactic-shape-msgs, ros-galactic-srdfdom, ros-galactic-std-msgs, ros-galactic-tf2, ros-galactic-tf2-eigen, ros-galactic-tf2-geometry-msgs, ros-galactic-tf2-kdl, ros-galactic-trajectory-msgs, ros-galactic-urdf, ros-galactic-urdfdom, ros-galactic-urdfdom-headers, ros-galactic-visualization-msgs, ros-galactic-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-galactic-moveit-core
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libassimp-dev, libboost-all-dev, libbullet-dev, libeigen3-dev, libfcl-dev, ros-galactic-angles, ros-galactic-common-interfaces, ros-galactic-eigen-stl-containers, ros-galactic-eigen3-cmake-module, ros-galactic-geometric-shapes, ros-galactic-geometry-msgs, ros-galactic-kdl-parser, ros-galactic-moveit-msgs, ros-galactic-octomap, ros-galactic-octomap-msgs, ros-galactic-pluginlib, ros-galactic-pybind11-vendor, ros-galactic-random-numbers, ros-galactic-rclcpp, ros-galactic-sensor-msgs, ros-galactic-shape-msgs, ros-galactic-srdfdom, ros-galactic-std-msgs, ros-galactic-tf2, ros-galactic-tf2-eigen, ros-galactic-tf2-geometry-msgs, ros-galactic-trajectory-msgs, ros-galactic-urdf, ros-galactic-urdfdom, ros-galactic-urdfdom-headers, ros-galactic-visualization-msgs, ros-galactic-ros-workspace
+Description: Core libraries used by MoveIt
