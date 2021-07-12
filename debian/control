@@ -1,0 +1,12 @@
+Source: ros-foxy-moveit-ros-visualization
+Section: misc
+Priority: optional
+Maintainer: Jon Binney <jon.binney@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libeigen3-dev, libogre-1.9-dev, libqt5opengl5-dev, pkg-config, qtbase5-dev, ros-foxy-ament-cmake, ros-foxy-ament-lint-auto, ros-foxy-ament-lint-common, ros-foxy-class-loader, ros-foxy-geometric-shapes, ros-foxy-interactive-markers, ros-foxy-moveit-common, ros-foxy-moveit-ros-planning-interface, ros-foxy-moveit-ros-robot-interaction, ros-foxy-moveit-ros-warehouse, ros-foxy-object-recognition-msgs, ros-foxy-pluginlib (>= 1.11.2), ros-foxy-rclcpp, ros-foxy-rclpy, ros-foxy-rviz2, ros-foxy-tf2-eigen, ros-foxy-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-foxy-moveit-ros-visualization
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-foxy-geometric-shapes, ros-foxy-interactive-markers, ros-foxy-moveit-ros-planning-interface, ros-foxy-moveit-ros-robot-interaction, ros-foxy-moveit-ros-warehouse, ros-foxy-object-recognition-msgs, ros-foxy-pluginlib (>= 1.11.2), ros-foxy-rclcpp, ros-foxy-rclpy, ros-foxy-rviz2, ros-foxy-tf2-eigen, ros-foxy-ros-workspace
+Description: Components of MoveIt that offer visualization
