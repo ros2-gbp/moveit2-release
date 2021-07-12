@@ -1,0 +1,12 @@
+Source: ros-foxy-moveit-servo
+Section: misc
+Priority: optional
+Maintainer: Blake Anderson <blakeanderson@utexas.edu>
+Build-Depends: debhelper (>= 9.0.0), ros-foxy-ament-cmake, ros-foxy-ament-cmake-gtest, ros-foxy-ament-lint-auto, ros-foxy-ament-lint-common, ros-foxy-control-msgs, ros-foxy-control-toolbox, ros-foxy-geometry-msgs, ros-foxy-moveit-common, ros-foxy-moveit-msgs, ros-foxy-moveit-resources-panda-moveit-config, ros-foxy-moveit-ros-planning-interface, ros-foxy-ros-testing, ros-foxy-sensor-msgs, ros-foxy-std-msgs, ros-foxy-std-srvs, ros-foxy-tf2-eigen, ros-foxy-trajectory-msgs, ros-foxy-ros-workspace
+Homepage: https://ros-planning.github.io/moveit_tutorials
+Standards-Version: 3.9.2
+
+Package: ros-foxy-moveit-servo
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-foxy-control-msgs, ros-foxy-control-toolbox, ros-foxy-geometry-msgs, ros-foxy-joy, ros-foxy-moveit-msgs, ros-foxy-moveit-ros-planning-interface, ros-foxy-robot-state-publisher, ros-foxy-sensor-msgs, ros-foxy-std-msgs, ros-foxy-std-srvs, ros-foxy-tf2-eigen, ros-foxy-tf2-ros, ros-foxy-trajectory-msgs, ros-foxy-ros-workspace
+Description: Provides real-time manipulator Cartesian and joint servoing.
