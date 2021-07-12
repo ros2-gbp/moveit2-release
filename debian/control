@@ -1,0 +1,12 @@
+Source: ros-foxy-moveit-ros-perception
+Section: misc
+Priority: optional
+Maintainer: Michael Ferguson <mferguson@fetchrobotics.com>
+Build-Depends: debhelper (>= 9.0.0), freeglut3-dev, libeigen3-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libomp-dev, ros-foxy-ament-cmake, ros-foxy-ament-lint-auto, ros-foxy-ament-lint-common, ros-foxy-cv-bridge, ros-foxy-image-transport, ros-foxy-message-filters, ros-foxy-moveit-common, ros-foxy-moveit-core, ros-foxy-moveit-msgs, ros-foxy-moveit-ros-occupancy-map-monitor, ros-foxy-moveit-ros-planning, ros-foxy-object-recognition-msgs, ros-foxy-pluginlib (>= 1.11.2), ros-foxy-rclcpp, ros-foxy-sensor-msgs, ros-foxy-tf2, ros-foxy-tf2-eigen, ros-foxy-tf2-geometry-msgs, ros-foxy-tf2-ros, ros-foxy-urdf, ros-foxy-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-foxy-moveit-ros-perception
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, freeglut3-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libomp-dev, ros-foxy-cv-bridge, ros-foxy-image-transport, ros-foxy-message-filters, ros-foxy-moveit-core, ros-foxy-moveit-msgs, ros-foxy-moveit-ros-occupancy-map-monitor, ros-foxy-moveit-ros-planning, ros-foxy-object-recognition-msgs, ros-foxy-pluginlib (>= 1.11.2), ros-foxy-rclcpp, ros-foxy-sensor-msgs, ros-foxy-tf2, ros-foxy-tf2-eigen, ros-foxy-tf2-geometry-msgs, ros-foxy-tf2-ros, ros-foxy-urdf, ros-foxy-ros-workspace
+Description: Components of MoveIt connecting to perception
