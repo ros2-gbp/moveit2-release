@@ -1,0 +1,12 @@
+Source: ros-rolling-run-moveit-cpp
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ros-rolling-ament-cmake, ros-rolling-ament-lint-auto, ros-rolling-ament-lint-common, ros-rolling-moveit-common, ros-rolling-moveit-ros-planning-interface, ros-rolling-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-rolling-run-moveit-cpp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-rolling-moveit-ros-planning-interface, ros-rolling-ros-workspace
+Description: TODO: Package description
