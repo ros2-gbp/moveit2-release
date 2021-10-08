@@ -75,6 +75,11 @@ def generate_servo_test_description(
     robot_description_semantic = {
         "robot_description_semantic": robot_description_semantic_config
     }
+    joint_limits_yaml = {
+        "robot_description_planning": load_yaml(
+            "moveit_resources_panda_moveit_config", "config/joint_limits.yaml"
+        )
+    }
 
     # ros2_control using FakeSystem as hardware
     ros2_controllers_path = os.path.join(
@@ -94,7 +99,7 @@ def generate_servo_test_description(
 
     # Load controllers
     load_controllers = []
-    for controller in ["panda_arm_controller", "joint_state_controller"]:
+    for controller in ["panda_arm_controller", "joint_state_broadcaster"]:
         load_controllers += [
             ExecuteProcess(
                 cmd=["ros2 run controller_manager spawner.py {}".format(controller)],
@@ -126,20 +131,21 @@ def generate_servo_test_description(
         output="screen",
     )
 
-    servo_server_container = ComposableNodeContainer(
-        name="servo_server_container",
+    servo_container = ComposableNodeContainer(
+        name="servo_container",
         namespace="/",
         package="rclcpp_components",
         executable="component_container",
         composable_node_descriptions=[
             ComposableNode(
                 package="moveit_servo",
-                plugin="moveit_servo::ServoServer",
-                name="servo_server",
+                plugin="moveit_servo::ServoNode",
+                name="servo_node",
                 parameters=[
                     servo_params,
                     robot_description,
                     robot_description_semantic,
+                    joint_limits_yaml,
                 ],
                 extra_arguments=[{"use_intra_process_comm": True}],
             ),
@@ -165,14 +171,14 @@ def generate_servo_test_description(
                 "containing test executables",
             ),
             ros2_control_node,
-            servo_server_container,
+            servo_container,
             test_container,
             TimerAction(period=2.0, actions=[servo_gtest]),
             launch_testing.actions.ReadyToTest(),
         ]
         + load_controllers
     ), {
-        "servo_container": servo_server_container,
+        "servo_container": servo_container,
         "test_container": test_container,
         "servo_gtest": servo_gtest,
         "ros2_control_node": ros2_control_node,
