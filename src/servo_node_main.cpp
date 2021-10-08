@@ -1,12 +1,7 @@
 /*******************************************************************************
- *      Title     : low_pass_filter.h
- *      Project   : moveit_servo
- *      Created   : 1/11/2019
- *      Author    : Andy Zelenak
- *
  * BSD 3-Clause License
  *
- * Copyright (c) 2019, Los Alamos National Security, LLC
+ * Copyright (c) 2021, PickNik Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,34 +31,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-#pragma once
-
-#include <cstddef>
-
-namespace moveit_servo
-{
-/**
- * Class LowPassFilter - Filter a signal to soften jerks.
- * This is a first-order Butterworth low-pass filter.
- *
- * TODO: Use ROS filters package (http://wiki.ros.org/filters, https://github.com/ros/filters)
+/*      Title     : servo_node_main.cpp
+ *      Project   : moveit_servo
+ *      Created   : 08/18/2021
+ *      Author    : Joe Schornak
  */
-class LowPassFilter
-{
-public:
-  // Larger filter_coeff-> more smoothing of servo commands, but more lag.
-  // Rough plot, with cutoff frequency on the y-axis:
-  // https://www.wolframalpha.com/input/?i=plot+arccot(c)
-  explicit LowPassFilter(double low_pass_filter_coeff);
-  double filter(double new_measurement);
-  void reset(double data);
 
-private:
-  static constexpr std::size_t FILTER_LENGTH = 2;
-  double previous_measurements_[FILTER_LENGTH];
-  double previous_filtered_measurement_;
-  // Scale and feedback term are calculated from supplied filter coefficient
-  double scale_term_;
-  double feedback_term_;
-};
-}  // namespace moveit_servo
+#include <moveit_servo/servo_node.h>
+
+int main(int argc, char* argv[])
+{
+  rclcpp::init(argc, argv);
+
+  rclcpp::NodeOptions options;
+  options.automatically_declare_parameters_from_overrides(true);
+
+  auto node = std::make_shared<moveit_servo::ServoNode>(options);
+
+  rclcpp::spin(node);
+
+  rclcpp::shutdown();
+}
