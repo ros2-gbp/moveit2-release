@@ -1,1 +1,1 @@
-{"trim": "", "base": "adb90c2", "trimbase": "", "parent": "release/rolling/moveit_simple_controller_manager", "previous": "d4551c3"}
+{"base": "df282a0", "parent": "release/rolling/moveit_simple_controller_manager", "previous": "8c544f7", "trim": "", "trimbase": ""}
