@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2013, Willow Garage, Inc.
+ *  Copyright (c) 2012, Willow Garage, Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,22 +32,90 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Acorn Pooley, Ioan Sucan */
+/* Author: Ioan Sucan, Jon Binney */
 
 #pragma once
 
-#include <moveit/collision_detection/collision_detector_allocator.h>
-#include <moveit/collision_detection_fcl/collision_env_fcl.h>
+#include <octomap/octomap.h>
 
-#include "moveit_collision_detection_fcl_export.h"
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
+#include <boost/function.hpp>
+
+#include <memory>
+#include <string>
 
 namespace collision_detection
 {
-/** \brief An allocator for FCL collision detectors */
-class MOVEIT_COLLISION_DETECTION_FCL_EXPORT CollisionDetectorAllocatorFCL
-  : public CollisionDetectorAllocatorTemplate<CollisionEnvFCL, CollisionDetectorAllocatorFCL>
+typedef octomap::OcTreeNode OccMapNode;
+
+class OccMapTree : public octomap::OcTree
 {
 public:
-  static const std::string NAME;  // defined in collision_env_fcl.cpp
+  OccMapTree(double resolution) : octomap::OcTree(resolution)
+  {
+  }
+
+  OccMapTree(const std::string& filename) : octomap::OcTree(filename)
+  {
+  }
+
+  /** @brief lock the underlying octree. it will not be read or written by the
+   *  monitor until unlockTree() is called */
+  void lockRead()
+  {
+    tree_mutex_.lock_shared();
+  }
+
+  /** @brief unlock the underlying octree. */
+  void unlockRead()
+  {
+    tree_mutex_.unlock_shared();
+  }
+
+  /** @brief lock the underlying octree. it will not be read or written by the
+   *  monitor until unlockTree() is called */
+  void lockWrite()
+  {
+    tree_mutex_.lock();
+  }
+
+  /** @brief unlock the underlying octree. */
+  void unlockWrite()
+  {
+    tree_mutex_.unlock();
+  }
+
+  using ReadLock = boost::shared_lock<boost::shared_mutex>;
+  using WriteLock = boost::unique_lock<boost::shared_mutex>;
+
+  ReadLock reading()
+  {
+    return ReadLock(tree_mutex_);
+  }
+
+  WriteLock writing()
+  {
+    return WriteLock(tree_mutex_);
+  }
+
+  void triggerUpdateCallback()
+  {
+    if (update_callback_)
+      update_callback_();
+  }
+
+  /** @brief Set the callback to trigger when updates are received */
+  void setUpdateCallback(const boost::function<void()>& update_callback)
+  {
+    update_callback_ = update_callback;
+  }
+
+private:
+  boost::shared_mutex tree_mutex_;
+  boost::function<void()> update_callback_;
 };
+
+using OccMapTreePtr = std::shared_ptr<OccMapTree>;
+using OccMapTreeConstPtr = std::shared_ptr<const OccMapTree>;
 }  // namespace collision_detection
