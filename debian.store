@@ -1,1 +1,1 @@
-{"trim": "", "base": "19fd054", "trimbase": "", "parent": "debian/galactic/moveit_ros_planning", "previous": "ce3b317"}
+{"base": "17c34b24", "parent": "debian/galactic/moveit_ros_planning", "previous": "040d2862", "trim": "", "trimbase": ""}
