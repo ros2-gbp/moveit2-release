@@ -1,1 +1,1 @@
-{"trim": "", "base": "c87b307", "trimbase": "", "parent": "debian/galactic/moveit_simple_controller_manager", "previous": "4f973aa"}
+{"base": "a72cd6fa", "parent": "debian/galactic/moveit_simple_controller_manager", "previous": "79113c62", "trim": "", "trimbase": ""}
