@@ -1,0 +1,12 @@
+Source: ros-rolling-moveit-core
+Section: misc
+Priority: optional
+Maintainer: Dave Coleman <dave@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libassimp-dev, libboost-all-dev, libbullet-dev, libeigen3-dev, libfcl-dev, pkg-config, ros-rolling-ament-cmake, ros-rolling-ament-cmake-gtest, ros-rolling-ament-index-cpp, ros-rolling-ament-lint-auto, ros-rolling-ament-lint-common, ros-rolling-angles, ros-rolling-common-interfaces, ros-rolling-eigen-stl-containers, ros-rolling-eigen3-cmake-module, ros-rolling-geometric-shapes, ros-rolling-geometry-msgs, ros-rolling-kdl-parser, ros-rolling-moveit-common, ros-rolling-moveit-msgs, ros-rolling-moveit-resources-panda-moveit-config, ros-rolling-moveit-resources-pr2-description, ros-rolling-octomap, ros-rolling-octomap-msgs, ros-rolling-orocos-kdl, ros-rolling-pluginlib, ros-rolling-pybind11-vendor, ros-rolling-random-numbers, ros-rolling-rclcpp, ros-rolling-ruckig, ros-rolling-sensor-msgs, ros-rolling-shape-msgs, ros-rolling-srdfdom, ros-rolling-std-msgs, ros-rolling-tf2, ros-rolling-tf2-eigen, ros-rolling-tf2-geometry-msgs, ros-rolling-tf2-kdl, ros-rolling-trajectory-msgs, ros-rolling-urdf, ros-rolling-urdfdom, ros-rolling-urdfdom-headers, ros-rolling-visualization-msgs, ros-rolling-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-rolling-moveit-core
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libassimp-dev, libboost-all-dev, libbullet-dev, libeigen3-dev, libfcl-dev, ros-rolling-angles, ros-rolling-common-interfaces, ros-rolling-eigen-stl-containers, ros-rolling-eigen3-cmake-module, ros-rolling-geometric-shapes, ros-rolling-geometry-msgs, ros-rolling-kdl-parser, ros-rolling-moveit-msgs, ros-rolling-octomap, ros-rolling-octomap-msgs, ros-rolling-pluginlib, ros-rolling-pybind11-vendor, ros-rolling-random-numbers, ros-rolling-rclcpp, ros-rolling-ruckig, ros-rolling-sensor-msgs, ros-rolling-shape-msgs, ros-rolling-srdfdom, ros-rolling-std-msgs, ros-rolling-tf2, ros-rolling-tf2-eigen, ros-rolling-tf2-geometry-msgs, ros-rolling-trajectory-msgs, ros-rolling-urdf, ros-rolling-urdfdom, ros-rolling-urdfdom-headers, ros-rolling-visualization-msgs, ros-rolling-ros-workspace
+Description: Core libraries used by MoveIt
