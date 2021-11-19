@@ -1,1 +1,1 @@
-{"trim": "", "base": "610f11a", "trimbase": "", "parent": "debian/foxy/moveit_core", "previous": "a347ff8"}
+{"base": "f3c32793", "parent": "debian/foxy/moveit_core", "previous": "1ce4f9db", "trim": "", "trimbase": ""}
