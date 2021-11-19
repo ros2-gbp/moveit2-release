@@ -1,1 +1,1 @@
-{"trim": "", "base": "6fbdc1d", "trimbase": "", "parent": "debian/foxy/moveit_simple_controller_manager", "previous": "95da9de"}
+{"base": "54aa84c2", "parent": "debian/foxy/moveit_simple_controller_manager", "previous": "26da1a22", "trim": "", "trimbase": ""}
