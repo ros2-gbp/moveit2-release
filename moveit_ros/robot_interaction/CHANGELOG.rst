@@ -2,14 +2,10 @@
 Changelog for package moveit_ros_robot_interaction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.3.0 (2021-10-08)
+2.2.2 (2021-11-16)
 ------------------
-* Fix warnings in Galactic and Rolling (`#598 <https://github.com/ros-planning/moveit2/issues/598>`_)
-  * Use __has_includes preprocessor directive for deprecated headers
-  * Fix parameter template types
-  * Proper initialization of smart pointers, rclcpp::Duration
 * Fixes for Windows (`#530 <https://github.com/ros-planning/moveit2/issues/530>`_)
-* Contributors: Akash, Nisala Kalupahana, Jorge Nicho, Henning Kayser, Vatan Aksoy Tezer, Tyler Weaver, Lior Lustgarten
+* Contributors: Akash, Lior Lustgarten, Tyler Weaver, Vatan Aksoy Tezer, Henning Kayser, Jorge Nicho, Nisala Kalupahana, Jafar Abdi
 
 2.2.1 (2021-07-12)
 ------------------

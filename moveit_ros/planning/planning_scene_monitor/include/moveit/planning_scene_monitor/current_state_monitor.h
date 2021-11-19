@@ -36,21 +36,15 @@
 
 #pragma once
 
-#include <chrono>
-#include <functional>
-#include <string>
-
 #include <boost/signals2.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
-
+#include <functional>
+#include <moveit/robot_state/robot_state.h>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <tf2_msgs/msg/tf_message.hpp>
-
+#include <string>
 #include <tf2_ros/buffer.h>
-
-#include <moveit/robot_state/robot_state.h>
 
 namespace planning_scene_monitor
 {
@@ -60,6 +54,8 @@ using JointStateUpdateCallback = std::function<void(sensor_msgs::msg::JointState
     @brief Monitors the joint_states topic and tf to maintain the current state of the robot. */
 class CurrentStateMonitor
 {
+  using TFConnection = boost::signals2::connection;
+
 public:
   /**
    * @brief      Dependency injection class for testing the CurrentStateMonitor
@@ -67,8 +63,6 @@ public:
   class MiddlewareHandle
   {
   public:
-    using TfCallback = std::function<void(const tf2_msgs::msg::TFMessage::ConstSharedPtr)>;
-
     /**
      * @brief      Destroys the object.
      */
@@ -90,20 +84,6 @@ public:
     virtual void createJointStateSubscription(const std::string& topic, JointStateUpdateCallback callback) = 0;
 
     /**
-     * @brief      Creates a static transform message subscription
-     *
-     * @param[in]  callback  The callback
-     */
-    virtual void createStaticTfSubscription(TfCallback callback) = 0;
-
-    /**
-     * @brief      Creates a dynamic transform message subscription
-     *
-     * @param[in]  callback  The callback
-     */
-    virtual void createDynamicTfSubscription(TfCallback callback) = 0;
-
-    /**
      * @brief      Reset the joint state subscription
      */
     virtual void resetJointStateSubscription() = 0;
@@ -114,34 +94,6 @@ public:
      * @return     The joint state topic name.
      */
     virtual std::string getJointStateTopicName() const = 0;
-
-    /**
-     * @brief      Block for the specified amount of time.
-     *
-     * @param[in]  nanoseconds  The nanoseconds to sleep
-     *
-     * @return     True if sleep happened as expected.
-     */
-    virtual bool sleepFor(const std::chrono::nanoseconds& nanoseconds) const = 0;
-
-    /**
-     * @brief      Get the static transform topic name
-     *
-     * @return     The static transform topic name.
-     */
-    virtual std::string getStaticTfTopicName() const = 0;
-
-    /**
-     * @brief      Get the dynamic transform topic name
-     *
-     * @return     The dynamic transform topic name.
-     */
-    virtual std::string getDynamicTfTopicName() const = 0;
-
-    /**
-     * @brief      Reset the static & dynamic transform subscriptions
-     */
-    virtual void resetTfSubscriptions() = 0;
   };
 
   /** @brief Constructor.
@@ -258,18 +210,18 @@ public:
    *  @return Returns the map from joint names to joint state values*/
   std::map<std::string, double> getCurrentStateValues() const;
 
-  /** @brief Wait for at most \e wait_time_s seconds (default 1s) for a robot state more recent than t
-   *  @return true on success, false if up-to-date robot state wasn't received within \e wait_time_s
+  /** @brief Wait for at most \e wait_time seconds (default 1s) for a robot state more recent than t
+   *  @return true on success, false if up-to-date robot state wasn't received within \e wait_time
    */
-  bool waitForCurrentState(const rclcpp::Time& t = rclcpp::Clock(RCL_ROS_TIME).now(), double wait_time_s = 1.0) const;
+  bool waitForCurrentState(const rclcpp::Time& t = rclcpp::Clock(RCL_ROS_TIME).now(), double wait_time = 1.0) const;
 
-  /** @brief Wait for at most \e wait_time_s seconds until the complete robot state is known.
+  /** @brief Wait for at most \e wait_time seconds until the complete robot state is known.
       @return true if the full state is known */
-  bool waitForCompleteState(double wait_time_s) const;
+  bool waitForCompleteState(double wait_time) const;
 
-  /** @brief Wait for at most \e wait_time_s seconds until the joint values from the group \e group are known. Return
-   * true if values for all joints in \e group are known */
-  bool waitForCompleteState(const std::string& group, double wait_time_s) const;
+  /** @brief Wait for at most \e wait_time seconds until the joint values from the group \e group are known. Return true
+   * if values for all joints in \e group are known */
+  bool waitForCompleteState(const std::string& group, double wait_time) const;
 
   /** @brief Get the time point when the monitor was started */
   const rclcpp::Time& getMonitorStartTime() const
@@ -314,8 +266,7 @@ private:
                                std::vector<std::string>* missing_joints) const;
 
   void jointStateCallback(sensor_msgs::msg::JointState::ConstSharedPtr joint_state);
-  void updateMultiDofJoints();
-  void transformCallback(const tf2_msgs::msg::TFMessage::ConstSharedPtr msg, const bool is_static);
+  void tfCallback();
 
   std::unique_ptr<MiddlewareHandle> middleware_handle_;
   std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
@@ -331,6 +282,8 @@ private:
   mutable std::mutex state_update_lock_;
   mutable std::condition_variable state_update_condition_;
   std::vector<JointStateUpdateCallback> update_callbacks_;
+
+  std::shared_ptr<TFConnection> tf_connection_;
 };
 
 MOVEIT_CLASS_FORWARD(CurrentStateMonitor);  // Defines CurrentStateMonitorPtr, ConstPtr, WeakPtr... etc

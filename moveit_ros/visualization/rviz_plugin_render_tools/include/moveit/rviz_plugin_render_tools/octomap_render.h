@@ -54,8 +54,7 @@ namespace moveit_rviz_plugin
 enum OctreeVoxelRenderMode
 {
   OCTOMAP_FREE_VOXELS = 1,
-  OCTOMAP_OCCUPIED_VOXELS = 2,
-  OCTOMAP_DISABLED = 3
+  OCTOMAP_OCCUPIED_VOXELS = 2
 };
 
 enum OctreeVoxelColorMode

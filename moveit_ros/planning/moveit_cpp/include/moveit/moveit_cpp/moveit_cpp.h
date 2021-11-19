@@ -45,6 +45,7 @@
 #include <moveit/trajectory_execution_manager/trajectory_execution_manager.h>
 #include <moveit/robot_state/robot_state.h>
 #include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
 
 namespace moveit_cpp
 {
@@ -107,18 +108,9 @@ public:
   };
 
   /** \brief Constructor */
-  [[deprecated("Passing tf2_ros::Buffer to MoveItCpp's constructor is deprecated")]] MoveItCpp(
-      const rclcpp::Node::SharedPtr& node, const std::shared_ptr<tf2_ros::Buffer>& tf_buffer)
-    : MoveItCpp(node)
-  {
-  }
-  MoveItCpp(const rclcpp::Node::SharedPtr& node);
-  [[deprecated("Passing tf2_ros::Buffer to MoveItCpp's constructor is deprecated")]] MoveItCpp(
-      const rclcpp::Node::SharedPtr& node, const Options& options, const std::shared_ptr<tf2_ros::Buffer>& tf_buffer)
-    : MoveItCpp(node, options)
-  {
-  }
-  MoveItCpp(const rclcpp::Node::SharedPtr& node, const Options& options);
+  MoveItCpp(const rclcpp::Node::SharedPtr& node, const std::shared_ptr<tf2_ros::Buffer>& tf_buffer = {});
+  MoveItCpp(const rclcpp::Node::SharedPtr& node, const Options& options,
+            const std::shared_ptr<tf2_ros::Buffer>& tf_buffer = {});
 
   /**
    * @brief This class owns unique resources (e.g. action clients, threads) and its not very
@@ -175,6 +167,10 @@ private:
   rclcpp::Node::SharedPtr node_;
   moveit::core::RobotModelConstPtr robot_model_;
   planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
+
+  // TF
+  std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
+  std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
   // Planning
   std::map<std::string, planning_pipeline::PlanningPipelinePtr> planning_pipelines_;

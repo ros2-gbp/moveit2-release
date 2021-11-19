@@ -125,12 +125,6 @@ protected:
    * \brief ROS callback for an incoming path message
    */
   void incomingDisplayTrajectory(const moveit_msgs::msg::DisplayTrajectory::ConstSharedPtr msg);
-
-  /**
-   * \brief get time to show each single robot state
-   * \return Positive values indicate a fixed time per state
-   *         Negative values indicate a realtime-factor
-   */
   float getStateDisplayTime();
   void clearTrajectoryTrail();
 

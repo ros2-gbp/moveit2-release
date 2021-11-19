@@ -34,7 +34,6 @@
 
 /* Author: Tyler Weaver */
 
-#include <chrono>
 #include <memory>
 #include <string>
 
@@ -42,6 +41,8 @@
 #include "gtest/gtest.h"
 #include "moveit/planning_scene_monitor/current_state_monitor.h"
 #include "moveit/utils/robot_model_test_utils.h"
+#include "rclcpp/node_interfaces/node_clock_interface.hpp"
+#include "rclcpp/node_interfaces/node_topics_interface.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "tf2_ros/buffer.h"
 
@@ -52,12 +53,6 @@ struct MockMiddlewareHandle : public planning_scene_monitor::CurrentStateMonitor
               (const std::string& topic, planning_scene_monitor::JointStateUpdateCallback callback), (override));
   MOCK_METHOD(void, resetJointStateSubscription, (), (override));
   MOCK_METHOD(std::string, getJointStateTopicName, (), (const, override));
-  MOCK_METHOD(bool, sleepFor, (const std::chrono::nanoseconds& nanoseconds), (const, override));
-  MOCK_METHOD(void, createStaticTfSubscription, (TfCallback callback), (override));
-  MOCK_METHOD(void, createDynamicTfSubscription, (TfCallback callback), (override));
-  MOCK_METHOD(std::string, getStaticTfTopicName, (), (const, override));
-  MOCK_METHOD(std::string, getDynamicTfTopicName, (), (const, override));
-  MOCK_METHOD(void, resetTfSubscriptions, (), (override));
 };
 
 TEST(CurrentStateMonitorTests, StartCreateSubscriptionTest)
@@ -159,43 +154,6 @@ TEST(CurrentStateMonitorTests, NoModelTest)
                    std::make_unique<MockMiddlewareHandle>(), robot_model,
                    std::make_shared<tf2_ros::Buffer>(std::make_shared<rclcpp::Clock>())),
                std::invalid_argument);
-}
-
-TEST(CurrentStateMonitorTests, HaveCompleteStateConstructFalse)
-{
-  // GIVEN a CurrentStateMonitor
-  planning_scene_monitor::CurrentStateMonitor current_state_monitor{
-    std::make_unique<MockMiddlewareHandle>(), moveit::core::loadTestingRobotModel("panda"),
-    std::make_shared<tf2_ros::Buffer>(std::make_shared<rclcpp::Clock>())
-  };
-
-  // WHEN it is constructed
-  // THEN we expect haveCompleteState to be false
-  EXPECT_FALSE(current_state_monitor.haveCompleteState());
-}
-
-TEST(CurrentStateMonitorTests, WaitForCompleteStateWaits)
-{
-  auto mock_middleware_handle = std::make_unique<MockMiddlewareHandle>();
-
-  auto nanoseconds_slept = std::chrono::nanoseconds(0);
-  ON_CALL(*mock_middleware_handle, sleepFor)
-      .WillByDefault(testing::Invoke([&](const std::chrono::nanoseconds& nanoseconds) {
-        nanoseconds_slept += nanoseconds;
-        return true;
-      }));
-
-  // GIVEN a CurrentStateMonitor
-  planning_scene_monitor::CurrentStateMonitor current_state_monitor{
-    std::move(mock_middleware_handle), moveit::core::loadTestingRobotModel("panda"),
-    std::make_shared<tf2_ros::Buffer>(std::make_shared<rclcpp::Clock>())
-  };
-
-  // WHEN we wait for complete state for 1s
-  current_state_monitor.waitForCompleteState(1.0);
-
-  // THEN we expect it waited for near 1 seconds
-  EXPECT_NEAR(nanoseconds_slept.count(), 1e+9, 1e3);
 }
 
 int main(int argc, char** argv)

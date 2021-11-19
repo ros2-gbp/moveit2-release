@@ -1,7 +1,7 @@
 # ghcr.io/ros-planning/moveit2:${ROS_DISTRO}-ci-testing
 # CI image using the ROS testing repository
 
-ARG ROS_DISTRO=rolling
+ARG ROS_DISTRO=foxy
 FROM ghcr.io/ros-planning/moveit2:${ROS_DISTRO}-ci
 MAINTAINER Robert Haschke rhaschke@techfak.uni-bielefeld.de
 

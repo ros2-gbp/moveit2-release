@@ -44,6 +44,7 @@
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_servo.collision_check");
 static const double MIN_RECOMMENDED_COLLISION_RATE = 10;
+constexpr double EPSILON = 1e-6;                       // For very small numeric comparisons
 constexpr size_t ROS_LOG_THROTTLE_PERIOD = 30 * 1000;  // Milliseconds to throttle logs inside loops
 
 namespace moveit_servo
@@ -69,6 +70,10 @@ CollisionCheck::CollisionCheck(rclcpp::Node::SharedPtr node, const ServoParamete
     RCLCPP_WARN_STREAM_THROTTLE(LOGGER, clk, ROS_LOG_THROTTLE_PERIOD,
                                 "Collision check rate is low, increase it in yaml file if CPU allows");
   }
+
+  collision_check_type_ =
+      (parameters_->collision_check_type == "threshold_distance" ? K_THRESHOLD_DISTANCE : K_STOP_DISTANCE);
+  safety_factor_ = parameters_->collision_distance_safety_factor;
 
   // ROS pubs/subs
   collision_velocity_scale_pub_ =
@@ -126,7 +131,8 @@ void CollisionCheck::run()
   {
     velocity_scale_ = 0;
   }
-  else
+  // If threshold distances were specified
+  else if (collision_check_type_ == K_THRESHOLD_DISTANCE)
   {
     // If we are far from a collision, velocity_scale should be 1.
     // If we are very close to a collision, velocity_scale should be ~zero.
@@ -148,6 +154,36 @@ void CollisionCheck::run()
           std::min(velocity_scale_, exp(self_velocity_scale_coefficient_ *
                                         (self_collision_distance_ - parameters_->self_collision_proximity_threshold)));
     }
+  }
+  // Else, we stop based on worst-case stopping distance
+  else
+  {
+    // Retrieve the worst-case time to stop, based on current joint velocities
+
+    // Calculate rate of change of distance to nearest collision
+    current_collision_distance_ = std::min(scene_collision_distance_, self_collision_distance_);
+    derivative_of_collision_distance_ = (current_collision_distance_ - prev_collision_distance_) / period_;
+
+    if (current_collision_distance_ < parameters_->min_allowable_collision_distance &&
+        derivative_of_collision_distance_ <= 0)
+    {
+      velocity_scale_ = 0;
+    }
+    // Only bother doing calculations if we are moving toward the nearest collision
+    else if (derivative_of_collision_distance_ < -EPSILON)
+    {
+      // At the rate the collision distance is decreasing, how long until we collide?
+      est_time_to_collision_ = fabs(current_collision_distance_ / derivative_of_collision_distance_);
+
+      // halt if we can't stop fast enough (including the safety factor)
+      if (est_time_to_collision_ < (safety_factor_ * worst_case_stop_time_))
+      {
+        velocity_scale_ = 0;
+      }
+    }
+
+    // Update for the next iteration
+    prev_collision_distance_ = current_collision_distance_;
   }
 
   // publish message

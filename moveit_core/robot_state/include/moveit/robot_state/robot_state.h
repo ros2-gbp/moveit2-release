@@ -1291,8 +1291,6 @@ public:
    *   A related, more comprehensive function is |getFrameTransform|, which additionally to link frames
    *   also searches for attached object frames and their subframes.
    *
-   *   This will throw an exception if the passed link is not found
-   *
    *  The returned transformation is always a valid isometry.
    */
   const Eigen::Isometry3d& getGlobalLinkTransform(const std::string& link_name)
@@ -1302,10 +1300,6 @@ public:
 
   const Eigen::Isometry3d& getGlobalLinkTransform(const LinkModel* link)
   {
-    if (!link)
-    {
-      throw Exception("Invalid link");
-    }
     updateLinkTransforms();
     return global_link_transforms_[link->getLinkIndex()];
   }
@@ -1317,10 +1311,6 @@ public:
 
   const Eigen::Isometry3d& getGlobalLinkTransform(const LinkModel* link) const
   {
-    if (!link)
-    {
-      throw Exception("Invalid link");
-    }
     BOOST_VERIFY(checkLinkTransforms());
     return global_link_transforms_[link->getLinkIndex()];
   }

@@ -112,13 +112,8 @@ public:
    *  @param tf_buffer A pointer to a tf2_ros::Buffer
    *  @param name A name identifying this planning scene monitor
    */
-  [[deprecated("Passing tf2_ros::Buffer to PlanningSceneMonitor's constructor is deprecated")]] PlanningSceneMonitor(
-      const rclcpp::Node::SharedPtr& node, const std::string& robot_description,
-      const std::shared_ptr<tf2_ros::Buffer>& tf_buffer, const std::string& name = "")
-    : PlanningSceneMonitor(node, robot_description, name)
-  {
-  }
   PlanningSceneMonitor(const rclcpp::Node::SharedPtr& node, const std::string& robot_description,
+                       const std::shared_ptr<tf2_ros::Buffer>& tf_buffer = std::shared_ptr<tf2_ros::Buffer>(),
                        const std::string& name = "");
 
   /** @brief Constructor
@@ -126,13 +121,8 @@ public:
    *  @param tf_buffer A pointer to a tf2_ros::Buffer
    *  @param name A name identifying this planning scene monitor
    */
-  [[deprecated("Passing tf2_ros::Buffer to PlanningSceneMonitor's constructor is deprecated")]] PlanningSceneMonitor(
-      const rclcpp::Node::SharedPtr& node, const robot_model_loader::RobotModelLoaderPtr& rml,
-      const std::shared_ptr<tf2_ros::Buffer>& tf_buffer, const std::string& name = "")
-    : PlanningSceneMonitor(node, rml, name)
-  {
-  }
   PlanningSceneMonitor(const rclcpp::Node::SharedPtr& node, const robot_model_loader::RobotModelLoaderPtr& rml,
+                       const std::shared_ptr<tf2_ros::Buffer>& tf_buffer = std::shared_ptr<tf2_ros::Buffer>(),
                        const std::string& name = "");
 
   /** @brief Constructor
@@ -141,15 +131,10 @@ public:
    *  @param tf_buffer A pointer to a tf2_ros::Buffer
    *  @param name A name identifying this planning scene monitor
    */
-  [[deprecated("Passing tf2_ros::Buffer to PlanningSceneMonitor's constructor is deprecated")]] PlanningSceneMonitor(
-      const rclcpp::Node::SharedPtr& node, const planning_scene::PlanningScenePtr& scene,
-      const std::string& robot_description, const std::shared_ptr<tf2_ros::Buffer>& tf_buffer,
-      const std::string& name = "")
-    : PlanningSceneMonitor(node, scene, robot_description, name)
-  {
-  }
   PlanningSceneMonitor(const rclcpp::Node::SharedPtr& node, const planning_scene::PlanningScenePtr& scene,
-                       const std::string& robot_description, const std::string& name = "");
+                       const std::string& robot_description,
+                       const std::shared_ptr<tf2_ros::Buffer>& tf_buffer = std::shared_ptr<tf2_ros::Buffer>(),
+                       const std::string& name = "");
 
   /** @brief Constructor
    *  @param scene The scene instance to maintain up to date with monitored information
@@ -157,15 +142,10 @@ public:
    *  @param tf_buffer A pointer to a tf2_ros::Buffer
    *  @param name A name identifying this planning scene monitor
    */
-  [[deprecated("Passing tf2_ros::Buffer to PlanningSceneMonitor's constructor is deprecated")]] PlanningSceneMonitor(
-      const rclcpp::Node::SharedPtr& node, const planning_scene::PlanningScenePtr& scene,
-      const robot_model_loader::RobotModelLoaderPtr& rml, const std::shared_ptr<tf2_ros::Buffer>& tf_buffer,
-      const std::string& name = "")
-    : PlanningSceneMonitor(node, scene, rml, name)
-  {
-  }
   PlanningSceneMonitor(const rclcpp::Node::SharedPtr& node, const planning_scene::PlanningScenePtr& scene,
-                       const robot_model_loader::RobotModelLoaderPtr& rml, const std::string& name = "");
+                       const robot_model_loader::RobotModelLoaderPtr& rml,
+                       const std::shared_ptr<tf2_ros::Buffer>& tf_buffer = std::shared_ptr<tf2_ros::Buffer>(),
+                       const std::string& name = "");
 
   ~PlanningSceneMonitor();
 
@@ -490,7 +470,6 @@ protected:
   std::thread private_executor_thread_;
 
   std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
-  std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
   std::string robot_description_;
 

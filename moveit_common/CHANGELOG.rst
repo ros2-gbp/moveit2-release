@@ -2,10 +2,8 @@
 Changelog for package moveit_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.3.0 (2021-10-08)
+2.2.2 (2021-11-16)
 ------------------
-* Upgrade to C++17
-* Contributors: Henning Kayser, Tyler Weaver
 
 2.2.1 (2021-07-12)
 ------------------

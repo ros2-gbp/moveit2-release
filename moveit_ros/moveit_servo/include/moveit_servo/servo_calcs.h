@@ -57,11 +57,7 @@
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <std_msgs/msg/int8.hpp>
 #include <std_srvs/srv/empty.hpp>
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
-#include <tf2_eigen/tf2_eigen.hpp>
-#else
 #include <tf2_eigen/tf2_eigen.h>
-#endif
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 
 // moveit_servo
@@ -130,6 +126,9 @@ protected:
 
   /** \brief Parse the incoming joint msg for the joints of our MoveGroup */
   void updateJoints();
+
+  /** \brief Finds the worst case stopping time based on accel limits, for collision checking */
+  void calculateWorstCaseStopTime();
 
   /**
    * Checks a JointJog msg for valid (non-NaN) velocities
@@ -309,7 +308,6 @@ protected:
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr worst_case_stop_time_pub_;
   rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr trajectory_outgoing_cmd_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr multiarray_outgoing_cmd_pub_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr condition_pub_;
   rclcpp::Service<moveit_msgs::srv::ChangeControlDimensions>::SharedPtr control_dimensions_server_;
   rclcpp::Service<moveit_msgs::srv::ChangeDriftDimensions>::SharedPtr drift_dimensions_server_;
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reset_servo_status_;

@@ -97,16 +97,14 @@ TrajectoryVisualization::TrajectoryVisualization(rviz_common::properties::Proper
   robot_path_alpha_property_->setMax(1.0);
 
   state_display_time_property_ =
-      new rviz_common::properties::EditableEnumProperty("State Display Time", "3x",
-                                                        "Replay speed of trajectory. Either as factor of its time"
-                                                        "parameterization or as constant time (s) per waypoint.",
+      new rviz_common::properties::EditableEnumProperty("State Display Time", "0.05 s",
+                                                        "The amount of wall-time to wait in between displaying "
+                                                        "states along a received trajectory path",
                                                         widget, SLOT(changedStateDisplayTime()), this);
-  state_display_time_property_->addOptionStd("3x");
-  state_display_time_property_->addOptionStd("1x");
-  state_display_time_property_->addOptionStd("0.5x");
-  state_display_time_property_->addOptionStd("0.05s");
-  state_display_time_property_->addOptionStd("0.1s");
-  state_display_time_property_->addOptionStd("0.5s");
+  state_display_time_property_->addOptionStd("REALTIME");
+  state_display_time_property_->addOptionStd("0.05 s");
+  state_display_time_property_->addOptionStd("0.1 s");
+  state_display_time_property_->addOptionStd("0.5 s");
 
   loop_display_property_ = new rviz_common::properties::BoolProperty("Loop Animation", false,
                                                                      "Indicates whether the last received path "
@@ -358,49 +356,24 @@ void TrajectoryVisualization::interruptCurrentDisplay()
 
 float TrajectoryVisualization::getStateDisplayTime()
 {
-  constexpr char default_time_string[] = "3x";
-  constexpr float default_time_value = -3.0f;
-
   std::string tm = state_display_time_property_->getStdString();
-  boost::trim(tm);
-
-  float type;
-
-  if (tm.back() == 'x')
-  {
-    type = -1.0f;
-  }
-  else if (tm.back() == 's')
-  {
-    type = 1.0f;
-  }
+  if (tm == "REALTIME")
+    return -1.0;
   else
   {
-    state_display_time_property_->setStdString(default_time_string);
-    return default_time_value;
+    boost::replace_all(tm, "s", "");
+    boost::trim(tm);
+    float t = 0.05f;
+    try
+    {
+      t = boost::lexical_cast<float>(tm);
+    }
+    catch (const boost::bad_lexical_cast& ex)
+    {
+      state_display_time_property_->setStdString("0.05 s");
+    }
+    return t;
   }
-
-  tm.resize(tm.size() - 1);
-  boost::trim_right(tm);
-
-  float value;
-  try
-  {
-    value = boost::lexical_cast<float>(tm);
-  }
-  catch (const boost::bad_lexical_cast& ex)
-  {
-    state_display_time_property_->setStdString(default_time_string);
-    return default_time_value;
-  }
-
-  if (value <= 0)
-  {
-    state_display_time_property_->setStdString(default_time_string);
-    return default_time_value;
-  }
-
-  return type * value;
 }
 
 void TrajectoryVisualization::dropTrajectory()
@@ -472,16 +445,13 @@ void TrajectoryVisualization::update(float wall_dt, float /*ros_dt*/)
       current_state_time_ = 0.0;
     }
     else if (tm < 0.0)
-    {
-      // using realtime factors: skip to next waypoint based on elapsed display time
-      const float rt_factor = -tm;  // negative tm is the intended realtime factor
-      while (current_state_ < waypoint_count &&
-             (tm = displaying_trajectory_message_->getWayPointDurationFromPrevious(current_state_ + 1) / rt_factor) <
-                 current_state_time_)
+    {  // using realtime: skip to next waypoint based on elapsed display time
+      while (current_state_ < waypoint_count && (tm = displaying_trajectory_message_->getWayPointDurationFromPrevious(
+                                                     current_state_ + 1)) < current_state_time_)
       {
         current_state_time_ -= tm;
-        // if we are stuck in the while loop we should move the robot along the path to keep up
-        if (tm < current_state_time_)
+        if (tm < current_state_time_)  // if we are stuck in the while loop we should
+                                       // move the robot along the path to keep up
           display_path_robot_->update(displaying_trajectory_message_->getWayPointPtr(current_state_));
         ++current_state_;
       }

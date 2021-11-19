@@ -107,11 +107,6 @@ ServoCalcs::ServoCalcs(rclcpp::Node::SharedPtr node,
   // MoveIt Setup
   current_state_ = planning_scene_monitor_->getStateMonitor()->getCurrentState();
   joint_model_group_ = current_state_->getJointModelGroup(parameters_->move_group_name);
-  if (joint_model_group_ == nullptr)
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "Invalid move group name: `" << parameters_->move_group_name << "`");
-    throw std::runtime_error("Invalid move group name");
-  }
   prev_joint_velocity_ = Eigen::ArrayXd::Zero(joint_model_group_->getActiveJointModels().size());
 
   // Subscribe to command topics
@@ -157,7 +152,6 @@ ServoCalcs::ServoCalcs(rclcpp::Node::SharedPtr node,
 
   // Publish status
   status_pub_ = node_->create_publisher<std_msgs::msg::Int8>(parameters_->status_topic, ROS_QUEUE_SIZE);
-  condition_pub_ = node_->create_publisher<std_msgs::msg::Float64>("~/condition", ROS_QUEUE_SIZE);
 
   internal_joint_state_.name = joint_model_group_->getActiveJointModelNames();
   num_joints_ = internal_joint_state_.name.size();
@@ -303,6 +297,10 @@ void ServoCalcs::calculateSingleIteration()
   // 2) so the low-pass filters are up to date and don't cause a jump
   updateJoints();
 
+  // Calculate and publish worst stop time for collision checker
+  if (parameters_->check_collisions && parameters_->collision_check_type == "stop_distance")
+    calculateWorstCaseStopTime();
+
   // Update from latest state
   current_state_ = planning_scene_monitor_->getStateMonitor()->getCurrentState();
 
@@ -384,6 +382,14 @@ void ServoCalcs::calculateSingleIteration()
     }
   }
 
+  // Print a warning to the user if both are stale
+  if (twist_command_is_stale_ && joint_command_is_stale_)
+  {
+    rclcpp::Clock& clock = *node_->get_clock();
+    RCLCPP_WARN_STREAM_THROTTLE(LOGGER, clock, ROS_LOG_THROTTLE_PERIOD,
+                                "Stale command. Try a larger 'incoming_command_timeout' parameter?");
+  }
+
   // If we should halt
   if (!have_nonzero_command_)
   {
@@ -400,14 +406,6 @@ void ServoCalcs::calculateSingleIteration()
     ok_to_publish_ = false;
     rclcpp::Clock& clock = *node_->get_clock();
     RCLCPP_DEBUG_STREAM_THROTTLE(LOGGER, clock, ROS_LOG_THROTTLE_PERIOD, "All-zero command. Doing nothing.");
-  }
-  // Skip servoing publication if both types of commands are stale.
-  else if (twist_command_is_stale_ && joint_command_is_stale_)
-  {
-    ok_to_publish_ = false;
-    rclcpp::Clock& clock = *node_->get_clock();
-    RCLCPP_DEBUG_STREAM_THROTTLE(LOGGER, clock, ROS_LOG_THROTTLE_PERIOD,
-                                 "Skipping publishing because incoming commands are stale.");
   }
   else
   {
@@ -714,10 +712,6 @@ double ServoCalcs::velocityScalingFactorForSingularity(const Eigen::VectorXd& co
 
   double ini_condition = svd.singularValues()(0) / svd.singularValues()(svd.singularValues().size() - 1);
 
-  auto condition_msg = std::make_unique<std_msgs::msg::Float64>();
-  condition_msg->data = ini_condition;
-  condition_pub_->publish(std::move(condition_msg));
-
   // This singular vector tends to flip direction unpredictably. See R. Bro,
   // "Resolving the Sign Ambiguity in the Singular Value Decomposition".
   // Look ahead to see if the Jacobian's condition will decrease in this
@@ -792,7 +786,7 @@ ServoCalcs::enforcePositionLimits(sensor_msgs::msg::JointState& joint_state) con
 
     if (!joint->satisfiesPositionBounds(&joint_angle, -parameters_->joint_limit_margin))
     {
-      const std::vector<moveit_msgs::msg::JointLimits>& limits = joint->getVariableBoundsMsg();
+      const std::vector<moveit_msgs::msg::JointLimits> limits = joint->getVariableBoundsMsg();
 
       // Joint limits are not defined for some joints. Skip them.
       if (!limits.empty())
@@ -887,6 +881,60 @@ void ServoCalcs::updateJoints()
 
   // Cache the original joints in case they need to be reset
   original_joint_state_ = internal_joint_state_;
+}
+
+// Calculate worst case joint stop time, for collision checking
+void ServoCalcs::calculateWorstCaseStopTime()
+{
+  std::string joint_name = "";
+  moveit::core::JointModel::Bounds kinematic_bounds;
+  double accel_limit = 0;
+  double joint_velocity = 0;
+  double worst_case_stop_time = 0;
+  for (size_t jt_state_idx = 0; jt_state_idx < internal_joint_state_.velocity.size(); ++jt_state_idx)
+  {
+    joint_name = internal_joint_state_.name[jt_state_idx];
+
+    // Get acceleration limit for this joint
+    for (auto joint_model : joint_model_group_->getActiveJointModels())
+    {
+      if (joint_model->getName() == joint_name)
+      {
+        kinematic_bounds = joint_model->getVariableBounds();
+        // Some joints do not have acceleration limits
+        if (kinematic_bounds[0].acceleration_bounded_)
+        {
+          // Be conservative when calculating overall acceleration limit from min and max limits
+          accel_limit =
+              std::min(fabs(kinematic_bounds[0].min_acceleration_), fabs(kinematic_bounds[0].max_acceleration_));
+        }
+        else
+        {
+          rclcpp::Clock& clock = *node_->get_clock();
+          RCLCPP_ERROR_STREAM_THROTTLE(LOGGER, clock, ROS_LOG_THROTTLE_PERIOD,
+                                       "An acceleration limit is not defined for this joint; minimum stop distance "
+                                       "should not be used for collision checking");
+
+          // TODO(adamp): figure out what to do here. We definitely don't want to allow 'stop_distance' collision
+          // checking with no acceleration limits defined.
+        }
+        break;
+      }
+    }
+
+    // Get the current joint velocity
+    joint_velocity = internal_joint_state_.velocity[jt_state_idx];
+
+    // Calculate worst case stop time
+    worst_case_stop_time = std::max(worst_case_stop_time, fabs(joint_velocity / accel_limit));
+  }
+
+  // publish message
+  {
+    auto msg = std::make_unique<std_msgs::msg::Float64>();
+    msg->data = worst_case_stop_time;
+    worst_case_stop_time_pub_->publish(std::move(msg));
+  }
 }
 
 bool ServoCalcs::checkValidCommand(const control_msgs::msg::JointJog& cmd)

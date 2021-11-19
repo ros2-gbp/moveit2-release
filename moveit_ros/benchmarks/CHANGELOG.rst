@@ -2,16 +2,11 @@
 Changelog for package moveit_ros_benchmarks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.3.0 (2021-10-08)
+2.2.2 (2021-11-16)
 ------------------
-* Fix warnings in Galactic and Rolling (`#598 <https://github.com/ros-planning/moveit2/issues/598>`_)
-  * Use __has_includes preprocessor directive for deprecated headers
-  * Fix parameter template types
-  * Proper initialization of smart pointers, rclcpp::Duration
 * Fix loading joint_limits.yaml in demo and test launch files (`#544 <https://github.com/ros-planning/moveit2/issues/544>`_)
 * Fixes for Windows (`#530 <https://github.com/ros-planning/moveit2/issues/530>`_)
-* Fix predefined poses benchmark example (`#2718 <https://github.com/ros-planning/moveit2/issues/2718>`_)
-* Contributors: Akash, Captain Yoshi, Jafar Abdi, Vatan Aksoy Tezer, Nisala Kalupahana, Jorge Nicho, Henning Kayser, Tyler Weaver, Lior Lustgarten
+* Contributors: Akash, Lior Lustgarten, Tyler Weaver, Vatan Aksoy Tezer, Henning Kayser, Jorge Nicho, Nisala Kalupahana, Jafar Abdi
 
 2.2.1 (2021-07-12)
 ------------------

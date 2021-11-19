@@ -34,16 +34,12 @@
 
 /* Author: Jon Binney, Ioan Sucan */
 
-#include <moveit/occupancy_map_monitor/occupancy_map_monitor.h>
-
-#include <octomap_msgs/conversions.h>
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <tf2_ros/transform_listener.h>
-
+#include <moveit/occupancy_map_monitor/occupancy_map_monitor.h>
+#include <octomap_msgs/conversions.h>
 #include <boost/bind.hpp>
-
-#include <memory>
-#include <sstream>
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit.ros.occupancy_map_server");
 
