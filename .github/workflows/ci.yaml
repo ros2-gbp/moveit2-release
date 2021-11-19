@@ -1,19 +1,20 @@
 # This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).
 # For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
 
-name: Build and Test (Foxy)
+name: CI
 
 on:
   workflow_dispatch:
   pull_request:
   push:
     branches:
-      - main
+      - foxy
       - feature/hybrid_planning
 
 jobs:
   industrial_ci:
     strategy:
+      fail-fast: false
       matrix:
         env:
           - IMAGE: foxy-ci
@@ -22,9 +23,11 @@ jobs:
             IKFAST_TEST: true
             CLANG_TIDY: true
     env:
-      DOCKER_IMAGE: moveit/moveit2:${{ matrix.env.IMAGE }}
-      UPSTREAM_WORKSPACE: moveit2.repos
-      AFTER_SETUP_UPSTREAM_WORKSPACE: vcs pull $BASEDIR/upstream_ws/src
+      CXXFLAGS: "-Wall -Wextra -Wwrite-strings -Wunreachable-code -Wpointer-arith -Wredundant-decls -Wno-deprecated-copy"
+      DOCKER_IMAGE: ghcr.io/ros-planning/moveit2:${{ matrix.env.IMAGE }}
+      # The released versions of all upstream repos are current
+      # UPSTREAM_WORKSPACE: moveit2.repos
+      # AFTER_SETUP_UPSTREAM_WORKSPACE: vcs pull $BASEDIR/upstream_ws/src
       BEFORE_TARGET_TEST_EMBED: ${{ matrix.env.IKFAST_TEST && 'set +u && source moveit_kinematics/test/test_ikfast_plugins.sh && set -u' || '' }}
       AFTER_RUN_TARGET_TEST: ${{ matrix.env.CCOV && './.ci.prepare_codecov' || '' }}
       TARGET_CMAKE_ARGS: >
@@ -34,6 +37,9 @@ jobs:
       BASEDIR: ${{ github.workspace }}/.work
       CACHE_PREFIX: ${{ matrix.env.IMAGE }}${{ matrix.env.CCOV && '-ccov' || '' }}
       CLANG_TIDY_BASE_REF: ${{ github.base_ref || github.ref }}
+      BEFORE_CLANG_TIDY_CHECKS: (cd $TARGET_REPO_PATH; clang-tidy --list-checks)
+      CC: ${{ matrix.env.CLANG_TIDY && 'clang' }}
+      CXX: ${{ matrix.env.CLANG_TIDY && 'clang++' }}
 
     name: ${{ matrix.env.IMAGE }}${{ contains(matrix.env.IKFAST_TEST, 'ikfast') && ' + ikfast' || ''}}${{ matrix.env.CCOV && ' + ccov' || ''}}${{ matrix.env.CLANG_TIDY && ' + clang-tidy' || '' }}
     runs-on: ubuntu-latest
@@ -53,25 +59,26 @@ jobs:
           sudo rm -rf /usr/local/*
           df -h
       - uses: actions/checkout@v2
-      - name: cache upstream_ws
-        uses: pat-s/always-upload-cache@v2.1.3
-        with:
-          path: ${{ env.BASEDIR }}/upstream_ws
-          key: upstream_ws-${{ env.CACHE_PREFIX }}-${{ hashFiles('moveit2.repos') }}-${{ github.run_id }}
-          restore-keys: |
-            upstream_ws-${{ env.CACHE_PREFIX }}-${{ hashFiles('moveit2.repos') }}
+      # The released versions of all upstream repos are current
+      # - name: cache upstream_ws
+      #   uses: pat-s/always-upload-cache@v2.1.5
+      #   with:
+      #     path: ${{ env.BASEDIR }}/upstream_ws
+      #     key: upstream_ws-${{ env.CACHE_PREFIX }}-${{ hashFiles('moveit2.repos') }}-${{ github.run_id }}
+      #     restore-keys: |
+      #       upstream_ws-${{ env.CACHE_PREFIX }}-${{ hashFiles('moveit2.repos') }}
       # The target directory cache doesn't include the source directory because
       # that comes from the checkout.  See "prepare target_ws for cache" task below
       - name: cache target_ws
         if: ${{ ! matrix.env.CCOV }}
-        uses: pat-s/always-upload-cache@v2.1.3
+        uses: pat-s/always-upload-cache@v2.1.5
         with:
           path: ${{ env.BASEDIR }}/target_ws
           key: target_ws-${{ env.CACHE_PREFIX }}-${{ hashFiles('**/CMakeLists.txt', '**/package.xml') }}-${{ github.run_id }}
           restore-keys: |
             target_ws-${{ env.CACHE_PREFIX }}-${{ hashFiles('**/CMakeLists.txt', '**/package.xml') }}
       - name: cache ccache
-        uses: pat-s/always-upload-cache@v2.1.3
+        uses: pat-s/always-upload-cache@v2.1.5
         with:
           path: ${{ env.CCACHE_DIR }}
           key: ccache-${{ env.CACHE_PREFIX }}-${{ github.sha }}-${{ github.run_id }}
