@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014 Fetch Robotics Inc.
+ *  Copyright (c) 2021, PickNik Robotics
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of Fetch Robotics nor the names of its
+ *   * Neither the name of PickNik Robotics nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,19 +32,53 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
+/* Author: David V. Lu!! */
+
 #pragma once
 
+#include <std_msgs/msg/string.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <moveit/collision_detection/collision_plugin_cache.h>
 
-namespace collision_detection
+namespace rdf_loader
 {
-/** Augment CollisionPluginLoader with a method to fetch the plugin name from the ROS parameter server */
-class CollisionPluginLoader : public CollisionPluginCache
+using StringCallback = std::function<void(const std::string&)>;
+
+/**
+ * @brief SynchronizedStringParameter is a way to load a string from the ROS environment.
+ *
+ * First it tries to load the string from a parameter.
+ * If that fails, it subscribes to a std_msgs::String topic of the same name to get the value.
+ *
+ * If the parameter is loaded successfully, you can publish the value as a String msg if the publish_NAME param is true.
+ *
+ * You can specify how long to wait for a subscribed message with NAME_timeout (double in seconds)
+ *
+ * By default, the subscription will be killed after the first message is received.
+ * If the parameter NAME_continuous is true, then the parent_callback will be called on every subsequent message.
+ */
+class SynchronizedStringParameter
 {
 public:
-  /** @brief Fetch plugin name from parameter server and activate the plugin for the given scene */
-  void setupScene(const rclcpp::Node::SharedPtr& node, const planning_scene::PlanningScenePtr& scene);
-};
+  std::string loadInitialValue(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
+                               StringCallback parent_callback = {}, bool default_continuous_value = false,
+                               double default_timeout = 10.0);
 
-}  // namespace collision_detection
+protected:
+  bool getMainParameter();
+
+  bool shouldPublish();
+
+  bool waitForMessage(const rclcpp::Duration timeout);
+
+  void stringCallback(const std_msgs::msg::String::SharedPtr msg);
+
+  std::shared_ptr<rclcpp::Node> node_;
+  std::string name_;
+  StringCallback parent_callback_;
+
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr string_subscriber_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr string_publisher_;
+
+  std::string content_;
+};
+}  // namespace rdf_loader

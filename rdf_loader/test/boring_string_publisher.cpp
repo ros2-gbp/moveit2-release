@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2012, Willow Garage, Inc.
+ *  Copyright (c) 2021, PickNik Robotics
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of Willow Garage nor the names of its
+ *   * Neither the name of PickNik Robotics nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,49 +32,55 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Ioan Sucan */
+/* Author: David V. Lu!! */
 
-#include <pluginlib/class_loader.hpp>
-#include <moveit/planning_request_adapter/planning_request_adapter.h>
 #include <rclcpp/rclcpp.hpp>
-#include <memory>
+#include <std_msgs/msg/string.hpp>
+#include <fstream>
+#include <sstream>
+#include <sys/stat.h>
 
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
+  auto node = std::make_shared<rclcpp::Node>("boring_string_publisher");
 
-  auto node = std::make_shared<rclcpp::Node>("list_planning_adapter_plugins");
+  // Get Two String Parameters
+  std::string topic, content_path;
+  node->declare_parameter("topic", rclcpp::ParameterType::PARAMETER_STRING);
+  node->get_parameter("topic", topic);
+  node->declare_parameter("content_path", rclcpp::ParameterType::PARAMETER_STRING);
+  node->get_parameter("content_path", content_path);
 
-  std::unique_ptr<pluginlib::ClassLoader<planning_request_adapter::PlanningRequestAdapter>> loader;
-  try
+  if (content_path.empty())
   {
-    loader = std::make_unique<pluginlib::ClassLoader<planning_request_adapter::PlanningRequestAdapter>>(
-        "moveit_core", "planning_request_adapter::PlanningRequestAdapter");
-  }
-  catch (pluginlib::PluginlibException& ex)
-  {
-    std::cout << "Exception while creating class loader " << ex.what() << '\n';
+    RCLCPP_FATAL(node->get_logger(), "content_path parameter was not specified or is empty");
+    return -1;
   }
 
-  const std::vector<std::string>& classes = loader->getDeclaredClasses();
-  std::cout << "Available planning request adapter plugins:" << '\n';
-  for (const std::string& adapter_plugin_name : classes)
+  // Check if content exists
+  struct stat statistics;
+  if (stat(content_path.c_str(), &statistics) != 0)
   {
-    std::cout << " \t " << adapter_plugin_name << '\n';
-    planning_request_adapter::PlanningRequestAdapterConstPtr ad;
-    try
-    {
-      ad = loader->createUniqueInstance(adapter_plugin_name);
-    }
-    catch (pluginlib::PluginlibException& ex)
-    {
-      std::cout << " \t\t  Exception while planning adapter plugin '" << adapter_plugin_name << "': " << ex.what()
-                << '\n';
-    }
-    if (ad)
-      std::cout << " \t\t  " << ad->getDescription() << '\n';
-    std::cout << '\n' << '\n';
+    RCLCPP_FATAL(node->get_logger(), "%s does not exist!", content_path.c_str());
+    return -1;
   }
+
+  // Set Up Publisher
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr string_publisher =
+      node->create_publisher<std_msgs::msg::String>(topic, rclcpp::QoS(1).transient_local());
+
+  // Read in Content
+  std::ifstream content_stream(content_path.c_str());
+  std::stringstream buffer;
+  buffer << content_stream.rdbuf();
+
+  // Publish Content
+  std_msgs::msg::String msg;
+  msg.data = buffer.str();
+  string_publisher->publish(msg);
+
+  rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;
 }
