@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2012, Willow Garage, Inc.
+ *  Copyright (c) 2021, PickNik, Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of Willow Garage nor the names of its
+ *   * Neither the name of PickNik nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,49 +32,40 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Ioan Sucan */
+/* Author: Abishalini Sivaraman */
 
-#include <pluginlib/class_loader.hpp>
-#include <moveit/planning_request_adapter/planning_request_adapter.h>
+#pragma once
+
+#include <moveit/planning_scene_monitor/trajectory_monitor.h>
 #include <rclcpp/rclcpp.hpp>
-#include <memory>
 
-int main(int argc, char** argv)
+namespace planning_scene_monitor
 {
-  rclcpp::init(argc, argv);
+/**
+ * @brief      This class contains the ROS2 interfaces for TrajectoryMonitor.
+ *             This class is useful for testing by mocking the functions in the class below.
+ */
+class TrajectoryMonitorMiddlewareHandle : public TrajectoryMonitor::MiddlewareHandle
+{
+public:
+  /**
+   * @brief      Constructor for TrajectoryMonitor
+   *
+   * @param[in]  sampling_frequency  Used to create ROS2 Rate
+   */
+  TrajectoryMonitorMiddlewareHandle(double sampling_frequency);
 
-  auto node = std::make_shared<rclcpp::Node>("list_planning_adapter_plugins");
+  /**
+   * @brief    Set Rate using sampling frequency
+   */
+  void setRate(double sampling_frequency) override;
 
-  std::unique_ptr<pluginlib::ClassLoader<planning_request_adapter::PlanningRequestAdapter>> loader;
-  try
-  {
-    loader = std::make_unique<pluginlib::ClassLoader<planning_request_adapter::PlanningRequestAdapter>>(
-        "moveit_core", "planning_request_adapter::PlanningRequestAdapter");
-  }
-  catch (pluginlib::PluginlibException& ex)
-  {
-    std::cout << "Exception while creating class loader " << ex.what() << '\n';
-  }
+  /**
+   * @brief      Sleeps for time specified by @p sampling_frequency
+   */
+  void sleep() override;
 
-  const std::vector<std::string>& classes = loader->getDeclaredClasses();
-  std::cout << "Available planning request adapter plugins:" << '\n';
-  for (const std::string& adapter_plugin_name : classes)
-  {
-    std::cout << " \t " << adapter_plugin_name << '\n';
-    planning_request_adapter::PlanningRequestAdapterConstPtr ad;
-    try
-    {
-      ad = loader->createUniqueInstance(adapter_plugin_name);
-    }
-    catch (pluginlib::PluginlibException& ex)
-    {
-      std::cout << " \t\t  Exception while planning adapter plugin '" << adapter_plugin_name << "': " << ex.what()
-                << '\n';
-    }
-    if (ad)
-      std::cout << " \t\t  " << ad->getDescription() << '\n';
-    std::cout << '\n' << '\n';
-  }
-  rclcpp::shutdown();
-  return 0;
-}
+private:
+  std::unique_ptr<rclcpp::Rate> rate_;
+};
+}  // namespace planning_scene_monitor
