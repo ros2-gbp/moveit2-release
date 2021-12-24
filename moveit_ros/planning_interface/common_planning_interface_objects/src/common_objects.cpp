@@ -35,7 +35,6 @@
 /* Author: Ioan Sucan */
 
 #include <moveit/common_planning_interface_objects/common_objects.h>
-#include <tf2_ros/transform_listener.h>
 
 using namespace planning_scene_monitor;
 using namespace robot_model_loader;
@@ -75,22 +74,6 @@ SharedStorage& getSharedStorage()
   return *storage;
 #endif
 }
-
-// Deleter that, additionally to T*, deletes another object too
-template <typename T, typename O>
-struct CoupledDeleter
-{
-  const O* other_;
-  CoupledDeleter(const O* other = nullptr) : other_(other)
-  {
-  }
-
-  void operator()(const T* p)
-  {
-    delete other_;
-    delete p;
-  }
-};
 }  // namespace
 
 namespace moveit
@@ -100,15 +83,12 @@ namespace planning_interface
 std::shared_ptr<tf2_ros::Buffer> getSharedTF()
 {
   SharedStorage& s = getSharedStorage();
-  std::unique_lock<std::recursive_mutex> slock(s.lock_);
+  std::scoped_lock slock(s.lock_);
 
-  typedef CoupledDeleter<tf2_ros::Buffer, tf2_ros::TransformListener> Deleter;
   std::shared_ptr<tf2_ros::Buffer> buffer = s.tf_buffer_.lock();
   if (!buffer)
   {
-    tf2_ros::Buffer* raw = new tf2_ros::Buffer(std::make_shared<rclcpp::Clock>(RCL_ROS_TIME));
-    // assign custom deleter to also delete associated TransformListener
-    buffer.reset(raw, Deleter(new tf2_ros::TransformListener(*raw)));
+    buffer = std::make_shared<tf2_ros::Buffer>(std::make_shared<rclcpp::Clock>(RCL_ROS_TIME));
     s.tf_buffer_ = buffer;
   }
   return buffer;
@@ -118,7 +98,7 @@ robot_model_loader::RobotModelLoaderPtr getSharedRobotModelLoader(const rclcpp::
                                                                   const std::string& robot_description)
 {
   SharedStorage& s = getSharedStorage();
-  std::unique_lock<std::recursive_mutex> slock(s.lock_);
+  std::scoped_lock slock(s.lock_);
   auto it = s.robot_model_loaders_
                 .insert(std::make_pair(node->get_fully_qualified_name() + robot_description,
                                        robot_model_loader::RobotModelLoaderWeakPtr()))
@@ -136,7 +116,7 @@ moveit::core::RobotModelConstPtr getSharedRobotModel(const rclcpp::Node::SharedP
                                                      const std::string& robot_description)
 {
   SharedStorage& s = getSharedStorage();
-  std::unique_lock<std::recursive_mutex> slock(s.lock_);
+  std::scoped_lock slock(s.lock_);
   auto it = s.models_.insert(std::make_pair(robot_description, moveit::core::RobotModelWeakPtr())).first;
   moveit::core::RobotModelPtr model = it->second.lock();
   if (!model)
@@ -154,13 +134,14 @@ CurrentStateMonitorPtr getSharedStateMonitor(const rclcpp::Node::SharedPtr& node
                                              const std::shared_ptr<tf2_ros::Buffer>& tf_buffer)
 {
   SharedStorage& s = getSharedStorage();
-  std::unique_lock<std::recursive_mutex> slock(s.lock_);
+  std::scoped_lock slock(s.lock_);
   auto it = s.state_monitors_.insert(std::make_pair(robot_model->getName(), CurrentStateMonitorWeakPtr())).first;
   CurrentStateMonitorPtr monitor = it->second.lock();
   if (!monitor)
   {
     // if there was no valid entry, create one
-    monitor.reset(new CurrentStateMonitor(node, robot_model, tf_buffer));
+    const bool use_sim_time = node->get_parameter("use_sim_time").as_bool();
+    monitor = std::make_shared<CurrentStateMonitor>(node, robot_model, tf_buffer, use_sim_time);
     it->second = monitor;
   }
   return monitor;

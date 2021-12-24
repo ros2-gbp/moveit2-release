@@ -37,7 +37,11 @@
 #include <moveit/kdl_kinematics_plugin/kdl_kinematics_plugin.h>
 #include <moveit/kdl_kinematics_plugin/chainiksolver_vel_mimic_svd.hpp>
 
+#if __has_include(<tf2_kdl/tf2_kdl.hpp>)
+#include <tf2_kdl/tf2_kdl.hpp>
+#else
 #include <tf2_kdl/tf2_kdl.h>
+#endif
 #include <tf2/transform_datatypes.h>
 
 #include <kdl_parser/kdl_parser.hpp>
@@ -190,7 +194,7 @@ bool KDLKinematicsPlugin::initialize(const rclcpp::Node::SharedPtr& node, const 
   joint_min_.resize(solver_info_.limits.size());
   joint_max_.resize(solver_info_.limits.size());
 
-  for (unsigned int i = 0; i < solver_info_.limits.size(); i++)
+  for (unsigned int i = 0; i < solver_info_.limits.size(); ++i)
   {
     joint_min_(i) = solver_info_.limits[i].min_position;
     joint_max_(i) = solver_info_.limits[i].max_position;
@@ -257,9 +261,9 @@ bool KDLKinematicsPlugin::initialize(const rclcpp::Node::SharedPtr& node, const 
   }
 
   // Setup the joint state groups that we need
-  state_.reset(new moveit::core::RobotState(robot_model_));
+  state_ = std::make_shared<moveit::core::RobotState>(robot_model_);
 
-  fk_solver_.reset(new KDL::ChainFkSolverPos_recursive(kdl_chain_));
+  fk_solver_ = std::make_unique<KDL::ChainFkSolverPos_recursive>(kdl_chain_);
 
   initialized_ = true;
   RCLCPP_DEBUG(LOGGER, "KDL solver initialized");
@@ -333,7 +337,7 @@ bool KDLKinematicsPlugin::searchPositionIK(const geometry_msgs::msg::Pose& ik_po
 
   if (ik_seed_state.size() != dimension_)
   {
-    RCLCPP_ERROR(LOGGER, "Seed state must have size %d instead of size %d\n", dimension_, ik_seed_state.size());
+    RCLCPP_ERROR(LOGGER, "Seed state must have size %d instead of size %zu\n", dimension_, ik_seed_state.size());
     error_code.val = error_code.NO_IK_SOLUTION;
     return false;
   }
@@ -344,7 +348,7 @@ bool KDLKinematicsPlugin::searchPositionIK(const geometry_msgs::msg::Pose& ik_po
   {
     if (consistency_limits.size() != dimension_)
     {
-      RCLCPP_ERROR(LOGGER, "Consistency limits must be empty or have size %d instead of size %d\n", dimension_,
+      RCLCPP_ERROR(LOGGER, "Consistency limits must be empty or have size %d instead of size %zu\n", dimension_,
                    consistency_limits.size());
       error_code.val = error_code.NO_IK_SOLUTION;
       return false;
@@ -543,7 +547,7 @@ bool KDLKinematicsPlugin::getPositionFK(const std::vector<std::string>& link_nam
   jnt_pos_in.data = Eigen::Map<const Eigen::VectorXd>(joint_angles.data(), joint_angles.size());
 
   bool valid = true;
-  for (unsigned int i = 0; i < poses.size(); i++)
+  for (unsigned int i = 0; i < poses.size(); ++i)
   {
     if (fk_solver_->JntToCart(jnt_pos_in, p_out) >= 0)
     {

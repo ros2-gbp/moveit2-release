@@ -41,7 +41,11 @@
 #include <moveit/robot_state/conversions.h>
 #include <object_recognition_msgs/action/object_recognition.hpp>
 
+#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
+#include <tf2_eigen/tf2_eigen.hpp>
+#else
 #include <tf2_eigen/tf2_eigen.h>
+#endif
 
 #include "ui_motion_planning_rviz_plugin_frame.h"
 
@@ -83,7 +87,7 @@ void MotionPlanningFrame::processDetectedObjects()
   double max_z = ui_->roi_center_z->value() + ui_->roi_size_z->value() / 2.0;
 
   rclcpp::Time start_time = rclcpp::Clock().now();
-  while (object_ids.empty() && (rclcpp::Clock().now() - start_time) <= rclcpp::Duration(3.0))
+  while (object_ids.empty() && (rclcpp::Clock().now() - start_time) <= rclcpp::Duration::from_seconds(3))
   {
     // collect all objects in region of interest
     {
@@ -92,14 +96,11 @@ void MotionPlanningFrame::processDetectedObjects()
       object_ids.clear();
       for (const auto& object : *world)
       {
-        if (!object.second->shape_poses_.empty())
+        const auto& position = object.second->pose_.translation();
+        if (position.x() >= min_x && position.x() <= max_x && position.y() >= min_y && position.y() <= max_y &&
+            position.z() >= min_z && position.z() <= max_z)
         {
-          const auto& position = object.second->shape_poses_[0].translation();
-          if (position.x() >= min_x && position.x() <= max_x && position.y() >= min_y && position.y() <= max_y &&
-              position.z() >= min_z && position.z() <= max_z)
-          {
-            object_ids.push_back(object.first);
-          }
+          object_ids.push_back(object.first);
         }
       }
       if (!object_ids.empty())
@@ -108,7 +109,7 @@ void MotionPlanningFrame::processDetectedObjects()
     rclcpp::sleep_for(std::chrono::milliseconds(500));
   }
 
-  RCLCPP_DEBUG(LOGGER, "Found %d objects", (int)object_ids.size());
+  RCLCPP_DEBUG(LOGGER, "Found %d objects", static_cast<int>(object_ids.size()));
   updateDetectedObjectsList(object_ids);
 }
 
@@ -179,7 +180,7 @@ void MotionPlanningFrame::updateDetectedObjectsList(const std::vector<std::strin
     for (std::size_t i = 0; i < object_ids.size(); ++i)
     {
       QListWidgetItem* item =
-          new QListWidgetItem(QString::fromStdString(object_ids[i]), ui_->detected_objects_list, (int)i);
+          new QListWidgetItem(QString::fromStdString(object_ids[i]), ui_->detected_objects_list, static_cast<int>(i));
       item->setToolTip(item->text());
       Qt::ItemFlags flags = item->flags();
       flags &= ~(Qt::ItemIsUserCheckable);
@@ -245,7 +246,7 @@ void MotionPlanningFrame::updateSupportSurfacesList()
   // std::vector<std::string> support_ids = semantic_world_->getTableNamesInROI(min_x, min_y, min_z, max_x, max_y,
   // max_z);
   std::vector<std::string> support_ids;
-  RCLCPP_INFO(LOGGER, "%d Tables in collision world", (int)support_ids.size());
+  RCLCPP_INFO(LOGGER, "%d Tables in collision world", static_cast<int>(support_ids.size()));
 
   ui_->support_surfaces_list->setUpdatesEnabled(false);
   bool old_state = ui_->support_surfaces_list->blockSignals(true);
@@ -254,7 +255,7 @@ void MotionPlanningFrame::updateSupportSurfacesList()
     for (std::size_t i = 0; i < support_ids.size(); ++i)
     {
       QListWidgetItem* item =
-          new QListWidgetItem(QString::fromStdString(support_ids[i]), ui_->support_surfaces_list, (int)i);
+          new QListWidgetItem(QString::fromStdString(support_ids[i]), ui_->support_surfaces_list, static_cast<int>(i));
       item->setToolTip(item->text());
       Qt::ItemFlags flags = item->flags();
       flags &= ~(Qt::ItemIsUserCheckable);

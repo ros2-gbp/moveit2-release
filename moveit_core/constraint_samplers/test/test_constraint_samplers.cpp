@@ -75,11 +75,11 @@ protected:
     node_ = rclcpp::Node::make_shared("test_constraint_samplers");
     robot_model_ = moveit::core::loadTestingRobotModel("pr2");
 
-    pr2_kinematics_plugin_right_arm_.reset(new pr2_arm_kinematics::PR2ArmKinematicsPlugin);
+    pr2_kinematics_plugin_right_arm_ = std::make_shared<pr2_arm_kinematics::PR2ArmKinematicsPlugin>();
     pr2_kinematics_plugin_right_arm_->initialize(node_, *robot_model_, "right_arm", "torso_lift_link",
                                                  { "r_wrist_roll_link" }, .01);
 
-    pr2_kinematics_plugin_left_arm_.reset(new pr2_arm_kinematics::PR2ArmKinematicsPlugin);
+    pr2_kinematics_plugin_left_arm_ = std::make_shared<pr2_arm_kinematics::PR2ArmKinematicsPlugin>();
     pr2_kinematics_plugin_left_arm_->initialize(node_, *robot_model_, "left_arm", "torso_lift_link",
                                                 { "l_wrist_roll_link" }, .01);
 
@@ -94,7 +94,7 @@ protected:
 
     robot_model_->setKinematicsAllocators(allocators);
 
-    ps_.reset(new planning_scene::PlanningScene(robot_model_));
+    ps_ = std::make_shared<planning_scene::PlanningScene>(robot_model_);
   };
 
   void TearDown() override
@@ -340,6 +340,7 @@ TEST_F(LoadPlanningModelsPr2, OrientationConstraintsSampler)
   ocm.absolute_y_axis_tolerance = 0.01;
   ocm.absolute_z_axis_tolerance = 0.01;
   ocm.weight = 1.0;
+  ocm.parameterization = moveit_msgs::msg::OrientationConstraint::XYZ_EULER_ANGLES;
 
   EXPECT_TRUE(oc.configure(ocm, tf));
 
@@ -350,6 +351,18 @@ TEST_F(LoadPlanningModelsPr2, OrientationConstraintsSampler)
   EXPECT_TRUE(oc.configure(ocm, tf));
 
   constraint_samplers::IKConstraintSampler iks(ps_, "right_arm");
+  EXPECT_TRUE(iks.configure(constraint_samplers::IKSamplingPose(oc)));
+  for (int t = 0; t < 100; ++t)
+  {
+    ks.update();
+    EXPECT_TRUE(iks.sample(ks, ks_const, 100));
+    EXPECT_TRUE(oc.decide(ks).satisfied);
+  }
+
+  // test another parameterization for orientation constraints
+  ocm.parameterization = moveit_msgs::msg::OrientationConstraint::ROTATION_VECTOR;
+  EXPECT_TRUE(oc.configure(ocm, tf));
+
   EXPECT_TRUE(iks.configure(constraint_samplers::IKSamplingPose(oc)));
   for (int t = 0; t < 100; ++t)
   {

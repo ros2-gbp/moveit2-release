@@ -2,17 +2,63 @@
 Changelog for package moveit_servo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.2.2 (2021-11-16)
+2.3.1 (2021-12-23)
 ------------------
-* Migrate to joint_state_broadcaster (`#656 <https://github.com/ros-planning/moveit2/issues/656>`_)
-* Fix missing include in servo example (`#609 <https://github.com/ros-planning/moveit2/issues/609>`_)
+* Servo: fix -Wunused-private-field (`#937 <https://github.com/ros-planning/moveit2/issues/937>`_)
+* Add codespell to precommit, fix A LOT of spelling mistakes (`#934 <https://github.com/ros-planning/moveit2/issues/934>`_)
+* Add descriptions and default values to servo parameters (`#799 <https://github.com/ros-planning/moveit2/issues/799>`_)
+* Update README (`#812 <https://github.com/ros-planning/moveit2/issues/812>`_)
+* Enforce package.xml format 3 Schema (`#779 <https://github.com/ros-planning/moveit2/issues/779>`_)
+* Update Maintainers of MoveIt package (`#697 <https://github.com/ros-planning/moveit2/issues/697>`_)
+* moveit_servo: Fix ACM for collision checking & PSM's scene monitor topic (`#673 <https://github.com/ros-planning/moveit2/issues/673>`_)
+* Fix initialization of PSM publisher in servo (`#771 <https://github.com/ros-planning/moveit2/issues/771>`_)
+* Move initialization of ServoNode into constructor (`#761 <https://github.com/ros-planning/moveit2/issues/761>`_)
+* Fix missing test depend in servo (`#759 <https://github.com/ros-planning/moveit2/issues/759>`_)
+* Find/replace deprecated spawner.py (`#737 <https://github.com/ros-planning/moveit2/issues/737>`_)
+* Fix the servo executable name (`#746 <https://github.com/ros-planning/moveit2/issues/746>`_)
+* Use rclcpp::SystemDefaultsQoS in Servo (`#721 <https://github.com/ros-planning/moveit2/issues/721>`_)
+* Use multi-threaded component container, do not use intraprocess comms in Servo (`#723 <https://github.com/ros-planning/moveit2/issues/723>`_)
+* Disable use_intra_process_comms in servo launch files (`#722 <https://github.com/ros-planning/moveit2/issues/722>`_)
+* Servo: minor fixups (`#2759 <https://github.com/ros-planning/moveit/issues/2759>`_)
+* Contributors: AndyZe, Dave Coleman, David V. Lu!!, Henning Kayser, Jafar Abdi, Robert Haschke, Stephanie Eng, Tyler Weaver, toru-kuga
+
+2.3.0 (2021-10-08)
+------------------
+* Make TF buffer & listener in PSM private (`#654 <https://github.com/ros-planning/moveit2/issues/654>`_)
+* Rename ServoServer to ServerNode (`#649 <https://github.com/ros-planning/moveit2/issues/649>`_)
+* Fix std::placeholders namespace conflict (`#713 <https://github.com/ros-planning/moveit2/issues/713>`_)
+* Publish singularity condition to ~/servo_server/condition (`#695 <https://github.com/ros-planning/moveit2/issues/695>`_)
+* Skip publishing to Servo topics if input commands are stale (`#707 <https://github.com/ros-planning/moveit2/issues/707>`_)
+* Delete duplicate entry in Servo launch file (`#684 <https://github.com/ros-planning/moveit2/issues/684>`_)
+* Fix cmake warnings (`#690 <https://github.com/ros-planning/moveit2/issues/690>`_)
+  * Fix -Wformat-security
+  * Fix -Wunused-variable
+  * Fix -Wunused-lambda-capture
+  * Fix -Wdeprecated-declarations
+  * Fix clang-tidy, readability-identifier-naming in moveit_kinematics
+* Add standalone executable for Servo node, and example launch file (`#621 <https://github.com/ros-planning/moveit2/issues/621>`_)
+* Validate return of getJointModelGroup in ServoCalcs (`#648 <https://github.com/ros-planning/moveit2/issues/648>`_)
+* Migrate to joint_state_broadcaster (`#657 <https://github.com/ros-planning/moveit2/issues/657>`_)
+* Add gripper and traj control packages as run dependencies (`#636 <https://github.com/ros-planning/moveit2/issues/636>`_)
+* Fix warnings in Galactic and Rolling (`#598 <https://github.com/ros-planning/moveit2/issues/598>`_)
+  * Use __has_includes preprocessor directive for deprecated headers
+  * Fix parameter template types
+  * Proper initialization of smart pointers, rclcpp::Duration
+* Remove stray semicolon (`#613 <https://github.com/ros-planning/moveit2/issues/613>`_)
+* Re-Enable Servo Tests (`#603 <https://github.com/ros-planning/moveit2/issues/603>`_)
+* Fix missing include in servo example (`#604 <https://github.com/ros-planning/moveit2/issues/604>`_)
+* Document the difference between Servo pause/unpause and start/stop (`#605 <https://github.com/ros-planning/moveit2/issues/605>`_)
+* Wait for complete state duration fix (`#590 <https://github.com/ros-planning/moveit2/issues/590>`_)
+* Delete "stop distance"-based collision checking (`#564 <https://github.com/ros-planning/moveit2/issues/564>`_)
 * Fix loading joint_limits.yaml in demo and test launch files (`#544 <https://github.com/ros-planning/moveit2/issues/544>`_)
 * Fixes for Windows (`#530 <https://github.com/ros-planning/moveit2/issues/530>`_)
 * Refactor out velocity limit enforcement with test (`#540 <https://github.com/ros-planning/moveit2/issues/540>`_)
 * Refactor moveit_servo::LowPassFilter to be assignable (`#572 <https://github.com/ros-planning/moveit2/issues/572>`_)
 * Fix MoveIt Servo compilation on macOS (`#555 <https://github.com/ros-planning/moveit2/issues/555>`_)
 * Fix segfault if servo collision checking is disabled (`#568 <https://github.com/ros-planning/moveit2/issues/568>`_)
-* Contributors: Akash, Griswald Brooks, Joseph Schornak, Nisala Kalupahana, Lior Lustgarten, Tyler Weaver, Vatan Aksoy Tezer, Henning Kayser, Jorge Nicho, Nisala Kalupahana, Jafar Abdi, Adam Pettinger
+* Remove gtest include from non-testing source (`#2747 <https://github.com/ros-planning/moveit2/issues/2747>`_)
+* Fix an off-by-one error in servo_calcs.cpp (`#2740 <https://github.com/ros-planning/moveit2/issues/2740>`_)
+* Contributors: AdamPettinger, Akash, AndyZe, Griswald Brooks, Henning Kayser, Jafar Abdi, Joseph Schornak, Michael Görner, Nathan Brooks, Nisala Kalupahana, Tyler Weaver, Vatan Aksoy Tezer, luisrayas3, Lior Lustgarten
 
 2.2.1 (2021-07-12)
 ------------------
