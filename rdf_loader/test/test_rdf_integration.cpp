@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2012, Willow Garage, Inc.
+ *  Copyright (c) 2021, PickNik Robotics
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of Willow Garage nor the names of its
+ *   * Neither the name of PickNik Robotics nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,49 +32,46 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Ioan Sucan */
+/* Author: David V. Lu!! */
 
-#include <pluginlib/class_loader.hpp>
-#include <moveit/planning_request_adapter/planning_request_adapter.h>
+#include <moveit/rdf_loader/rdf_loader.h>
 #include <rclcpp/rclcpp.hpp>
-#include <memory>
+#include <gtest/gtest.h>
+
+TEST(RDFIntegration, default_arguments)
+{
+  rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("default_arguments");
+  rdf_loader::RDFLoader loader(node);
+  ASSERT_NE(nullptr, loader.getURDF());
+  EXPECT_EQ("kermit", loader.getURDF()->name_);
+  ASSERT_NE(nullptr, loader.getSRDF());
+  EXPECT_EQ("kermit", loader.getSRDF()->getName());
+}
+
+TEST(RDFIntegration, non_existent)
+{
+  rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("non_existent");
+  rdf_loader::RDFLoader loader(node, "does_not_exist");
+  ASSERT_EQ(nullptr, loader.getURDF());
+  ASSERT_EQ(nullptr, loader.getSRDF());
+}
+
+TEST(RDFIntegration, topic_based)
+{
+  rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("topic_based");
+  rdf_loader::RDFLoader loader(node, "topic_description");
+  ASSERT_NE(nullptr, loader.getURDF());
+  EXPECT_EQ("gonzo", loader.getURDF()->name_);
+  ASSERT_NE(nullptr, loader.getSRDF());
+  EXPECT_EQ("gonzo", loader.getSRDF()->getName());
+}
 
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
+  ::testing::InitGoogleTest(&argc, argv);
 
-  auto node = std::make_shared<rclcpp::Node>("list_planning_adapter_plugins");
-
-  std::unique_ptr<pluginlib::ClassLoader<planning_request_adapter::PlanningRequestAdapter>> loader;
-  try
-  {
-    loader = std::make_unique<pluginlib::ClassLoader<planning_request_adapter::PlanningRequestAdapter>>(
-        "moveit_core", "planning_request_adapter::PlanningRequestAdapter");
-  }
-  catch (pluginlib::PluginlibException& ex)
-  {
-    std::cout << "Exception while creating class loader " << ex.what() << '\n';
-  }
-
-  const std::vector<std::string>& classes = loader->getDeclaredClasses();
-  std::cout << "Available planning request adapter plugins:" << '\n';
-  for (const std::string& adapter_plugin_name : classes)
-  {
-    std::cout << " \t " << adapter_plugin_name << '\n';
-    planning_request_adapter::PlanningRequestAdapterConstPtr ad;
-    try
-    {
-      ad = loader->createUniqueInstance(adapter_plugin_name);
-    }
-    catch (pluginlib::PluginlibException& ex)
-    {
-      std::cout << " \t\t  Exception while planning adapter plugin '" << adapter_plugin_name << "': " << ex.what()
-                << '\n';
-    }
-    if (ad)
-      std::cout << " \t\t  " << ad->getDescription() << '\n';
-    std::cout << '\n' << '\n';
-  }
+  int ret = RUN_ALL_TESTS();
   rclcpp::shutdown();
-  return 0;
+  return ret;
 }
