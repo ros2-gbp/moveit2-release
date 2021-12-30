@@ -1,0 +1,12 @@
+Source: ros-galactic-moveit-resources-prbt-ikfast-manipulator-plugin
+Section: misc
+Priority: optional
+Maintainer: Alexander Gutenkunst <a.gutenkunst@pilz.de>
+Build-Depends: debhelper (>= 9.0.0), ros-galactic-ament-cmake, ros-galactic-moveit-core, ros-galactic-pluginlib, ros-galactic-rclcpp, ros-galactic-tf2-eigen, ros-galactic-tf2-eigen-kdl, ros-galactic-tf2-geometry-msgs, ros-galactic-tf2-kdl, ros-galactic-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-galactic-moveit-resources-prbt-ikfast-manipulator-plugin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-galactic-moveit-core, ros-galactic-pluginlib, ros-galactic-rclcpp, ros-galactic-tf2-geometry-msgs, ros-galactic-tf2-kdl, ros-galactic-ros-workspace
+Description: The prbt_ikfast_manipulator_plugin package
