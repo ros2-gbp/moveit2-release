@@ -1,0 +1,12 @@
+Source: ros-galactic-moveit-hybrid-planning
+Section: misc
+Priority: optional
+Maintainer: MoveIt Release Team <moveit_releasers@googlegroups.com>
+Build-Depends: debhelper (>= 9.0.0), ros-galactic-ament-cmake, ros-galactic-ament-cmake-gtest, ros-galactic-ament-index-cpp, ros-galactic-ament-lint-auto, ros-galactic-ament-lint-common, ros-galactic-moveit-common, ros-galactic-moveit-core, ros-galactic-moveit-msgs, ros-galactic-moveit-planners-ompl, ros-galactic-moveit-ros-planning, ros-galactic-moveit-ros-planning-interface, ros-galactic-pluginlib, ros-galactic-rclcpp, ros-galactic-rclcpp-action, ros-galactic-rclcpp-components, ros-galactic-ros-testing, ros-galactic-std-msgs, ros-galactic-std-srvs, ros-galactic-tf2-ros, ros-galactic-trajectory-msgs, ros-galactic-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-galactic-moveit-hybrid-planning
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-galactic-ament-index-cpp, ros-galactic-controller-manager, ros-galactic-moveit-core, ros-galactic-moveit-msgs, ros-galactic-moveit-resources-panda-moveit-config, ros-galactic-moveit-ros-planning, ros-galactic-moveit-ros-planning-interface, ros-galactic-pluginlib, ros-galactic-rclcpp, ros-galactic-rclcpp-action, ros-galactic-rclcpp-components, ros-galactic-robot-state-publisher, ros-galactic-rviz2, ros-galactic-std-msgs, ros-galactic-std-srvs, ros-galactic-tf2-ros, ros-galactic-trajectory-msgs, ros-galactic-ros-workspace
+Description: Hybrid planning components of MoveIt 2
