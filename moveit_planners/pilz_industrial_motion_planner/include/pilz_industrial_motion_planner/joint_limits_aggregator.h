@@ -37,7 +37,7 @@
 #include "pilz_industrial_motion_planner/joint_limits_container.h"
 #include "pilz_industrial_motion_planner/joint_limits_extension.h"
 
-#include <rclcpp/rclcpp.hpp>
+#include <ros/ros.h>
 
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/planning_interface/planning_response.h>
@@ -49,7 +49,7 @@ namespace pilz_industrial_motion_planner
 {
 /**
  * @brief  Unifies the joint limits from the given joint models with joint
- * limits from the node parameters.
+ * limits from the parameter server.
  *
  * Does not support MultiDOF joints.
  */
@@ -58,27 +58,26 @@ class JointLimitsAggregator
 public:
   /**
    * @brief  Aggregates(combines) the joint limits from joint model and
-   * node parameters.
+   * parameter server.
    * The rules for the combination are:
-   *   1. Position and velocity limits in the node parameters must be stricter
+   *   1. Position and velocity limits on the parameter server must be stricter
    * or equal if they are defined.
-   *   2. Limits in the node parameters where the corresponding
+   *   2. Limits on the parameter server where the corresponding
    *      has_<position|velocity|acceleration|deceleration>_limits are „false“
    * are considered undefined(see point 1).
-   *   3. Not all joints have to be limited by the node parameters. Selective
+   *   3. Not all joints have to be limited by the parameter server. Selective
    * limitation is possible.
    *   4. If max_deceleration is unset, it will be set to: max_deceleration = -
    * max_acceleration.
-   * @note The acceleration/deceleration can only be set via the node parameters parameter
-   * since they are not supported
+   * @note The acceleration/deceleration can only be set via the parameter
+   * server since they are not supported
    * in the urdf so far.
-   * @param node Node to use for accessing joint limit parameters
-   * @param param_namespace Namespace to use for looking up node parameters
+   * @param nh Node handle in whose namespace the joint limit parameters are
+   * expected.
    * @param joint_models The joint models
    * @return Container containing the limits
    */
-  static JointLimitsContainer getAggregatedLimits(const rclcpp::Node::SharedPtr& node,
-                                                  const std::string& param_namespace,
+  static JointLimitsContainer getAggregatedLimits(const ros::NodeHandle& nh,
                                                   const std::vector<const moveit::core::JointModel*>& joint_models);
 
 protected:
@@ -136,7 +135,7 @@ public:
 
 /**
  * @class AggregationJointMissingException
- * @brief Thrown the limits from the node parameter are weaker(forbidden) than
+ * @brief Thrown the limits from the parameter server are weaker(forbidden) than
  * the ones defined in the urdf
  *
  */

@@ -37,10 +37,6 @@
 #include <moveit/occupancy_map_monitor/occupancy_map_monitor.h>
 #include <moveit/occupancy_map_monitor/occupancy_map_updater.h>
 
-#include <rclcpp/rclcpp.hpp>
-
-#include <string>
-
 namespace occupancy_map_monitor
 {
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit.ros.occupancy_map_updater");
@@ -63,7 +59,7 @@ void OccupancyMapUpdater::setMonitor(OccupancyMapMonitor* monitor)
 //   if (params.hasMember(param_name))
 //   {
 //     if (params[param_name].getType() == XmlRpc::XmlRpcValue::TypeInt)
-//       *value = static_cast<int>(params[param_name]);
+//       *value = (int)params[param_name];
 //     else
 //       *value = (double)params[param_name];
 //   }
@@ -74,7 +70,7 @@ void OccupancyMapUpdater::setMonitor(OccupancyMapMonitor* monitor)
 // value)
 // {
 //   if (params.hasMember(param_name))
-//     *value = static_cast<int>(params[param_name]);
+//     *value = (int)params[param_name];
 // }
 
 bool OccupancyMapUpdater::updateTransformCache(const std::string& target_frame, const rclcpp::Time& target_time)

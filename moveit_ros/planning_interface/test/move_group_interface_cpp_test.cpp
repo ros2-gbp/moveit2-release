@@ -58,18 +58,10 @@
 #include <moveit/planning_scene_monitor/planning_scene_monitor.h>
 
 // TF2
-#if __has_include(<tf2_geometry_msgs/tf2_geometry_msgs.hpp>)
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#else
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#endif
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
-#include <tf2_eigen/tf2_eigen.hpp>
-#else
 #include <tf2_eigen/tf2_eigen.h>
-#endif
 
-// 10um accuracy tested for position and orientation
+// 10um acuracy tested for position and orientation
 constexpr double EPSILON = 1e-5;
 
 static const std::string PLANNING_GROUP = "panda_arm";
@@ -194,7 +186,7 @@ TEST_F(MoveGroupTestFixture, PathConstraintCollisionTest)
 
   ////////////////////////////////////////////////////////////////////
   // set a custom start state
-  // this simplifies planning for the orientation constraint below
+  // this simplifies planning for the orientation constraint bellow
   geometry_msgs::Pose start_pose;
   start_pose.orientation.w = 1.0;
   start_pose.position.x = 0.3;

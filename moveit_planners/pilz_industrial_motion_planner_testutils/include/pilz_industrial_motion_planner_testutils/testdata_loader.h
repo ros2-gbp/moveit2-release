@@ -32,7 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#pragma once
+#ifndef TESTDATA_LOADER_H
+#define TESTDATA_LOADER_H
 
 #include <string>
 #include <utility>
@@ -112,3 +113,5 @@ inline void TestdataLoader::setRobotModel(moveit::core::RobotModelConstPtr robot
 
 using TestdataLoaderUPtr = std::unique_ptr<TestdataLoader>;
 }  // namespace pilz_industrial_motion_planner_testutils
+
+#endif  // TESTDATA_LOADER_H

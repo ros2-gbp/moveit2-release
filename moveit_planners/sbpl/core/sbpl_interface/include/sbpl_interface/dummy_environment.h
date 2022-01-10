@@ -64,13 +64,13 @@ public:
       most searches do not require this, so it is not necessary to support this
   */
   virtual void GetSuccs(int SourceStateID, std::vector<int>* SuccIDV, std::vector<int>* CostV){};
-  /** \brief see comments for GetSuccs function
+  /** \brief see comments for GetSuccs functon
    */
   virtual void GetPreds(int TargetStateID, std::vector<int>* PredIDV, std::vector<int>* CostV){};
-  /** \brief see comments for GetSuccs function
+  /** \brief see comments for GetSuccs functon
    */
   virtual void SetAllActionsandAllOutcomes(CMDPSTATE* state){};
-  /** \brief see comments for GetSuccs function
+  /** \brief see comments for GetSuccs functon
    */
   virtual void SetAllPreds(CMDPSTATE* state){};
 

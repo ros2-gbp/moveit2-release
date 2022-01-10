@@ -32,22 +32,25 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#pragma once
+#ifndef GOALCONSTRAINTSMSGCONVERTIBLE_H
+#define GOALCONSTRAINTSMSGCONVERTIBLE_H
 
 #include <string>
 
-#include <moveit_msgs/msg/constraints.hpp>
+#include <moveit_msgs/Constraints.h>
 #include <moveit/robot_model/robot_model.h>
 
 namespace pilz_industrial_motion_planner_testutils
 {
 /**
  * @brief Interface class to express that a derived class can be converted
- * into a moveit_msgs::msg::Constraints.
+ * into a moveit_msgs::Constaints.
  */
 class GoalConstraintMsgConvertible
 {
 public:
-  virtual moveit_msgs::msg::Constraints toGoalConstraints() const = 0;
+  virtual moveit_msgs::Constraints toGoalConstraints() const = 0;
 };
 }  // namespace pilz_industrial_motion_planner_testutils
+
+#endif  // GOALCONSTRAINTSMSGCONVERTIBLE_H

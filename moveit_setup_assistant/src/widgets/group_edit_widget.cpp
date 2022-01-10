@@ -321,8 +321,7 @@ void GroupEditWidget::loadKinematicPlannersComboBox()
   std::unique_ptr<pluginlib::ClassLoader<kinematics::KinematicsBase>> loader;
   try
   {
-    loader = std::make_unique<pluginlib::ClassLoader<kinematics::KinematicsBase>>("moveit_core",
-                                                                                  "kinematics::KinematicsBase");
+    loader.reset(new pluginlib::ClassLoader<kinematics::KinematicsBase>("moveit_core", "kinematics::KinematicsBase"));
   }
   catch (pluginlib::PluginlibException& ex)
   {

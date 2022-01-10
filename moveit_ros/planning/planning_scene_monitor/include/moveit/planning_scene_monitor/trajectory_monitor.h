@@ -37,17 +37,15 @@
 #pragma once
 
 #include <moveit/macros/class_forward.h>
-#include <moveit/robot_state/robot_state.h>
 #include <moveit/planning_scene_monitor/current_state_monitor.h>
 #include <moveit/robot_trajectory/robot_trajectory.h>
 #include <boost/thread.hpp>
-#include <rclcpp/time.hpp>
 #include <memory>
-#include <functional>
 
 namespace planning_scene_monitor
 {
-using TrajectoryStateAddedCallback = std::function<void(const moveit::core::RobotStateConstPtr&, const rclcpp::Time&)>;
+using TrajectoryStateAddedCallback =
+    boost::function<void(const moveit::core::RobotStateConstPtr&, const rclcpp::Time&)>;
 
 MOVEIT_CLASS_FORWARD(TrajectoryMonitor);  // Defines TrajectoryMonitorPtr, ConstPtr, WeakPtr... etc
 
@@ -56,40 +54,9 @@ MOVEIT_CLASS_FORWARD(TrajectoryMonitor);  // Defines TrajectoryMonitorPtr, Const
 class TrajectoryMonitor
 {
 public:
-  /**
-   * @brief      This class contains the rcl interfaces for easier testing
-   */
-  class MiddlewareHandle
-  {
-  public:
-    /**
-     * @brief      Destroys the object.
-     */
-    virtual ~MiddlewareHandle() = default;
-
-    /**
-     * @brief      set Rate using sampling frequency
-     */
-    virtual void setRate(double sampling_frequency) = 0;
-
-    /**
-     * @brief      Sleep the handle for some prescribed amount of time.
-     */
-    virtual void sleep() = 0;
-  };
-
-  /** @brief Constructor
-   *  @param[in]  state_monitor
-   *  @param[in]  sampling_frequency
+  /** @brief Constructor.
    */
   TrajectoryMonitor(const CurrentStateMonitorConstPtr& state_monitor, double sampling_frequency = 0.0);
-
-  /** @brief Constructor with middleware handle as input parameter
-   *  @param[in]  state_monitor
-   *  @param[in]  sampling_frequency
-   */
-  TrajectoryMonitor(const CurrentStateMonitorConstPtr& state_monitor,
-                    std::unique_ptr<MiddlewareHandle> middleware_handle, double sampling_frequency = 0.0);
 
   ~TrajectoryMonitor();
 
@@ -128,10 +95,7 @@ public:
 private:
   void recordStates();
 
-  // Samples robot states.
   CurrentStateMonitorConstPtr current_state_monitor_;
-  // Interface for communicating with ROS.
-  std::unique_ptr<MiddlewareHandle> middleware_handle_;
   double sampling_frequency_;
 
   robot_trajectory::RobotTrajectory trajectory_;

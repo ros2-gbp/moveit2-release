@@ -51,11 +51,7 @@
 #include <boost/progress.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
-#include <tf2_eigen/tf2_eigen.hpp>
-#else
 #include <tf2_eigen/tf2_eigen.h>
-#endif
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -102,8 +98,8 @@ moveit_benchmarks::BenchmarkExecution::BenchmarkExecution(const planning_scene::
   // load the pluginlib class loader
   try
   {
-    planner_plugin_loader_ = std::make_shared<pluginlib::ClassLoader<planning_interface::PlannerManager>>(
-        "moveit_core", "planning_interface::PlannerManager");
+    planner_plugin_loader_.reset(new pluginlib::ClassLoader<planning_interface::PlannerManager>(
+        "moveit_core", "planning_interface::PlannerManager"));
   }
   catch (pluginlib::PluginlibException& ex)
   {
@@ -278,7 +274,7 @@ void moveit_benchmarks::BenchmarkExecution::runAllBenchmarks(BenchmarkType type)
 
       if (got_robot_state)
       {
-        start_state_to_use = std::make_shared<moveit_msgs::RobotState(*robot_state));
+        start_state_to_use.reset(new moveit_msgs::msg::RobotState(*robot_state));
         ROS_INFO("Loaded start state '%s'", state_name.c_str());
       }
       else
@@ -327,8 +323,8 @@ void moveit_benchmarks::BenchmarkExecution::runAllBenchmarks(BenchmarkType type)
             checkHeader(req.motion_plan_request.goal_constraints[j], options_.planning_frame);
         }
 
-        ROS_INFO("Benchmarking query '%s' (%d of %d)", planning_queries_names[i].c_str(), static_cast<int>(i) + 1,
-                 static_cast<int>(planning_queries_names.size());
+        ROS_INFO("Benckmarking query '%s' (%d of %d)", planning_queries_names[i].c_str(), (int)i + 1,
+                 (int)planning_queries_names.size());
         runBenchmark(req);
       }
     }
@@ -406,8 +402,7 @@ void moveit_benchmarks::BenchmarkExecution::runAllBenchmarks(BenchmarkType type)
             checkHeader(req.motion_plan_request.goal_constraints[0], options_.planning_frame);
           req.filename = options_.output + "." + boost::lexical_cast<std::string>(++n_call) + ".log";
 
-          ROS_INFO("Benchmarking goal '%s' (%d of %d)", cnames[i].c_str(), static_cast<int>(i) + 1,
-                   static_cast<int>(cnames.size()));
+          ROS_INFO("Benckmarking goal '%s' (%d of %d)", cnames[i].c_str(), (int)i + 1, (int)cnames.size());
           runBenchmark(req);
         }
       }
@@ -495,8 +490,7 @@ void moveit_benchmarks::BenchmarkExecution::runAllBenchmarks(BenchmarkType type)
             req.motion_plan_request.allowed_planning_time = options_.timeout;
           req.filename = options_.output + ".trajectory." + boost::lexical_cast<std::string>(i + 1) + ".log";
 
-          ROS_INFO("Benchmarking trajectory '%s' (%d of %d)", cnames[i].c_str(), static_cast<int>(i) + 1,
-                   static_cast<int>(cnames.size()));
+          ROS_INFO("Benckmarking trajectory '%s' (%d of %d)", cnames[i].c_str(), (int)i + 1, (int)cnames.size());
           runBenchmark(req);
         }
       }
@@ -671,7 +665,7 @@ bool moveit_benchmarks::BenchmarkExecution::readOptions(const std::string& filen
         {
           if (bpo)
             options_.plugins.push_back(*bpo);
-          bpo = std::make_shared<PlanningPluginOptions());
+          bpo.reset(new PlanningPluginOptions());
           bpo->name = val;
           bpo->runs = default_run_count;
         }
@@ -770,25 +764,26 @@ bool moveit_benchmarks::BenchmarkExecution::readOptions(const std::string& filen
 
 void moveit_benchmarks::BenchmarkExecution::printOptions(std::ostream& out)
 {
-  out << "Benchmark for scene '" << options_.scene << "' to be saved at location '" << options_.output << "'" << '\n';
+  out << "Benchmark for scene '" << options_.scene << "' to be saved at location '" << options_.output << "'"
+      << std::endl;
   if (!options_.query_regex.empty())
     out << "Planning requests associated to the scene that match '" << options_.query_regex << "' will be evaluated"
-        << '\n';
+        << std::endl;
   if (!options_.goal_regex.empty())
     out << "Planning requests constructed from goal constraints that match '" << options_.goal_regex
-        << "' will be evaluated" << '\n';
+        << "' will be evaluated" << std::endl;
   if (!options_.trajectory_regex.empty())
     out << "Planning requests constructed from trajectory constraints that match '" << options_.trajectory_regex
-        << "' will be evaluated" << '\n';
-  out << "Plugins:" << '\n';
+        << "' will be evaluated" << std::endl;
+  out << "Plugins:" << std::endl;
   for (std::size_t i = 0; i < options_.plugins.size(); ++i)
   {
     out << "   * name: " << options_.plugins[i].name << " (to be run " << options_.plugins[i].runs
-        << " times for each planner)" << '\n';
+        << " times for each planner)" << std::endl;
     out << "   * planners:";
     for (std::size_t j = 0; j < options_.plugins[i].planners.size(); ++j)
       out << ' ' << options_.plugins[i].planners[j];
-    out << '\n';
+    out << std::endl;
   }
 }
 
@@ -1025,10 +1020,10 @@ void moveit_benchmarks::BenchmarkExecution::runPlanningBenchmark(BenchmarkReques
     if (planner_ids_to_benchmark_per_planner_interface[i].empty())
       continue;
     sst << "  * " << planner_interfaces_to_benchmark[i]->getDescription() << " - Will execute interface "
-        << runs_per_planner_interface[i] << " times:" << '\n';
+        << runs_per_planner_interface[i] << " times:" << std::endl;
     for (std::size_t k = 0; k < planner_ids_to_benchmark_per_planner_interface[i].size(); ++k)
-      sst << "    - " << planner_ids_to_benchmark_per_planner_interface[i][k] << '\n';
-    sst << '\n';
+      sst << "    - " << planner_ids_to_benchmark_per_planner_interface[i][k] << std::endl;
+    sst << std::endl;
   }
   ROS_INFO("Benchmarking Planning Interfaces:\n%s", sst.str().c_str());
 
@@ -1119,7 +1114,7 @@ void moveit_benchmarks::BenchmarkExecution::runPlanningBenchmark(BenchmarkReques
 
           // collect data
           start = ros::WallTime::now();
-          runs[run_id].insert(parameter_data.begin(), parameter_data.end());  // initialize this run's data with the
+          runs[run_id].insert(parameter_data.begin(), parameter_data.end());  // initalize this run's data with the
                                                                               // chosen parameters, if we have any
 
           collectMetrics(runs[run_id], mp_res, solved, total_time);
@@ -1136,7 +1131,7 @@ void moveit_benchmarks::BenchmarkExecution::runPlanningBenchmark(BenchmarkReques
       // this vector of runs represents all the runs*parameters
       data.push_back(runs);
 
-    }  // end j - planning algorithms
+    }  // end j - planning algoritms
   }    // end i - planning plugins
 
   double duration = (ros::WallTime::now() - startTime).toSec();
@@ -1146,14 +1141,14 @@ void moveit_benchmarks::BenchmarkExecution::runPlanningBenchmark(BenchmarkReques
                               boost::posix_time::to_iso_extended_string(startTime.toBoost()) + ".log") :
                              req.filename;
   std::ofstream out(filename.c_str());
-  out << "Experiment " << (planning_scene_->getName().empty() ? "NO_NAME" : planning_scene_->getName()) << '\n';
-  out << "Running on " << (host.empty() ? "UNKNOWN" : host) << '\n';
-  out << "Starting at " << boost::posix_time::to_iso_extended_string(startTime.toBoost()) << '\n';
-  out << "Goal name " << (req.goal_name.empty() ? "UNKNOWN" : req.goal_name) << '\n';
-  // out << "<<<|" << '\n' << "ROS" << '\n' << req.motion_plan_request << '\n' << "|>>>" << '\n';
-  out << req.motion_plan_request.allowed_planning_time << " seconds per run" << '\n';
-  out << duration << " seconds spent to collect the data" << '\n';
-  out << total_n_planners << " planners" << '\n';
+  out << "Experiment " << (planning_scene_->getName().empty() ? "NO_NAME" : planning_scene_->getName()) << std::endl;
+  out << "Running on " << (host.empty() ? "UNKNOWN" : host) << std::endl;
+  out << "Starting at " << boost::posix_time::to_iso_extended_string(startTime.toBoost()) << std::endl;
+  out << "Goal name " << (req.goal_name.empty() ? "UNKNOWN" : req.goal_name) << std::endl;
+  // out << "<<<|" << std::endl << "ROS" << std::endl << req.motion_plan_request << std::endl << "|>>>" << std::endl;
+  out << req.motion_plan_request.allowed_planning_time << " seconds per run" << std::endl;
+  out << duration << " seconds spent to collect the data" << std::endl;
+  out << total_n_planners << " planners" << std::endl;
 
   // tracks iteration location in data[] vector
   std::size_t run_id = 0;
@@ -1167,11 +1162,11 @@ void moveit_benchmarks::BenchmarkExecution::runPlanningBenchmark(BenchmarkReques
       // Output name of planning algorithm
       out << planner_interfaces_to_benchmark[q]->getDescription() + "_" +
                  planner_ids_to_benchmark_per_planner_interface[q][p]
-          << '\n';
+          << std::endl;
 
       // in general, we could have properties specific for a planner;
       // right now, we do not include such properties
-      out << "0 common properties" << '\n';
+      out << "0 common properties" << std::endl;
 
       // construct the list of all possible properties for all runs
       std::set<std::string> properties_set;
@@ -1187,12 +1182,12 @@ void moveit_benchmarks::BenchmarkExecution::runPlanningBenchmark(BenchmarkReques
       std::vector<std::string> properties;
       for (std::set<std::string>::iterator it = properties_set.begin(); it != properties_set.end(); ++it)
         properties.push_back(*it);
-      out << properties.size() << " properties for each run" << '\n';
+      out << properties.size() << " properties for each run" << std::endl;
 
       // output the vector of properties to the log file
       for (unsigned int j = 0; j < properties.size(); ++j)
-        out << properties[j] << '\n';
-      out << data[run_id].size() << " runs" << '\n';
+        out << properties[j] << std::endl;
+      out << data[run_id].size() << " runs" << std::endl;
 
       // output all the data to the log file
       for (std::size_t j = 0; j < data[run_id].size(); ++j)
@@ -1207,9 +1202,9 @@ void moveit_benchmarks::BenchmarkExecution::runPlanningBenchmark(BenchmarkReques
         }
 
         // end the line
-        out << '\n';
+        out << std::endl;
       }
-      out << '.' << '\n';
+      out << '.' << std::endl;
 
       ++run_id;
     }
@@ -1306,16 +1301,16 @@ void moveit_benchmarks::BenchmarkExecution::runGoalExistenceBenchmark(BenchmarkR
                                 boost::posix_time::to_iso_extended_string(startTime.toBoost()) + ".log") :
                                req.filename;
     std::ofstream out(filename.c_str());
-    out << "Experiment " << (planning_scene_->getName().empty() ? "NO_NAME" : planning_scene_->getName()) << '\n';
-    out << "Running on " << (host.empty() ? "UNKNOWN" : host) << '\n';
-    out << "Starting at " << boost::posix_time::to_iso_extended_string(startTime.toBoost()) << '\n';
-    out << "<<<|" << '\n' << "ROS" << '\n' << req.motion_plan_request << '\n' << "|>>>" << '\n';
-    out << req.motion_plan_request.allowed_planning_time << " seconds per run" << '\n';
-    out << duration << " seconds spent to collect the data" << '\n';
-    out << "reachable BOOLEAN" << '\n';
-    out << "collision_free BOOLEAN" << '\n';
-    out << "total_time REAL" << '\n';
-    out << reachable << "; " << success << "; " << duration << '\n';
+    out << "Experiment " << (planning_scene_->getName().empty() ? "NO_NAME" : planning_scene_->getName()) << std::endl;
+    out << "Running on " << (host.empty() ? "UNKNOWN" : host) << std::endl;
+    out << "Starting at " << boost::posix_time::to_iso_extended_string(startTime.toBoost()) << std::endl;
+    out << "<<<|" << std::endl << "ROS" << std::endl << req.motion_plan_request << std::endl << "|>>>" << std::endl;
+    out << req.motion_plan_request.allowed_planning_time << " seconds per run" << std::endl;
+    out << duration << " seconds spent to collect the data" << std::endl;
+    out << "reachable BOOLEAN" << std::endl;
+    out << "collision_free BOOLEAN" << std::endl;
+    out << "total_time REAL" << std::endl;
+    out << reachable << "; " << success << "; " << duration << std::endl;
     out.close();
     ROS_INFO("Results saved to '%s'", filename.c_str());
   }
@@ -1331,14 +1326,14 @@ void moveit_benchmarks::BenchmarkExecution::runGoalExistenceBenchmark(BenchmarkR
                                 boost::posix_time::to_iso_extended_string(startTime.toBoost()) + ".log") :
                                req.filename;
     std::ofstream out(filename.c_str());
-    out << "Experiment " << (planning_scene_->getName().empty() ? "NO_NAME" : planning_scene_->getName()) << '\n';
-    out << "Running on " << (host.empty() ? "UNKNOWN" : host) << '\n';
-    out << "Starting at " << boost::posix_time::to_iso_extended_string(startTime.toBoost()) << '\n';
-    out << "<<<|" << '\n' << "ROS" << '\n' << req.motion_plan_request << '\n' << "|>>>" << '\n';
-    out << req.motion_plan_request.allowed_planning_time << " seconds per run" << '\n';
-    out << "reachable BOOLEAN" << '\n';
-    out << "collision_free BOOLEAN" << '\n';
-    out << "total_time REAL" << '\n';
+    out << "Experiment " << (planning_scene_->getName().empty() ? "NO_NAME" : planning_scene_->getName()) << std::endl;
+    out << "Running on " << (host.empty() ? "UNKNOWN" : host) << std::endl;
+    out << "Starting at " << boost::posix_time::to_iso_extended_string(startTime.toBoost()) << std::endl;
+    out << "<<<|" << std::endl << "ROS" << std::endl << req.motion_plan_request << std::endl << "|>>>" << std::endl;
+    out << req.motion_plan_request.allowed_planning_time << " seconds per run" << std::endl;
+    out << "reachable BOOLEAN" << std::endl;
+    out << "collision_free BOOLEAN" << std::endl;
+    out << "total_time REAL" << std::endl;
 
     for (std::size_t tc = 0; tc < req.motion_plan_request.trajectory_constraints.constraints.size(); ++tc)
     {
@@ -1391,7 +1386,7 @@ void moveit_benchmarks::BenchmarkExecution::runGoalExistenceBenchmark(BenchmarkR
         ROS_INFO("  Not reachable");
       }
 
-      out << reachable << "; " << success << "; " << duration << '\n';
+      out << reachable << "; " << success << "; " << duration << std::endl;
     }
     out.close();
     ROS_INFO("Results saved to '%s'", filename.c_str());
@@ -1454,7 +1449,7 @@ std::size_t moveit_benchmarks::BenchmarkExecution::generateParamCombinations()
     param_instance[param_options_[i].key] = param_options_[i].start;
   }
 
-  // call recursive function for every param option available
+  // call recusive function for every param option available
   int initial_options_id = 0;
   recursiveParamCombinations(initial_options_id, param_instance);
 
@@ -1465,7 +1460,7 @@ std::size_t moveit_benchmarks::BenchmarkExecution::generateParamCombinations()
     // Debug map
     for(std::map<std::string,double>::const_iterator it = param_combinations_[i].begin(); it !=
   param_combinations_[i].end(); ++it)
-      std::cout << "  - " << it->first << " => " << it->second << '\n';
+      std::cout << "  - " << it->first << " => " << it->second << std::endl;
   }
   */
 
@@ -1506,10 +1501,10 @@ void moveit_benchmarks::BenchmarkExecution::printConfigurationSettings(
   // Debug map
   for (planning_interface::PlannerConfigurationMap::const_iterator it = settings.begin(); it != settings.end(); ++it)
   {
-    out << "  - " << it->first << " => " << it->second.name << "/" << it->second.group << '\n';
+    out << "  - " << it->first << " => " << it->second.name << "/" << it->second.group << std::endl;
     // Debug map
     for (std::map<std::string, std::string>::const_iterator config_it = it->second.config.begin();
          config_it != it->second.config.end(); ++config_it)
-      out << "      - " << config_it->first << " => " << config_it->second << '\n';
+      out << "      - " << config_it->first << " => " << config_it->second << std::endl;
   }
 }

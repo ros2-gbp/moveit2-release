@@ -48,17 +48,17 @@ void get_backtrace(std::ostream& out)
   void* array[500];
   size_t size = backtrace(array, 500);
   char** strings = backtrace_symbols((void* const*)array, size);
-  out << "Backtrace: \n";
+  out << "Backtrace:" << std::endl;
   for (size_t i = 0; i < size; ++i)
   {
-    out << "  " << strings[i] << '\n';
+    out << "  " << strings[i] << std::endl;
   }
   free(strings);
 }
 #else
 void get_backtrace(std::ostream& out)
 {
-  out << "Unable to get backtrace with the used compiler.\n";
+  out << "Unable to get backtrace with the used compiler." << std::endl;
 }
 #endif
 }  // namespace moveit

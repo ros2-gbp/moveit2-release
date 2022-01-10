@@ -640,7 +640,7 @@ bool JointModelGroup::canSetStateFromIK(const std::string& tip) const
     // remove frame reference, if specified
     const std::string& tip_local = tip[0] == '/' ? tip.substr(1) : tip;
     const std::string& tip_frame_local = tip_frame[0] == '/' ? tip_frame.substr(1) : tip_frame;
-    RCLCPP_DEBUG(LOGGER, "comparing input tip: %s to this groups tip: %s ", tip_local.c_str(), tip_frame_local.c_str());
+    RCLCPP_WARN(LOGGER, "comparing input tip: %s to this groups tip: %s ", tip_local.c_str(), tip_frame_local.c_str());
 
     // Check if the IK solver's tip is the same as the frame of inquiry
     if (tip_local != tip_frame_local)
@@ -668,11 +668,11 @@ bool JointModelGroup::canSetStateFromIK(const std::string& tip) const
 
 void JointModelGroup::printGroupInfo(std::ostream& out) const
 {
-  out << "Group '" << name_ << "' using " << variable_count_ << " variables\n";
-  out << "  * Joints:\n";
+  out << "Group '" << name_ << "' using " << variable_count_ << " variables" << std::endl;
+  out << "  * Joints:" << std::endl;
   for (const JointModel* joint_model : joint_model_vector_)
-    out << "    '" << joint_model->getName() << "' (" << joint_model->getTypeName() << ")\n";
-  out << "  * Variables:\n";
+    out << "    '" << joint_model->getName() << "' (" << joint_model->getTypeName() << ")" << std::endl;
+  out << "  * Variables:" << std::endl;
   for (const std::string& variable_name : variable_names_)
   {
     int local_idx = joint_variables_index_map_.find(variable_name)->second;
@@ -682,10 +682,10 @@ void JointModelGroup::printGroupInfo(std::ostream& out) const
         << local_idx << " in group state";
     if (jm->getMimic())
       out << ", mimic '" << jm->getMimic()->getName() << "'";
-    out << '\n';
-    out << "        " << parent_model_->getVariableBounds(variable_name) << '\n';
+    out << std::endl;
+    out << "        " << parent_model_->getVariableBounds(variable_name) << std::endl;
   }
-  out << "  * Variables Index List:\n";
+  out << "  * Variables Index List:" << std::endl;
   out << "    ";
   for (int variable_index : variable_index_list_)
     out << variable_index << " ";
@@ -693,35 +693,35 @@ void JointModelGroup::printGroupInfo(std::ostream& out) const
     out << "(contiguous)";
   else
     out << "(non-contiguous)";
-  out << '\n';
+  out << std::endl;
   if (group_kinematics_.first)
   {
-    out << "  * Kinematics solver bijection:\n";
+    out << "  * Kinematics solver bijection:" << std::endl;
     out << "    ";
     for (unsigned int index : group_kinematics_.first.bijection_)
       out << index << " ";
-    out << '\n';
+    out << std::endl;
   }
   if (!group_kinematics_.second.empty())
   {
-    out << "  * Compound kinematics solver:\n";
+    out << "  * Compound kinematics solver:" << std::endl;
     for (const std::pair<const JointModelGroup* const, KinematicsSolver>& it : group_kinematics_.second)
     {
       out << "    " << it.first->getName() << ":";
       for (unsigned int index : it.second.bijection_)
         out << " " << index;
-      out << '\n';
+      out << std::endl;
     }
   }
 
   if (!group_mimic_update_.empty())
   {
-    out << "  * Local Mimic Updates:\n";
+    out << "  * Local Mimic Updates:" << std::endl;
     for (const GroupMimicUpdate& mimic_update : group_mimic_update_)
       out << "    [" << mimic_update.dest << "] = " << mimic_update.factor << " * [" << mimic_update.src << "] + "
-          << mimic_update.offset << '\n';
+          << mimic_update.offset << std::endl;
   }
-  out << '\n';
+  out << std::endl;
 }
 
 bool JointModelGroup::isValidVelocityMove(const std::vector<double>& from_joint_pose,

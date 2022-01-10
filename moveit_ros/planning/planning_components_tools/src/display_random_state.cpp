@@ -89,7 +89,7 @@ int main(int argc, char** argv)
     else if (invalid)
       std::cout << "invalid ";
     std::cout << "states will be randomly generated at an interval of one second and published as a planning scene."
-              << '\n';
+              << std::endl;
     std::size_t n;
     std::cin >> n;
 
@@ -110,7 +110,7 @@ int main(int argc, char** argv)
         } while (!found && attempts < 100);
         if (!found)
         {
-          std::cout << "Unable to find valid state" << '\n';
+          std::cout << "Unable to find valid state" << std::endl;
           continue;
         }
       }
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
         } while (!found && attempts < 100);
         if (!found)
         {
-          std::cout << "Unable to find invalid state" << '\n';
+          std::cout << "Unable to find invalid state" << std::endl;
           continue;
         }
       }
@@ -139,7 +139,7 @@ int main(int argc, char** argv)
       moveit_msgs::msg::PlanningScene psmsg;
       psm.getPlanningScene()->getPlanningSceneMsg(psmsg);
       pub_scene->publish(psmsg);
-      std::cout << psm.getPlanningScene()->getCurrentState() << '\n';
+      std::cout << psm.getPlanningScene()->getCurrentState() << std::endl;
 
       rclcpp::sleep_for(1s);
     }

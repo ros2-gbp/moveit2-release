@@ -42,16 +42,8 @@
 #include <moveit/transforms/transforms.h>
 #include <interactive_markers/interactive_marker_server.hpp>
 #include <interactive_markers/menu_handler.hpp>
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
-#include <tf2_eigen/tf2_eigen.hpp>
-#else
 #include <tf2_eigen/tf2_eigen.h>
-#endif
-#if __has_include(<tf2_geometry_msgs/tf2_geometry_msgs.hpp>)
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#else
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#endif
 #include <tf2/LinearMath/Transform.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/math/constants/constants.hpp>
@@ -81,7 +73,7 @@ RobotInteraction::RobotInteraction(const moveit::core::RobotModelConstPtr& robot
 
   // spin a thread that will process feedback events
   run_processing_thread_ = true;
-  processing_thread_ = std::make_unique<boost::thread>(boost::bind(&RobotInteraction::processingThread, this));
+  processing_thread_.reset(new boost::thread(boost::bind(&RobotInteraction::processingThread, this)));
 }
 
 RobotInteraction::~RobotInteraction()
@@ -416,7 +408,7 @@ void RobotInteraction::addEndEffectorMarkers(const InteractionHandlerPtr& handle
   moveit::core::RobotStateConstPtr rstate = handler->getState();
   const std::vector<std::string>& link_names = rstate->getJointModelGroup(eef.eef_group)->getLinkModelNames();
   visualization_msgs::msg::MarkerArray marker_array;
-  rstate->getRobotMarkers(marker_array, link_names, marker_color, eef.eef_group, rclcpp::Duration::from_seconds(0));
+  rstate->getRobotMarkers(marker_array, link_names, marker_color, eef.eef_group, rclcpp::Duration(0.0));
   tf2::Transform tf_root_to_link;
   tf2::fromMsg(tf2::toMsg(rstate->getGlobalLinkTransform(eef.parent_link)), tf_root_to_link);
   // Release the ptr count on the kinematic state
@@ -576,7 +568,7 @@ void RobotInteraction::toggleMoveInteractiveMarkerTopic(bool enable)
     boost::unique_lock<boost::mutex> ulock(marker_access_lock_);
     if (int_marker_move_subscribers_.empty())
     {
-      for (size_t i = 0; i < int_marker_move_topics_.size(); ++i)
+      for (size_t i = 0; i < int_marker_move_topics_.size(); i++)
       {
         std::string topic_name = int_marker_move_topics_[i];
         std::string marker_name = int_marker_names_[i];

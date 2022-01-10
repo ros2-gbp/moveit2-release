@@ -40,11 +40,7 @@
 #include <moveit/planning_scene_monitor/planning_scene_monitor.h>
 #include <moveit/kinematic_constraints/utils.h>
 #include <moveit/robot_state/conversions.h>
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
-#include <tf2_eigen/tf2_eigen.hpp>
-#else
 #include <tf2_eigen/tf2_eigen.h>
-#endif
 #include <boost/program_options/cmdline.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -229,7 +225,7 @@ int main(int argc, char** argv)
 
   if (vm.count("help") || argc == 1)  // show help if no parameters passed
   {
-    std::cout << desc << '\n';
+    std::cout << desc << std::endl;
     return 1;
   }
   // Set up db

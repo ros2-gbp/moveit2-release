@@ -44,11 +44,7 @@
 #include <moveit_servo/make_shared_from_pool.h>
 #include <moveit_servo/servo.h>
 #include <moveit_servo/servo_parameters.h>
-#if __has_include(<tf2_geometry_msgs/tf2_geometry_msgs.hpp>)
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#else
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#endif
 #include <tf2_ros/transform_listener.h>
 #include <rclcpp/rclcpp.hpp>
 
@@ -100,7 +96,7 @@ public:
   /** \brief A method for a different thread to stop motion and return early from control loop */
   void stopMotion();
 
-  /** \brief Change PID parameters. Motion is stopped before the update */
+  /** \brief Change PID parameters. Motion is stopped before the udpate */
   void updatePIDConfig(const double x_proportional_gain, const double x_integral_gain, const double x_derivative_gain,
                        const double y_proportional_gain, const double y_integral_gain, const double y_derivative_gain,
                        const double z_proportional_gain, const double z_integral_gain, const double z_derivative_gain,

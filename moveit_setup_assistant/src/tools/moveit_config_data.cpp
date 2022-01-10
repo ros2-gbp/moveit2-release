@@ -34,18 +34,17 @@
 
 /* Author: Dave Coleman */
 
-#include <moveit/setup_assistant/tools/moveit_config_data.hpp>
+#include <moveit/setup_assistant/tools/moveit_config_data.h>
 // Reading/Writing Files
 #include <iostream>  // For writing yaml and launch files
 #include <fstream>
 #include <boost/filesystem/path.hpp>        // for creating folders/files
 #include <boost/filesystem/operations.hpp>  // is_regular_file, is_directory, etc.
 #include <boost/algorithm/string/trim.hpp>
-#include <tinyxml.h>
 
 // ROS
-#include <rclcpp/rclcpp.hpp>
-#include <ament_index_cpp/get_package_share_directory.hpp>  // for getting file path for loading images
+#include <ros/console.h>
+#include <ros/package.h>  // for getting file path for loading images
 
 // OMPL version
 #include <ompl/config.h>
@@ -61,14 +60,14 @@ namespace fs = boost::filesystem;
 MoveItConfigData::MoveItConfigData() : config_pkg_generated_timestamp_(0)
 {
   // Create an instance of SRDF writer and URDF model for all widgets to share
-  srdf_ = std::make_shared<srdf::SRDFWriter>();
-  urdf_model_ = std::make_shared<urdf::Model>();
+  srdf_.reset(new srdf::SRDFWriter());
+  urdf_model_.reset(new urdf::Model());
 
   // Not in debug mode
   debug_ = false;
 
   // Get MoveIt Setup Assistant package path
-  setup_assistant_path_ = ament_index_cpp::get_package_share_directory("moveit_setup_assistant");
+  setup_assistant_path_ = ros::package::getPath("moveit_setup_assistant");
   if (setup_assistant_path_.empty())
   {
     setup_assistant_path_ = ".";
@@ -96,7 +95,7 @@ moveit::core::RobotModelConstPtr MoveItConfigData::getRobotModel()
   if (!robot_model_)
   {
     // Initialize with a URDF Model Interface and a SRDF Model
-    robot_model_ = std::make_shared<moveit::core::RobotModel>(urdf_model_, srdf_->srdf_model_);
+    robot_model_.reset(new moveit::core::RobotModel(urdf_model_, srdf_->srdf_model_));
   }
 
   return robot_model_;
@@ -107,13 +106,13 @@ moveit::core::RobotModelConstPtr MoveItConfigData::getRobotModel()
 // ******************************************************************************************
 void MoveItConfigData::updateRobotModel()
 {
-  RCLCPP_INFO_STREAM(LOGGER, "Updating kinematic model");
+  ROS_INFO("Updating kinematic model");
 
   // Tell SRDF Writer to create new SRDF Model, use original URDF model
   srdf_->updateSRDFModel(*urdf_model_);
 
   // Create new kin model
-  robot_model_ = std::make_shared<moveit::core::RobotModel>(urdf_model_, srdf_->srdf_model_);
+  robot_model_.reset(new moveit::core::RobotModel(urdf_model_, srdf_->srdf_model_));
 
   // Reset the planning scene
   planning_scene_.reset();
@@ -130,7 +129,7 @@ planning_scene::PlanningScenePtr MoveItConfigData::getPlanningScene()
     getRobotModel();
 
     // Allocate an empty planning scene
-    planning_scene_ = std::make_shared<planning_scene::PlanningScene>(robot_model_);
+    planning_scene_.reset(new planning_scene::PlanningScene(robot_model_));
   }
   return planning_scene_;
 }
@@ -190,7 +189,7 @@ bool MoveItConfigData::outputSetupAssistantFile(const std::string& file_path)
   std::ofstream output_stream(file_path.c_str(), std::ios_base::trunc);
   if (!output_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for writing " << file_path);
+    ROS_ERROR_STREAM("Unable to open file for writing " << file_path);
     return false;
   }
 
@@ -270,11 +269,11 @@ bool MoveItConfigData::outputOMPLPlanningYAML(const std::string& file_path)
   std::ofstream output_stream(file_path.c_str(), std::ios_base::trunc);
   if (!output_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for writing " << file_path);
+    ROS_ERROR_STREAM("Unable to open file for writing " << file_path);
     return false;
   }
 
-  output_stream << emitter.c_str() << '\n';
+  output_stream << emitter.c_str() << std::endl;
   output_stream.close();
 
   return true;  // file created successfully
@@ -311,7 +310,7 @@ bool MoveItConfigData::outputCHOMPPlanningYAML(const std::string& file_path)
   std::ofstream output_stream(file_path.c_str(), std::ios_base::trunc);
   if (!output_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for writing " << file_path);
+    ROS_ERROR_STREAM("Unable to open file for writing " << file_path);
     return false;
   }
 
@@ -360,7 +359,7 @@ bool MoveItConfigData::outputKinematicsYAML(const std::string& file_path)
   std::ofstream output_stream(file_path.c_str(), std::ios_base::trunc);
   if (!output_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for writing " << file_path);
+    ROS_ERROR_STREAM("Unable to open file for writing " << file_path);
     return false;
   }
 
@@ -487,7 +486,7 @@ std::string MoveItConfigData::getGazeboCompatibleURDF()
   }
   catch (YAML::ParserException& e)  // Catch errors
   {
-    RCLCPP_ERROR_STREAM(LOGGER, e.what());
+    ROS_ERROR_STREAM_NAMED("moveit_config_data", e.what());
     return std::string("");
   }
 
@@ -584,7 +583,7 @@ bool MoveItConfigData::outputFakeControllersYAML(const std::string& file_path)
   std::ofstream output_stream(file_path.c_str(), std::ios_base::trunc);
   if (!output_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for writing " << file_path);
+    ROS_ERROR_STREAM("Unable to open file for writing " << file_path);
     return false;
   }
 
@@ -685,7 +684,7 @@ std::vector<OMPLPlannerDescription> MoveItConfigData::getOMPLPlanners()
                     "dist new state to nearest neighbor to disqualify as frontier. "
                     "default: 0.0 set in setup()");
   trrt.addParameter("frountierNodeRatio", "0.1", "1/10, or 1 nonfrontier for every 10 frontier. default: 0.1");
-  trrt.addParameter("k_constant", "0.0", "value used to normalize expression. default: 0.0 set in setup()");
+  trrt.addParameter("k_constant", "0.0", "value used to normalize expresssion. default: 0.0 set in setup()");
   planner_des.push_back(trrt);
 
   OMPLPlannerDescription prm("PRM", "geometric");
@@ -1060,7 +1059,7 @@ bool MoveItConfigData::outputROSControllersYAML(const std::string& file_path)
   std::ofstream output_stream(file_path.c_str(), std::ios_base::trunc);
   if (!output_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for writing " << file_path);
+    ROS_ERROR_STREAM("Unable to open file for writing " << file_path);
     return false;
   }
   output_stream << emitter.c_str();
@@ -1100,7 +1099,7 @@ bool MoveItConfigData::output3DSensorPluginYAML(const std::string& file_path)
   std::ofstream output_stream(file_path.c_str(), std::ios_base::trunc);
   if (!output_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for writing " << file_path);
+    ROS_ERROR_STREAM("Unable to open file for writing " << file_path);
     return false;
   }
 
@@ -1198,7 +1197,7 @@ bool MoveItConfigData::outputJointLimitsYAML(const std::string& file_path)
   std::ofstream output_stream(file_path.c_str(), std::ios_base::trunc);
   if (!output_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for writing " << file_path);
+    ROS_ERROR_STREAM("Unable to open file for writing " << file_path);
     return false;
   }
   output_stream << emitter.c_str();
@@ -1309,7 +1308,7 @@ bool MoveItConfigData::inputOMPLYAML(const std::string& file_path)
   std::ifstream input_stream(file_path.c_str());
   if (!input_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for reading " << file_path);
+    ROS_ERROR_STREAM("Unable to open file for reading " << file_path);
     return false;
   }
 
@@ -1342,7 +1341,7 @@ bool MoveItConfigData::inputOMPLYAML(const std::string& file_path)
   }
   catch (YAML::ParserException& e)  // Catch errors
   {
-    RCLCPP_ERROR_STREAM(LOGGER, e.what());
+    ROS_ERROR_STREAM(e.what());
     return false;
   }
   return true;
@@ -1357,7 +1356,7 @@ bool MoveItConfigData::inputKinematicsYAML(const std::string& file_path)
   std::ifstream input_stream(file_path.c_str());
   if (!input_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for reading " << file_path);
+    ROS_ERROR_STREAM("Unable to open file for reading " << file_path);
     return false;
   }
 
@@ -1386,7 +1385,7 @@ bool MoveItConfigData::inputKinematicsYAML(const std::string& file_path)
   }
   catch (YAML::ParserException& e)  // Catch errors
   {
-    RCLCPP_ERROR_STREAM(LOGGER, e.what());
+    ROS_ERROR_STREAM(e.what());
     return false;
   }
 
@@ -1401,7 +1400,7 @@ bool MoveItConfigData::inputPlanningContextLaunch(const std::string& file_path)
   TiXmlDocument launch_document(file_path);
   if (!launch_document.LoadFile())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Failed parsing " << file_path);
+    ROS_ERROR_STREAM("Failed parsing " << file_path);
     return false;
   }
 
@@ -1415,7 +1414,7 @@ bool MoveItConfigData::inputPlanningContextLaunch(const std::string& file_path)
   }
   if (!kinematics_group)
   {
-    RCLCPP_ERROR(LOGGER, "<group ns=\"$(arg robot_description)_kinematics\"> not found");
+    ROS_ERROR("<group ns=\"$(arg robot_description)_kinematics\"> not found");
     return false;
   }
 
@@ -1458,12 +1457,12 @@ bool MoveItConfigData::parseROSController(const YAML::Node& controller)
           }
           if (!parse(controller_node, "name", control_setting.name_))
           {
-            RCLCPP_ERROR_STREAM(LOGGER, "Couldn't parse ros_controllers.yaml");
+            ROS_ERROR_STREAM_NAMED("ros_controller.yaml", "Couldn't parse ros_controllers.yaml");
             return false;
           }
           if (!parse(controller_node, "type", control_setting.type_))
           {
-            RCLCPP_ERROR_STREAM(LOGGER, "Couldn't parse ros_controllers.yaml");
+            ROS_ERROR_STREAM_NAMED("ros_controller.yaml", "Couldn't parse ros_controllers.yaml");
             return false;
           }
           // All required fields were parsed correctly
@@ -1471,7 +1470,7 @@ bool MoveItConfigData::parseROSController(const YAML::Node& controller)
         }
         else
         {
-          RCLCPP_ERROR_STREAM(LOGGER, "Couldn't parse ros_controllers.yaml");
+          ROS_ERROR_STREAM_NAMED("ros_controller.yaml", "Couldn't parse ros_controllers.yaml");
           return false;
         }
       }
@@ -1545,7 +1544,7 @@ bool MoveItConfigData::inputROSControllersYAML(const std::string& file_path)
   std::ifstream input_stream(file_path.c_str());
   if (!input_stream.good())
   {
-    RCLCPP_WARN_STREAM(LOGGER, "Does not exist " << file_path);
+    ROS_WARN_STREAM_NAMED("ros_controllers.yaml", "Does not exist " << file_path);
     return false;
   }
 
@@ -1556,7 +1555,7 @@ bool MoveItConfigData::inputROSControllersYAML(const std::string& file_path)
   }
   catch (YAML::ParserException& e)  // Catch errors
   {
-    RCLCPP_ERROR_STREAM(LOGGER, e.what());
+    ROS_ERROR_STREAM(e.what());
     return false;
   }
 
@@ -1606,7 +1605,7 @@ bool MoveItConfigData::setPackagePath(const std::string& pkg_path)
   if (!fs::is_directory(pkg_path))
   {
     // does not exist, check if its a package
-    full_package_path = ament_index_cpp::get_package_share_directory(pkg_path);
+    full_package_path = ros::package::getPath(pkg_path);
 
     // check that the folder exists
     if (!fs::is_directory(full_package_path))
@@ -1640,10 +1639,10 @@ bool MoveItConfigData::extractPackageNameFromPath(const std::string& path, std::
   // truncate path step by step and check if it contains a package.xml
   while (!sub_path.empty())
   {
-    RCLCPP_DEBUG_STREAM(LOGGER, "checking in " << sub_path.make_preferred().string());
+    ROS_DEBUG_STREAM("checking in " << sub_path.make_preferred().string());
     if (fs::is_regular_file(sub_path / "package.xml"))
     {
-      RCLCPP_DEBUG_STREAM(LOGGER, "Found package.xml in " << sub_path.make_preferred().string());
+      ROS_DEBUG_STREAM("Found package.xml in " << sub_path.make_preferred().string());
       package_found = true;
       relative_filepath = relative_path.string();
       package_name = sub_path.leaf().string();
@@ -1660,7 +1659,7 @@ bool MoveItConfigData::extractPackageNameFromPath(const std::string& path, std::
     return false;
   }
 
-  RCLCPP_DEBUG_STREAM(LOGGER, "Package name for file \"" << path << "\" is \"" << package_name << "\"");
+  ROS_DEBUG_STREAM("Package name for file \"" << path << "\" is \"" << package_name << "\"");
   return true;
 }
 
@@ -1692,7 +1691,7 @@ bool MoveItConfigData::createFullURDFPath()
   else
   {
     // Check that ROS can find the package
-    std::string robot_desc_pkg_path = ament_index_cpp::get_package_share_directory(urdf_pkg_name_);
+    std::string robot_desc_pkg_path = ros::package::getPath(urdf_pkg_name_);
 
     if (robot_desc_pkg_path.empty())
     {
@@ -1727,7 +1726,7 @@ bool MoveItConfigData::inputSetupAssistantYAML(const std::string& file_path)
   std::ifstream input_stream(file_path.c_str());
   if (!input_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for reading " << file_path);
+    ROS_ERROR_STREAM("Unable to open file for reading " << file_path);
     return false;
   }
 
@@ -1768,10 +1767,10 @@ bool MoveItConfigData::inputSetupAssistantYAML(const std::string& file_path)
   }
   catch (YAML::ParserException& e)  // Catch errors
   {
-    RCLCPP_ERROR_STREAM(LOGGER, e.what());
+    ROS_ERROR_STREAM(e.what());
   }
 
-  return false;  // if it gets to this point an error has occurred
+  return false;  // if it gets to this point an error has occured
 }
 
 // ******************************************************************************************
@@ -1783,7 +1782,7 @@ bool MoveItConfigData::input3DSensorsYAML(const std::string& default_file_path, 
   std::ifstream default_input_stream(default_file_path.c_str());
   if (!default_input_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for reading " << default_file_path);
+    ROS_ERROR_STREAM_NAMED("sensors_3d.yaml", "Unable to open file for reading " << default_file_path);
     return false;
   }
 
@@ -1822,7 +1821,7 @@ bool MoveItConfigData::input3DSensorsYAML(const std::string& default_file_path, 
   }
   catch (YAML::ParserException& e)  // Catch errors
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Error parsing default sensors yaml: " << e.what());
+    ROS_ERROR_STREAM("Error parsing default sensors yaml: " << e.what());
   }
 
   // Is there a sensors config in the package?
@@ -1835,7 +1834,7 @@ bool MoveItConfigData::input3DSensorsYAML(const std::string& default_file_path, 
   std::ifstream input_stream(file_path.c_str());
   if (!input_stream.good())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Unable to open file for reading " << file_path);
+    ROS_ERROR_STREAM_NAMED("sensors_3d.yaml", "Unable to open file for reading " << file_path);
     return false;
   }
 
@@ -1877,10 +1876,10 @@ bool MoveItConfigData::input3DSensorsYAML(const std::string& default_file_path, 
   }
   catch (YAML::ParserException& e)  // Catch errors
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Error parsing sensors yaml: " << e.what());
+    ROS_ERROR_STREAM("Error parsing sensors yaml: " << e.what());
   }
 
-  return false;  // if it gets to this point an error has occurred
+  return false;  // if it gets to this point an error has occured
 }
 
 // ******************************************************************************************
@@ -1909,11 +1908,9 @@ srdf::Model::Group* MoveItConfigData::findGroupByName(const std::string& name)
 
   // Check if subgroup was found
   if (searched_group == nullptr)  // not found
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "An internal error has occurred while searching for groups. Group '"
-                                    << name << "' was not found  in the SRDF.");
-    throw std::runtime_error(name + " was not found in the SRDF");
-  }
+    ROS_FATAL_STREAM("An internal error has occured while searching for groups. Group '" << name
+                                                                                         << "' was not found "
+                                                                                            "in the SRDF.");
 
   return searched_group;
 }
@@ -1983,7 +1980,7 @@ std::vector<ROSControlConfig>& MoveItConfigData::getROSControllers()
 }
 
 // ******************************************************************************************
-// Used to add a sensor plugin configuration parameter to the sensor plugin configuration parameter list
+// Used to add a sensor plugin configuation parameter to the sensor plugin configuration parameter list
 // ******************************************************************************************
 void MoveItConfigData::addGenericParameterToSensorPluginConfig(const std::string& name, const std::string& value,
                                                                const std::string& /*comment*/)

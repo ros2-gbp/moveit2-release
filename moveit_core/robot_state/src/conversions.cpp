@@ -37,11 +37,7 @@
 
 #include <moveit/robot_state/conversions.h>
 #include <geometric_shapes/shape_operations.h>
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
-#include <tf2_eigen/tf2_eigen.hpp>
-#else
 #include <tf2_eigen/tf2_eigen.h>
-#endif
 #include <boost/lexical_cast.hpp>
 #include "rclcpp/rclcpp.hpp"
 
@@ -202,11 +198,10 @@ static void _attachedBodyToMsg(const AttachedBody& attached_body, moveit_msgs::m
     aco.touch_links.push_back(touch_link);
   aco.object.header.frame_id = aco.link_name;
   aco.object.id = attached_body.getName();
-  aco.object.pose = tf2::toMsg(attached_body.getPose());
 
   aco.object.operation = moveit_msgs::msg::CollisionObject::ADD;
   const std::vector<shapes::ShapeConstPtr>& ab_shapes = attached_body.getShapes();
-  const EigenSTL::vector_Isometry3d& shape_poses = attached_body.getShapePoses();
+  const EigenSTL::vector_Isometry3d& ab_tf = attached_body.getFixedTransforms();
   ShapeVisitorAddToCollisionObject sv(&aco.object);
   aco.object.primitives.clear();
   aco.object.meshes.clear();
@@ -220,13 +215,13 @@ static void _attachedBodyToMsg(const AttachedBody& attached_body, moveit_msgs::m
     if (shapes::constructMsgFromShape(ab_shapes[j].get(), sm))
     {
       geometry_msgs::msg::Pose p;
-      p = tf2::toMsg(shape_poses[j]);
+      p = tf2::toMsg(ab_tf[j]);
       sv.addToObject(sm, p);
     }
   }
   aco.object.subframe_names.clear();
   aco.object.subframe_poses.clear();
-  for (const auto& frame_pair : attached_body.getSubframes())
+  for (const auto& frame_pair : attached_body.getSubframeTransforms())
   {
     aco.object.subframe_names.push_back(frame_pair.first);
     geometry_msgs::msg::Pose pose;
@@ -270,30 +265,43 @@ static void _msgToAttachedBody(const Transforms* tf, const moveit_msgs::msg::Att
       const LinkModel* lm = state.getLinkModel(aco.link_name);
       if (lm)
       {
-        Eigen::Isometry3d object_pose;
-        tf2::fromMsg(aco.object.pose, object_pose);
-
         std::vector<shapes::ShapeConstPtr> shapes;
-        EigenSTL::vector_Isometry3d shape_poses;
-        const auto num_shapes = aco.object.primitives.size() + aco.object.meshes.size() + aco.object.planes.size();
-        shapes.reserve(num_shapes);
-        shape_poses.reserve(num_shapes);
-
-        auto append = [&shapes, &shape_poses](shapes::Shape* s, const geometry_msgs::msg::Pose& pose_msg) {
-          if (!s)
-            return;
-          Eigen::Isometry3d pose;
-          tf2::fromMsg(pose_msg, pose);
-          shapes.emplace_back(shapes::ShapeConstPtr(s));
-          shape_poses.emplace_back(std::move(pose));
-        };
+        EigenSTL::vector_Isometry3d poses;
 
         for (std::size_t i = 0; i < aco.object.primitives.size(); ++i)
-          append(shapes::constructShapeFromMsg(aco.object.primitives[i]), aco.object.primitive_poses[i]);
+        {
+          shapes::Shape* s = shapes::constructShapeFromMsg(aco.object.primitives[i]);
+          if (s)
+          {
+            Eigen::Isometry3d p;
+            tf2::fromMsg(aco.object.primitive_poses[i], p);
+            shapes.push_back(shapes::ShapeConstPtr(s));
+            poses.push_back(p);
+          }
+        }
         for (std::size_t i = 0; i < aco.object.meshes.size(); ++i)
-          append(shapes::constructShapeFromMsg(aco.object.meshes[i]), aco.object.mesh_poses[i]);
+        {
+          shapes::Shape* s = shapes::constructShapeFromMsg(aco.object.meshes[i]);
+          if (s)
+          {
+            Eigen::Isometry3d p;
+            tf2::fromMsg(aco.object.mesh_poses[i], p);
+            shapes.push_back(shapes::ShapeConstPtr(s));
+            poses.push_back(p);
+          }
+        }
         for (std::size_t i = 0; i < aco.object.planes.size(); ++i)
-          append(shapes::constructShapeFromMsg(aco.object.planes[i]), aco.object.plane_poses[i]);
+        {
+          shapes::Shape* s = shapes::constructShapeFromMsg(aco.object.planes[i]);
+          if (s)
+          {
+            Eigen::Isometry3d p;
+            tf2::fromMsg(aco.object.plane_poses[i], p);
+
+            shapes.push_back(shapes::ShapeConstPtr(s));
+            poses.push_back(p);
+          }
+        }
 
         moveit::core::FixedTransformsMap subframe_poses;
         for (std::size_t i = 0; i < aco.object.subframe_poses.size(); ++i)
@@ -304,26 +312,30 @@ static void _msgToAttachedBody(const Transforms* tf, const moveit_msgs::msg::Att
           subframe_poses[name] = p;
         }
 
-        // Transform shape pose to link frame
+        // Transform shape poses and subframes to link frame
         if (!Transforms::sameFrame(aco.object.header.frame_id, aco.link_name))
         {
           bool frame_found = false;
-          Eigen::Isometry3d world_to_header_frame;
-          world_to_header_frame = state.getFrameTransform(aco.object.header.frame_id, &frame_found);
+          Eigen::Isometry3d t0;
+          t0 = state.getFrameTransform(aco.object.header.frame_id, &frame_found);
           if (!frame_found)
           {
             if (tf && tf->canTransform(aco.object.header.frame_id))
-              world_to_header_frame = tf->getTransform(aco.object.header.frame_id);
+              t0 = tf->getTransform(aco.object.header.frame_id);
             else
             {
-              world_to_header_frame.setIdentity();
+              t0.setIdentity();
               RCLCPP_ERROR(LOGGER,
                            "Cannot properly transform from frame '%s'. "
                            "The pose of the attached body may be incorrect",
                            aco.object.header.frame_id.c_str());
             }
           }
-          object_pose = state.getGlobalLinkTransform(lm).inverse() * world_to_header_frame * object_pose;
+          Eigen::Isometry3d t = state.getGlobalLinkTransform(lm).inverse() * t0;
+          for (Eigen::Isometry3d& pose : poses)
+            pose = t * pose;
+          for (auto& subframe_pose : subframe_poses)
+            subframe_pose.second = t * subframe_pose.second;
         }
 
         if (shapes.empty())
@@ -338,8 +350,8 @@ static void _msgToAttachedBody(const Transforms* tf, const moveit_msgs::msg::Att
                          "The robot state already had an object named '%s' attached to link '%s'. "
                          "The object was replaced.",
                          aco.object.id.c_str(), aco.link_name.c_str());
-          state.attachBody(aco.object.id, object_pose, shapes, shape_poses, aco.touch_links, aco.link_name,
-                           aco.detach_posture, subframe_poses);
+          state.attachBody(aco.object.id, shapes, poses, aco.touch_links, aco.link_name, aco.detach_posture,
+                           subframe_poses);
           RCLCPP_DEBUG(LOGGER, "Attached object '%s' to link '%s'", aco.object.id.c_str(), aco.link_name.c_str());
         }
       }
@@ -496,7 +508,7 @@ void robotStateToStream(const RobotState& state, std::ostream& out, bool include
       if (i < state.getVariableCount() - 1)
         out << separator;
     }
-    out << '\n';
+    out << std::endl;
   }
 
   // Output values of joints
@@ -508,7 +520,7 @@ void robotStateToStream(const RobotState& state, std::ostream& out, bool include
     if (i < state.getVariableCount() - 1)
       out << separator;
   }
-  out << '\n';
+  out << std::endl;
 }
 
 void robotStateToStream(const RobotState& state, std::ostream& out,
@@ -544,8 +556,8 @@ void robotStateToStream(const RobotState& state, std::ostream& out,
 
   // Push all headers and joints to our output stream
   if (include_header)
-    out << headers.str() << '\n';
-  out << joints.str() << '\n';
+    out << headers.str() << std::endl;
+  out << joints.str() << std::endl;
 }
 
 void streamToRobotState(RobotState& state, const std::string& line, const std::string& separator)
@@ -558,7 +570,7 @@ void streamToRobotState(RobotState& state, const std::string& line, const std::s
   {
     // Get a variable
     if (!std::getline(line_stream, cell, separator[0]))
-      RCLCPP_ERROR(LOGGER, "Missing variable %s", state.getVariableNames()[i].c_str());
+      RCLCPP_ERROR(LOGGER, "Missing variable ", state.getVariableNames()[i].c_str());
     state.getVariablePositions()[i] = boost::lexical_cast<double>(cell.c_str());
   }
 }

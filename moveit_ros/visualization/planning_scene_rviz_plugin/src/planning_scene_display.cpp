@@ -61,7 +61,7 @@ namespace moveit_rviz_plugin
 {
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_ros_visualization.planning_scene_display");
 // ******************************************************************************************
-// Base class constructor
+// Base class contructor
 // ******************************************************************************************
 PlanningSceneDisplay::PlanningSceneDisplay(bool listen_to_planning_scene, bool show_scene_robot)
   : Display(), planning_scene_needs_render_(true), current_scene_time_(0.0f)
@@ -112,7 +112,6 @@ PlanningSceneDisplay::PlanningSceneDisplay(bool listen_to_planning_scene, bool s
   octree_render_property_->addOption("Occupied Voxels", OCTOMAP_OCCUPIED_VOXELS);
   octree_render_property_->addOption("Free Voxels", OCTOMAP_FREE_VOXELS);
   octree_render_property_->addOption("All Voxels", OCTOMAP_FREE_VOXELS | OCTOMAP_OCCUPIED_VOXELS);
-  octree_render_property_->addOption("Disabled", OCTOMAP_DISABLED);
 
   octree_coloring_property_ = new rviz_common::properties::EnumProperty(
       "Voxel Coloring", "Z-Axis", "Select voxel coloring mode", scene_category_, SLOT(changedOctreeColorMode()), this);
@@ -518,8 +517,9 @@ void PlanningSceneDisplay::unsetLinkColor(rviz_default_plugins::robot::Robot* ro
 // ******************************************************************************************
 planning_scene_monitor::PlanningSceneMonitorPtr PlanningSceneDisplay::createPlanningSceneMonitor()
 {
+  std::shared_ptr<tf2_ros::Buffer> tf_buffer = moveit::planning_interface::getSharedTF();
   auto rml = moveit::planning_interface::getSharedRobotModelLoader(node_, robot_description_property_->getStdString());
-  return std::make_shared<planning_scene_monitor::PlanningSceneMonitor>(node_, rml,
+  return std::make_shared<planning_scene_monitor::PlanningSceneMonitor>(node_, rml, tf_buffer,
                                                                         getNameStd() + "_planning_scene_monitor");
 }
 
@@ -563,7 +563,7 @@ void PlanningSceneDisplay::loadRobotModel()
 void PlanningSceneDisplay::onRobotModelLoaded()
 {
   changedPlanningSceneTopic();
-  planning_scene_render_ = std::make_shared<PlanningSceneRender>(planning_scene_node_, context_, planning_scene_robot_);
+  planning_scene_render_.reset(new PlanningSceneRender(planning_scene_node_, context_, planning_scene_robot_));
   planning_scene_render_->getGeometryNode()->setVisible(scene_enabled_property_->getBool());
 
   const planning_scene_monitor::LockedPlanningSceneRO& ps = getPlanningSceneRO();

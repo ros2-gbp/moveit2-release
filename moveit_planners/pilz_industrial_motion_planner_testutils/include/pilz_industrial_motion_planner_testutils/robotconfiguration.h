@@ -32,7 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#pragma once
+#ifndef ROBOTCONFIGURATION_H
+#define ROBOTCONFIGURATION_H
 
 #include <string>
 #include <utility>
@@ -87,3 +88,5 @@ inline void RobotConfiguration::clearModel()
   robot_model_ = nullptr;
 }
 }  // namespace pilz_industrial_motion_planner_testutils
+
+#endif  // ROBOTCONFIGURATION_H

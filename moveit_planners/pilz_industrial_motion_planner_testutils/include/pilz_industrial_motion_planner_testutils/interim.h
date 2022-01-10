@@ -32,7 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#pragma once
+#ifndef INTERIMAXILIARY_H
+#define INTERIMAXILIARY_H
 
 #include "circauxiliary.h"
 
@@ -55,3 +56,5 @@ std::string Interim<ConfigType, BuilderType>::getConstraintName() const
   return "interim";
 }
 }  // namespace pilz_industrial_motion_planner_testutils
+
+#endif  // INTERIMAXILIARY_H

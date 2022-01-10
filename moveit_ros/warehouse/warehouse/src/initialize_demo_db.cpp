@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 
   if (vm.count("help"))
   {
-    std::cout << desc << '\n';
+    std::cout << desc << std::endl;
     return 1;
   }
   // Set up db

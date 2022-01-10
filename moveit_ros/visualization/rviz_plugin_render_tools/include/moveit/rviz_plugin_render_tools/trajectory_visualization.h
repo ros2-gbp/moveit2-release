@@ -125,12 +125,6 @@ protected:
    * \brief ROS callback for an incoming path message
    */
   void incomingDisplayTrajectory(const moveit_msgs::msg::DisplayTrajectory::ConstSharedPtr msg);
-
-  /**
-   * \brief get time to show each single robot state
-   * \return Positive values indicate a fixed time per state
-   *         Negative values indicate a realtime-factor
-   */
   float getStateDisplayTime();
   void clearTrajectoryTrail();
 
@@ -155,7 +149,7 @@ protected:
   moveit::core::RobotModelConstPtr robot_model_;
   moveit::core::RobotStatePtr robot_state_;
 
-  // Pointers from parent display that we save
+  // Pointers from parent display taht we save
   rviz_common::Display* display_;  // the parent display that this class populates
   rviz_common::properties::Property* widget_;
   Ogre::SceneNode* scene_node_;

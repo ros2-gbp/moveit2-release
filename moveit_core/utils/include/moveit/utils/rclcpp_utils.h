@@ -25,7 +25,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef ROSCPP_NAMES_H
+#define ROSCPP_NAMES_H
 
 #include <string>
 
@@ -39,3 +40,5 @@ std::string clean(const std::string& name);
 std::string append(const std::string& left, const std::string& right);
 }  // namespace names
 }  // namespace rclcpp
+
+#endif  // ROSCPP_NAMES_H

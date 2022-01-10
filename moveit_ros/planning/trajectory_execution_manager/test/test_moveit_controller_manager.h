@@ -152,12 +152,12 @@ public:
     for (const std::string& controller : deactivate)
     {
       controllers_[controller] &= ~ACTIVE;
-      std::cout << "Deactivated controller " << controller << '\n';
+      std::cout << "Deactivated controller " << controller << std::endl;
     }
     for (const std::string& controller : activate)
     {
       controllers_[controller] |= ACTIVE;
-      std::cout << "Activated controller " << controller << '\n';
+      std::cout << "Activated controller " << controller << std::endl;
     }
     return true;
   }

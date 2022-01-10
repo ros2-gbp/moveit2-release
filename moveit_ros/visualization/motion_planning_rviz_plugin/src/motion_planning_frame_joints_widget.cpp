@@ -73,12 +73,12 @@ Qt::ItemFlags JMGItemModel::flags(const QModelIndex& index) const
     return Qt::ItemFlags();
 
   Qt::ItemFlags f = QAbstractTableModel::flags(index);
-
-  const moveit::core::JointModel* jm = getJointModel(index);
-  bool is_editable = !jm->isPassive() && !jm->getMimic();
-  f.setFlag(Qt::ItemIsEnabled, is_editable);
   if (index.column() == 1)
-    f.setFlag(Qt::ItemIsEditable, is_editable);
+  {
+    const moveit::core::JointModel* jm = getJointModel(index);
+    if (!jm->isPassive() && !jm->getMimic())  // these are not editable
+      f |= Qt::ItemIsEditable;
+  }
   return f;
 }
 
@@ -214,8 +214,8 @@ void MotionPlanningFrameJointsWidget::changePlanningGroup(
   // create new models
   start_state_handler_ = start_state_handler;
   goal_state_handler_ = goal_state_handler;
-  start_state_model_ = std::make_unique<JMGItemModel>(*start_state_handler_->getState(), group_name, this);
-  goal_state_model_ = std::make_unique<JMGItemModel>(*goal_state_handler_->getState(), group_name, this);
+  start_state_model_.reset(new JMGItemModel(*start_state_handler_->getState(), group_name, this));
+  goal_state_model_.reset(new JMGItemModel(*goal_state_handler_->getState(), group_name, this));
 
   // forward model updates to the PlanningDisplay
   connect(start_state_model_.get(), &JMGItemModel::dataChanged, this, [this]() {
@@ -471,7 +471,7 @@ bool JointsWidgetEventFilter::eventFilter(QObject* /*target*/, QEvent* event)
   {
     QAbstractItemView* view = qobject_cast<QAbstractItemView*>(parent());
     QModelIndex index = view->indexAt(static_cast<QMouseEvent*>(event)->pos());
-    if (index.flags() & Qt::ItemIsEditable)  // mouse event on any editable slider?
+    if (index.isValid() && index.column() == 1)  // mouse event on any of joint indexes?
     {
       view->setCurrentIndex(index);
       view->edit(index);

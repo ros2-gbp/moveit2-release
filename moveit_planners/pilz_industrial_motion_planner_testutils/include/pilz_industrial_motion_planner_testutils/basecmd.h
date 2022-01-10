@@ -32,7 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#pragma once
+#ifndef BASECMD_H
+#define BASECMD_H
 
 #include <string>
 
@@ -123,3 +124,5 @@ planning_interface::MotionPlanRequest BaseCmd<StartType, GoalType>::toRequest() 
   return req;
 }
 }  // namespace pilz_industrial_motion_planner_testutils
+
+#endif  // BASECMD_H

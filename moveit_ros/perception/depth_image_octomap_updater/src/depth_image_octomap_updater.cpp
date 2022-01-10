@@ -36,11 +36,7 @@
 
 #include <moveit/depth_image_octomap_updater/depth_image_octomap_updater.h>
 #include <moveit/occupancy_map_monitor/occupancy_map_monitor.h>
-#if __has_include(<tf2_geometry_msgs/tf2_geometry_msgs.hpp>)
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#else
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#endif
 #include <tf2/LinearMath/Vector3.h>
 #include <tf2/LinearMath/Transform.h>
 #include <geometric_shapes/shape_operations.h>
@@ -116,11 +112,11 @@ bool DepthImageOctomapUpdater::initialize(const rclcpp::Node::SharedPtr& node)
   filtered_label_transport_ = std::make_unique<image_transport::ImageTransport>(node_);
 
   tf_buffer_ = monitor_->getTFClient();
-  free_space_updater_ = std::make_unique<LazyFreeSpaceUpdater>(tree_);
+  free_space_updater_.reset(new LazyFreeSpaceUpdater(tree_));
 
   // create our mesh filter
-  mesh_filter_ = std::make_unique<mesh_filter::MeshFilter<mesh_filter::StereoCameraModel>>(
-      mesh_filter::MeshFilterBase::TransformCallback(), mesh_filter::StereoCameraModel::REGISTERED_PSDK_PARAMS);
+  mesh_filter_.reset(new mesh_filter::MeshFilter<mesh_filter::StereoCameraModel>(
+      mesh_filter::MeshFilterBase::TransformCallback(), mesh_filter::StereoCameraModel::REGISTERED_PSDK_PARAMS));
   mesh_filter_->parameters().setDepthRange(near_clipping_plane_distance_, far_clipping_plane_distance_);
   mesh_filter_->setShadowThreshold(shadow_threshold_);
   mesh_filter_->setPaddingOffset(padding_offset_);
@@ -263,8 +259,7 @@ void DepthImageOctomapUpdater::depthImageCallback(const sensor_msgs::msg::Image:
     {
       // wait at most 50ms
       static const double TEST_DT = 0.005;
-      const int nt =
-          static_cast<int>((0.5 + average_callback_dt_ / TEST_DT) * std::max(1, (static_cast<int>(queue_size_) / 2)));
+      const int nt = (int)(0.5 + average_callback_dt_ / TEST_DT) * std::max(1, ((int)queue_size_ / 2));
       bool found = false;
       std::string err;
       for (int t = 0; t < nt; ++t)
@@ -279,7 +274,7 @@ void DepthImageOctomapUpdater::depthImageCallback(const sensor_msgs::msg::Image:
         catch (tf2::TransformException& ex)
         {
           std::chrono::duration<double, std::nano> tmp_duration(TEST_DT);
-          static const rclcpp::Duration D(tmp_duration);
+          static const rclcpp::Duration D(tmp_duration.count());
           err = ex.what();
           std::this_thread::sleep_for(D.to_chrono<std::chrono::seconds>());
         }
@@ -299,7 +294,7 @@ void DepthImageOctomapUpdater::depthImageCallback(const sensor_msgs::msg::Image:
         failed_tf_++;
         if (failed_tf_ > good_tf_)
           RCLCPP_WARN_THROTTLE(LOGGER, *node_->get_clock(), 1000,
-                               "More than half of the image messages discarded due to TF being unavailable (%u%%). "
+                               "More than half of the image messages discared due to TF being unavailable (%u%%). "
                                "Transform error of sensor data: %s; quitting callback.",
                                (100 * failed_tf_) / (good_tf_ + failed_tf_), err.c_str());
         else

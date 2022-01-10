@@ -32,7 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#pragma once
+#ifndef COMMAND_TYPES_TYPEDEF_H
+#define COMMAND_TYPES_TYPEDEF_H
 
 #include <boost/variant.hpp>
 
@@ -64,3 +65,5 @@ typedef boost::variant<PtpJoint, PtpJointCart, PtpCart, LinJoint, LinCart, CircC
                        CircJointCenterCart, CircJointInterimCart, Gripper>
     CmdVariant;
 }  // namespace pilz_industrial_motion_planner_testutils
+
+#endif  // COMMAND_TYPES_TYPEDEF_H

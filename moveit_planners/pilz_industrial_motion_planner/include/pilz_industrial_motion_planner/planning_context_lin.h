@@ -34,7 +34,7 @@
 
 #include "pilz_industrial_motion_planner/limits_container.h"
 
-#include <rclcpp/rclcpp.hpp>
+#include <ros/ros.h>
 
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/planning_interface/planning_response.h>

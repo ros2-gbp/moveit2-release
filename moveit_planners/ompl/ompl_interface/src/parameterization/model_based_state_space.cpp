@@ -289,7 +289,7 @@ ompl::base::StateSamplerPtr ompl_interface::ModelBasedStateSpace::allocDefaultSt
 
 void ompl_interface::ModelBasedStateSpace::printSettings(std::ostream& out) const
 {
-  out << "ModelBasedStateSpace '" << getName() << "' at " << this << '\n';
+  out << "ModelBasedStateSpace '" << getName() << "' at " << this << std::endl;
 }
 
 void ompl_interface::ModelBasedStateSpace::printState(const ompl::base::State* state, std::ostream& out) const
@@ -301,21 +301,21 @@ void ompl_interface::ModelBasedStateSpace::printState(const ompl::base::State* s
     const int vc = j->getVariableCount();
     for (int i = 0; i < vc; ++i)
       out << state->as<StateType>()->values[idx + i] << " ";
-    out << '\n';
+    out << std::endl;
   }
 
   if (state->as<StateType>()->isStartState())
-    out << "* start state \n";
+    out << "* start state" << std::endl;
   if (state->as<StateType>()->isGoalState())
-    out << "* goal state \n";
+    out << "* goal state" << std::endl;
   if (state->as<StateType>()->isValidityKnown())
   {
     if (state->as<StateType>()->isMarkedValid())
-      out << "* valid state \n";
+      out << "* valid state" << std::endl;
     else
-      out << "* invalid state \n";
+      out << "* invalid state" << std::endl;
   }
-  out << "Tag: " << state->as<StateType>()->tag << '\n';
+  out << "Tag: " << state->as<StateType>()->tag << std::endl;
 }
 
 void ompl_interface::ModelBasedStateSpace::copyToRobotState(moveit::core::RobotState& rstate,

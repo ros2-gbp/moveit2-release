@@ -43,11 +43,7 @@
 
 #include <std_srvs/srv/empty.hpp>
 #include <moveit_msgs/msg/robot_state.hpp>
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
-#include <tf2_eigen/tf2_eigen.hpp>
-#else
 #include <tf2_eigen/tf2_eigen.h>
-#endif
 #include <moveit/trajectory_processing/iterative_time_parameterization.h>
 
 #include "ui_motion_planning_rviz_plugin_frame.h"
@@ -160,10 +156,10 @@ bool MotionPlanningFrame::computeCartesianPlan()
     trajectory_processing::IterativeParabolicTimeParameterization iptp;
     bool success =
         iptp.computeTimeStamps(rt, ui_->velocity_scaling_factor->value(), ui_->acceleration_scaling_factor->value());
-    RCLCPP_INFO(LOGGER, "Computing time stamps %s", success ? "SUCCEEDED" : "FAILED");
+    RCLCPP_INFO(LOGGER, "Computing time stamps %s", success ? "SUCCEDED" : "FAILED");
 
     // Store trajectory in current_plan_
-    current_plan_ = std::make_shared<moveit::planning_interface::MoveGroupInterface::Plan>();
+    current_plan_.reset(new moveit::planning_interface::MoveGroupInterface::Plan());
     rt.getRobotTrajectoryMsg(current_plan_->trajectory_);
     current_plan_->planning_time_ = (rclcpp::Clock().now() - start).seconds();
     return success;
@@ -173,7 +169,7 @@ bool MotionPlanningFrame::computeCartesianPlan()
 
 bool MotionPlanningFrame::computeJointSpacePlan()
 {
-  current_plan_ = std::make_shared<moveit::planning_interface::MoveGroupInterface::Plan>();
+  current_plan_.reset(new moveit::planning_interface::MoveGroupInterface::Plan());
   return move_group_->plan(*current_plan_) == moveit::planning_interface::MoveItErrorCode::SUCCESS;
 }
 
@@ -255,7 +251,7 @@ void MotionPlanningFrame::onFinishedExecution(bool success)
   // disable stop button
   ui_->stop_button->setEnabled(false);
 
-  // update query start state to current if necessary
+  // update query start state to current if neccessary
   if (ui_->start_state_combo_box->currentText() == "<current>")
     startStateTextChanged(ui_->start_state_combo_box->currentText());
 
@@ -419,8 +415,7 @@ void MotionPlanningFrame::populatePlannersList(const std::vector<moveit_msgs::ms
 void MotionPlanningFrame::populatePlannerDescription(const moveit_msgs::msg::PlannerInterfaceDescription& desc)
 {
   std::string group = planning_display_->getCurrentPlanningGroup();
-  RCLCPP_DEBUG(LOGGER, "Found %zu planners for group '%s' and pipeline '%s'", desc.planner_ids.size(), group.c_str(),
-               desc.pipeline_id.c_str());
+  RCLCPP_INFO(LOGGER, "POPULATING PLANNERS %d grp: %s", desc.planner_ids.size(), group.c_str());
   ui_->planning_algorithm_combo_box->clear();
 
   // set the label for the planning library
@@ -433,7 +428,7 @@ void MotionPlanningFrame::populatePlannerDescription(const moveit_msgs::msg::Pla
   {
     for (const std::string& planner_id : desc.planner_ids)
     {
-      RCLCPP_DEBUG(LOGGER, "planner id: %s", planner_id.c_str());
+      RCLCPP_INFO(LOGGER, "planner id: %s", planner_id.c_str());
       if (planner_id == group)
         found_group = true;
       else if (planner_id.substr(0, group.length()) == group)
@@ -575,7 +570,7 @@ void MotionPlanningFrame::remoteUpdateStartStateCallback(const std_msgs::msg::Em
 {
   if (move_group_ && planning_display_)
   {
-    planning_display_->waitForCurrentRobotState(node_->get_clock()->now());
+    planning_display_->waitForCurrentRobotState();
     const planning_scene_monitor::LockedPlanningSceneRO& ps = planning_display_->getPlanningSceneRO();
     if (ps)
     {
@@ -589,7 +584,7 @@ void MotionPlanningFrame::remoteUpdateGoalStateCallback(const std_msgs::msg::Emp
 {
   if (move_group_ && planning_display_)
   {
-    planning_display_->waitForCurrentRobotState(node_->get_clock()->now());
+    planning_display_->waitForCurrentRobotState();
     const planning_scene_monitor::LockedPlanningSceneRO& ps = planning_display_->getPlanningSceneRO();
     if (ps)
     {
@@ -606,7 +601,7 @@ void MotionPlanningFrame::remoteUpdateCustomStartStateCallback(const moveit_msgs
   msg_no_attached.is_diff = true;
   if (move_group_ && planning_display_)
   {
-    planning_display_->waitForCurrentRobotState(node_->get_clock()->now());
+    planning_display_->waitForCurrentRobotState();
     const planning_scene_monitor::LockedPlanningSceneRO& ps = planning_display_->getPlanningSceneRO();
     if (ps)
     {
@@ -624,7 +619,7 @@ void MotionPlanningFrame::remoteUpdateCustomGoalStateCallback(const moveit_msgs:
   msg_no_attached.is_diff = true;
   if (move_group_ && planning_display_)
   {
-    planning_display_->waitForCurrentRobotState(node_->get_clock()->now());
+    planning_display_->waitForCurrentRobotState();
     const planning_scene_monitor::LockedPlanningSceneRO& ps = planning_display_->getPlanningSceneRO();
     if (ps)
     {

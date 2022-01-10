@@ -37,7 +37,7 @@
 #include "pilz_industrial_motion_planner/joint_limits_container.h"
 #include "pilz_industrial_motion_planner/trajectory_generator.h"
 
-#include <rclcpp/rclcpp.hpp>
+#include <ros/ros.h>
 
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/planning_interface/planning_response.h>
@@ -94,7 +94,7 @@ public:
   /**
    * @brief Will terminate solve()
    * @return
-   * @note Currently will not stop a running solve but not start future solves.
+   * @note Currently will not stop a runnning solve but not start future solves.
    */
   bool terminate() override;
 
@@ -107,7 +107,7 @@ public:
   std::atomic_bool terminated_;
 
   /// The robot model
-  moveit::core::RobotModelConstPtr model_;
+  robot_model::RobotModelConstPtr model_;
 
   /// Joint limits to be used during planning
   pilz_industrial_motion_planner::LimitsContainer limits_;
@@ -124,19 +124,18 @@ bool pilz_industrial_motion_planner::PlanningContextBase<GeneratorT>::solve(plan
     // Use current state as start state if not set
     if (request_.start_state.joint_state.name.empty())
     {
-      moveit_msgs::msg::RobotState current_state;
+      moveit_msgs::RobotState current_state;
       moveit::core::robotStateToRobotStateMsg(getPlanningScene()->getCurrentState(), current_state);
       request_.start_state = current_state;
     }
-    bool result = generator_.generate(getPlanningScene(), request_, res);
+    bool result = generator_.generate(request_, res);
     return result;
-    // res.error_code_.val = moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN;
+    // res.error_code_.val = moveit_msgs::MoveItErrorCodes::INVALID_MOTION_PLAN;
     // return false; // TODO
   }
 
-  RCLCPP_ERROR(rclcpp::get_logger("moveit.pilz_industrial_motion_planner.planning_context_base"),
-               "Using solve on a terminated planning context!");
-  res.error_code_.val = moveit_msgs::msg::MoveItErrorCodes::PLANNING_FAILED;
+  ROS_ERROR("Using solve on a terminated planning context!");
+  res.error_code_.val = moveit_msgs::MoveItErrorCodes::PLANNING_FAILED;
   return false;
 }
 
@@ -167,8 +166,7 @@ bool pilz_industrial_motion_planner::PlanningContextBase<GeneratorT>::solve(
 template <typename GeneratorT>
 bool pilz_industrial_motion_planner::PlanningContextBase<GeneratorT>::terminate()
 {
-  RCLCPP_DEBUG_STREAM(rclcpp::get_logger("moveit.pilz_industrial_motion_planner.planning_context_base"),
-                      "Terminate called");
+  ROS_DEBUG_STREAM("Terminate called");
   terminated_ = true;
   return true;
 }

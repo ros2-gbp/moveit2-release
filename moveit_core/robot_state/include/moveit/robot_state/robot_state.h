@@ -1120,7 +1120,7 @@ public:
 
      In contrast to the previous functions, the Cartesian path is specified as a set of \e waypoints to be sequentially
      reached for the origin of a robot link (\e link). The waypoints are transforms given either in a global reference
-     frame or in the local reference frame of the link at the immediately preceding waypoint. The link needs to move
+     frame or in the local reference frame of the link at the immediately preceeding waypoint. The link needs to move
      in a straight line between two consecutive waypoints. All other comments apply.
 
      NOTE: As of ROS-Melodic these are deprecated and should not be used
@@ -1225,15 +1225,6 @@ public:
   /** \brief Set the joints in \e group to the position \e name defined in the SRDF */
   bool setToDefaultValues(const JointModelGroup* group, const std::string& name);
 
-  bool setToDefaultValues(const std::string& group_name, const std::string& state_name)
-  {
-    const JointModelGroup* jmg = getJointModelGroup(group_name);
-    if (jmg)
-      return setToDefaultValues(jmg, state_name);
-    else
-      return false;
-  }
-
   /** \brief Set all joints to random values.  Values will be within default bounds. */
   void setToRandomPositions();
 
@@ -1244,40 +1235,22 @@ public:
       Values will be within default bounds. */
   void setToRandomPositions(const JointModelGroup* group, random_numbers::RandomNumberGenerator& rng);
 
-  /** \brief Set all joints in \e group to random values near the value in \e seed.
+  /** \brief Set all joints in \e group to random values near the value in \near.
    *  \e distance is the maximum amount each joint value will vary from the
-   *  corresponding value in \e seed.  \distance represents meters for
+   *  corresponding value in \e near.  \distance represents meters for
    *  prismatic/postitional joints and radians for revolute/orientation joints.
    *  Resulting values are clamped within default bounds. */
-  void setToRandomPositionsNearBy(const JointModelGroup* group, const RobotState& seed, double distance);
+  void setToRandomPositionsNearBy(const JointModelGroup* group, const RobotState& near, double distance);
 
-  /** \brief Set all joints in \e group to random values near the value in \e seed, using a specified random number generator.
-   *  \e distance is the maximum amount each joint value will vary from the
-   *  corresponding value in \e seed.  \distance represents meters for
-   *  prismatic/postitional joints and radians for revolute/orientation joints.
-   *  Resulting values are clamped within default bounds. */
-  void setToRandomPositionsNearBy(const JointModelGroup* group, const RobotState& seed, double distance,
-                                  random_numbers::RandomNumberGenerator& rng);
-
-  /** \brief Set all joints in \e group to random values near the value in \e seed.
+  /** \brief Set all joints in \e group to random values near the value in \near.
    *  \e distances \b MUST have the same size as \c
    *  group.getActiveJointModels().  Each value in \e distances is the maximum
    *  amount the corresponding active joint in \e group will vary from the
-   *  corresponding value in \e seed.  \distance represents meters for
+   *  corresponding value in \e near.  \distance represents meters for
    *  prismatic/postitional joints and radians for revolute/orientation joints.
    *  Resulting values are clamped within default bounds. */
-  void setToRandomPositionsNearBy(const JointModelGroup* group, const RobotState& seed,
+  void setToRandomPositionsNearBy(const JointModelGroup* group, const RobotState& near,
                                   const std::vector<double>& distances);
-
-  /** \brief Set all joints in \e group to random values near the value in \e seed, using a specified random number generator.
-   *  \e distances \b MUST have the same size as \c
-   *  group.getActiveJointModels().  Each value in \e distances is the maximum
-   *  amount the corresponding active joint in \e group will vary from the
-   *  corresponding value in \e seed.  \distance represents meters for
-   *  prismatic/postitional joints and radians for revolute/orientation joints.
-   *  Resulting values are clamped within default bounds. */
-  void setToRandomPositionsNearBy(const JointModelGroup* group, const RobotState& seed,
-                                  const std::vector<double>& distances, random_numbers::RandomNumberGenerator& rng);
 
   /** @} */
 
@@ -1286,7 +1259,7 @@ public:
    */
 
   /** \brief Update the transforms for the collision bodies. This call is needed before calling collision checking.
-      If updating link transforms or joint transforms is needed, the corresponding updates are also triggered. */
+      If updating link transforms or joint transorms is needed, the corresponding updates are also triggered. */
   void updateCollisionBodyTransforms();
 
   /** \brief Update the reference frame transforms for links. This call is needed before using the transforms of links
@@ -1318,8 +1291,6 @@ public:
    *   A related, more comprehensive function is |getFrameTransform|, which additionally to link frames
    *   also searches for attached object frames and their subframes.
    *
-   *   This will throw an exception if the passed link is not found
-   *
    *  The returned transformation is always a valid isometry.
    */
   const Eigen::Isometry3d& getGlobalLinkTransform(const std::string& link_name)
@@ -1329,10 +1300,6 @@ public:
 
   const Eigen::Isometry3d& getGlobalLinkTransform(const LinkModel* link)
   {
-    if (!link)
-    {
-      throw Exception("Invalid link");
-    }
     updateLinkTransforms();
     return global_link_transforms_[link->getLinkIndex()];
   }
@@ -1344,10 +1311,6 @@ public:
 
   const Eigen::Isometry3d& getGlobalLinkTransform(const LinkModel* link) const
   {
-    if (!link)
-    {
-      throw Exception("Invalid link");
-    }
     BOOST_VERIFY(checkLinkTransforms());
     return global_link_transforms_[link->getLinkIndex()];
   }
@@ -1590,9 +1553,8 @@ public:
 
   /** @brief Add an attached body to a link
    * @param id The string id associated with the attached body
-   * @param pose The pose associated with the attached body
    * @param shapes The shapes that make up the attached body
-   * @param shape_poses The transforms between the object pose and the attached body's shapes
+   * @param attach_trans The desired transform between this link and the attached body
    * @param touch_links The set of links that the attached body is allowed to touch
    * @param link_name The link to attach to
    * @param detach_posture The posture of the gripper when placing the object
@@ -1605,17 +1567,16 @@ public:
    * from a planning_scene::PlanningScene), you will likely need to remove the
    * corresponding object from that world to avoid having collisions
    * detected against it. */
-  void attachBody(const std::string& id, const Eigen::Isometry3d& pose,
-                  const std::vector<shapes::ShapeConstPtr>& shapes, const EigenSTL::vector_Isometry3d& shape_poses,
-                  const std::set<std::string>& touch_links, const std::string& link_name,
+  void attachBody(const std::string& id, const std::vector<shapes::ShapeConstPtr>& shapes,
+                  const EigenSTL::vector_Isometry3d& shape_poses, const std::set<std::string>& touch_links,
+                  const std::string& link_name,
                   const trajectory_msgs::msg::JointTrajectory& detach_posture = trajectory_msgs::msg::JointTrajectory(),
                   const moveit::core::FixedTransformsMap& subframe_poses = moveit::core::FixedTransformsMap());
 
   /** @brief Add an attached body to a link
    * @param id The string id associated with the attached body
-   * @param pose The pose associated with the attached body
    * @param shapes The shapes that make up the attached body
-   * @param shape_poses The transforms between the object pose and the attached body's shapes
+   * @param attach_trans The desired transform between this link and the attached body
    * @param touch_links The set of links that the attached body is allowed to touch
    * @param link_name The link to attach to
    * @param detach_posture The posture of the gripper when placing the object
@@ -1628,14 +1589,14 @@ public:
    * from a planning_scene::PlanningScene), you will likely need to remove the
    * corresponding object from that world to avoid having collisions
    * detected against it. */
-  void attachBody(const std::string& id, const Eigen::Isometry3d& pose,
-                  const std::vector<shapes::ShapeConstPtr>& shapes, const EigenSTL::vector_Isometry3d& shape_poses,
-                  const std::vector<std::string>& touch_links, const std::string& link_name,
+  void attachBody(const std::string& id, const std::vector<shapes::ShapeConstPtr>& shapes,
+                  const EigenSTL::vector_Isometry3d& shape_poses, const std::vector<std::string>& touch_links,
+                  const std::string& link_name,
                   const trajectory_msgs::msg::JointTrajectory& detach_posture = trajectory_msgs::msg::JointTrajectory(),
                   const moveit::core::FixedTransformsMap& subframe_poses = moveit::core::FixedTransformsMap())
   {
     std::set<std::string> touch_links_set(touch_links.begin(), touch_links.end());
-    attachBody(id, pose, shapes, shape_poses, touch_links_set, link_name, detach_posture, subframe_poses);
+    attachBody(id, shapes, shape_poses, touch_links_set, link_name, detach_posture, subframe_poses);
   }
 
   /** \brief Get all bodies attached to the model corresponding to this state */

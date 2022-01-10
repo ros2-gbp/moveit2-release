@@ -56,12 +56,12 @@ namespace
 void checkFCLCapabilities(const DistanceRequest& req)
 {
 #if MOVEIT_FCL_VERSION < FCL_VERSION_CHECK(0, 6, 0)
+  static rclcpp::Clock steady_clock(RCL_STEADY_TIME);
   if (req.enable_nearest_points)
   {
     // Known issues:
     //   https://github.com/flexible-collision-library/fcl/issues/171,
     //   https://github.com/flexible-collision-library/fcl/pull/288
-    rclcpp::Clock steady_clock(RCL_STEADY_TIME);
     RCLCPP_ERROR_THROTTLE(LOGGER, steady_clock, 2000,
                           "You requested a distance check with enable_nearest_points=true, "
                           "but the FCL version MoveIt was compiled against (%d.%d.%d) "
@@ -102,7 +102,9 @@ CollisionEnvFCL::CollisionEnvFCL(const moveit::core::RobotModelConstPtr& model, 
         RCLCPP_ERROR(LOGGER, "Unable to construct collision geometry for link '%s'", link->getName().c_str());
     }
 
-  manager_ = std::make_unique<fcl::DynamicAABBTreeCollisionManagerd>();
+  auto m = new fcl::DynamicAABBTreeCollisionManagerd();
+  // m->tree_init_level = 2;
+  manager_.reset(m);
 
   // request notifications about changes to new world
   observer_handle_ = getWorld()->addObserver(boost::bind(&CollisionEnvFCL::notifyObjectChange, this, _1, _2));
@@ -137,7 +139,9 @@ CollisionEnvFCL::CollisionEnvFCL(const moveit::core::RobotModelConstPtr& model, 
         RCLCPP_ERROR(LOGGER, "Unable to construct collision geometry for link '%s'", link->getName().c_str());
     }
 
-  manager_ = std::make_unique<fcl::DynamicAABBTreeCollisionManagerd>();
+  auto m = new fcl::DynamicAABBTreeCollisionManagerd();
+  // m->tree_init_level = 2;
+  manager_.reset(m);
 
   // request notifications about changes to new world
   observer_handle_ = getWorld()->addObserver(boost::bind(&CollisionEnvFCL::notifyObjectChange, this, _1, _2));
@@ -154,7 +158,9 @@ CollisionEnvFCL::CollisionEnvFCL(const CollisionEnvFCL& other, const WorldPtr& w
   robot_geoms_ = other.robot_geoms_;
   robot_fcl_objs_ = other.robot_fcl_objs_;
 
-  manager_ = std::make_unique<fcl::DynamicAABBTreeCollisionManagerd>();
+  auto m = new fcl::DynamicAABBTreeCollisionManagerd();
+  // m->tree_init_level = 2;
+  manager_.reset(m);
 
   fcl_objs_ = other.fcl_objs_;
   for (auto& fcl_obj : fcl_objs_)
@@ -169,12 +175,9 @@ void CollisionEnvFCL::getAttachedBodyObjects(const moveit::core::AttachedBody* a
                                              std::vector<FCLGeometryConstPtr>& geoms) const
 {
   const std::vector<shapes::ShapeConstPtr>& shapes = ab->getShapes();
-  const size_t num_shapes = shapes.size();
-  geoms.reserve(num_shapes);
-  for (std::size_t i = 0; i < num_shapes; ++i)
+  for (std::size_t i = 0; i < shapes.size(); ++i)
   {
-    FCLGeometryConstPtr co = createCollisionGeometry(shapes[i], getLinkScale(ab->getAttachedLinkName()),
-                                                     getLinkPadding(ab->getAttachedLinkName()), ab, i);
+    FCLGeometryConstPtr co = createCollisionGeometry(shapes[i], ab, i);
     if (co)
       geoms.push_back(co);
   }
@@ -187,7 +190,7 @@ void CollisionEnvFCL::constructFCLObjectWorld(const World::Object* obj, FCLObjec
     FCLGeometryConstPtr g = createCollisionGeometry(obj->shapes_[i], obj);
     if (g)
     {
-      auto co = new fcl::CollisionObjectd(g->collision_geometry_, transform2fcl(obj->global_shape_poses_[i]));
+      auto co = new fcl::CollisionObjectd(g->collision_geometry_, transform2fcl(obj->shape_poses_[i]));
       fcl_obj.collision_objects_.push_back(FCLCollisionObjectPtr(co));
       fcl_obj.collision_geometry_.push_back(g);
     }
@@ -224,7 +227,7 @@ void CollisionEnvFCL::constructFCLObjectRobot(const moveit::core::RobotState& st
       {
         transform2fcl(ab_t[k], fcl_tf);
         fcl_obj.collision_objects_.push_back(
-            std::make_shared<fcl::CollisionObjectd>(objs[k]->collision_geometry_, fcl_tf));
+            FCLCollisionObjectPtr(new fcl::CollisionObjectd(objs[k]->collision_geometry_, fcl_tf)));
         // we copy the shared ptr to the CollisionGeometryData, as this is not stored by the class itself,
         // and would be destroyed when objs goes out of scope.
         fcl_obj.collision_geometry_.push_back(objs[k]);
@@ -234,10 +237,12 @@ void CollisionEnvFCL::constructFCLObjectRobot(const moveit::core::RobotState& st
 
 void CollisionEnvFCL::allocSelfCollisionBroadPhase(const moveit::core::RobotState& state, FCLManager& manager) const
 {
-  manager.manager_ = std::make_unique<fcl::DynamicAABBTreeCollisionManagerd>();
-
+  auto m = new fcl::DynamicAABBTreeCollisionManagerd();
+  // m->tree_init_level = 2;
+  manager.manager_.reset(m);
   constructFCLObjectRobot(state, manager.object_);
   manager.object_.registerTo(manager.manager_.get());
+  // manager.manager_->update();
 }
 
 void CollisionEnvFCL::checkSelfCollision(const CollisionRequest& req, CollisionResult& res,

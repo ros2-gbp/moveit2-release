@@ -42,11 +42,8 @@
 #include "pilz_industrial_motion_planner/command_list_manager.h"
 #include "pilz_industrial_motion_planner/trajectory_generation_exceptions.h"
 
-#include <moveit/moveit_cpp/moveit_cpp.h>
 namespace pilz_industrial_motion_planner
 {
-static const rclcpp::Logger LOGGER =
-    rclcpp::get_logger("moveit.pilz_industrial_motion_planner.move_group_sequence_service");
 MoveGroupSequenceService::MoveGroupSequenceService() : MoveGroupCapability("SequenceService")
 {
 }
@@ -57,69 +54,48 @@ MoveGroupSequenceService::~MoveGroupSequenceService()
 
 void MoveGroupSequenceService::initialize()
 {
-  command_list_manager_ = std::make_unique<pilz_industrial_motion_planner::CommandListManager>(
-      context_->moveit_cpp_->getNode(), context_->planning_scene_monitor_->getRobotModel());
+  command_list_manager_.reset(new pilz_industrial_motion_planner::CommandListManager(
+      ros::NodeHandle("~"), context_->planning_scene_monitor_->getRobotModel()));
 
-  sequence_service_ = context_->moveit_cpp_->getNode()->create_service<moveit_msgs::srv::GetMotionSequence>(
-      SEQUENCE_SERVICE_NAME,
-      std::bind(&MoveGroupSequenceService::plan, this, std::placeholders::_1, std::placeholders::_2));
+  sequence_service_ = root_node_handle_.advertiseService(SEQUENCE_SERVICE_NAME, &MoveGroupSequenceService::plan, this);
 }
 
-bool MoveGroupSequenceService::plan(const moveit_msgs::srv::GetMotionSequence::Request::SharedPtr req,
-                                    moveit_msgs::srv::GetMotionSequence::Response::SharedPtr res)
+bool MoveGroupSequenceService::plan(moveit_msgs::GetMotionSequence::Request& req,
+                                    moveit_msgs::GetMotionSequence::Response& res)
 {
-  // Handle empty requests
-  if (req->request.items.empty())
-  {
-    RCLCPP_WARN(LOGGER, "Received empty request. That's ok but maybe not what you intended.");
-    res->response.error_code.val = moveit_msgs::msg::MoveItErrorCodes::SUCCESS;
-    return true;
-  }
-
   // TODO: Do we lock on the correct scene? Does the lock belong to the scene
   // used for planning?
   planning_scene_monitor::LockedPlanningSceneRO ps(context_->planning_scene_monitor_);
 
-  rclcpp::Time planning_start = context_->moveit_cpp_->getNode()->now();
+  ros::Time planning_start = ros::Time::now();
   RobotTrajCont traj_vec;
   try
   {
-    // Select planning_pipeline to handle request
-    // All motions in the SequenceRequest need to use the same planning pipeline (but can use different planners)
-    const planning_pipeline::PlanningPipelinePtr planning_pipeline =
-        resolvePlanningPipeline(req->request.items[0].req.pipeline_id);
-    if (!planning_pipeline)
-    {
-      RCLCPP_ERROR_STREAM(LOGGER, "Could not load planning pipeline " << req->request.items[0].req.pipeline_id);
-      res->response.error_code.val = moveit_msgs::msg::MoveItErrorCodes::FAILURE;
-      return false;
-    }
-
-    traj_vec = command_list_manager_->solve(ps, context_->planning_pipeline_, req->request);
+    traj_vec = command_list_manager_->solve(ps, context_->planning_pipeline_, req.request);
   }
   catch (const MoveItErrorCodeException& ex)
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Planner threw an exception (error code: " << ex.getErrorCode() << "): " << ex.what());
-    res->response.error_code.val = ex.getErrorCode();
+    ROS_ERROR_STREAM("Planner threw an exception (error code: " << ex.getErrorCode() << "): " << ex.what());
+    res.response.error_code.val = ex.getErrorCode();
     return true;
   }
   // LCOV_EXCL_START // Keep moveit up even if lower parts throw
   catch (const std::exception& ex)
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Planner threw an exception: " << ex.what());
+    ROS_ERROR_STREAM("Planner threw an exception: " << ex.what());
     // If 'FALSE' then no response will be sent to the caller.
     return false;
   }
   // LCOV_EXCL_STOP
 
-  res->response.planned_trajectories.resize(traj_vec.size());
+  res.response.planned_trajectories.resize(traj_vec.size());
   for (RobotTrajCont::size_type i = 0; i < traj_vec.size(); ++i)
   {
-    move_group::MoveGroupCapability::convertToMsg(traj_vec.at(i), res->response.sequence_start,
-                                                  res->response.planned_trajectories.at(i));
+    move_group::MoveGroupCapability::convertToMsg(traj_vec.at(i), res.response.sequence_start,
+                                                  res.response.planned_trajectories.at(i));
   }
-  res->response.error_code.val = moveit_msgs::msg::MoveItErrorCodes::SUCCESS;
-  res->response.planning_time = (context_->moveit_cpp_->getNode()->now() - planning_start).seconds();
+  res.response.error_code.val = moveit_msgs::MoveItErrorCodes::SUCCESS;
+  res.response.planning_time = (ros::Time::now() - planning_start).toSec();
   return true;
 }
 

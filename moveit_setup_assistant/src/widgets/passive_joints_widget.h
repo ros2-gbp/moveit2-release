@@ -84,7 +84,7 @@ private:
   /// Contains all the configuration data for the setup assistant
   moveit_setup_assistant::MoveItConfigDataPtr config_data_;
 
-  /// Original name of vjoint currently being edited. This is used to find the element in the vector
+  /// Orignal name of vjoint currently being edited. This is used to find the element in the vector
   std::string current_edit_vjoint_;
 };
 

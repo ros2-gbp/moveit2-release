@@ -2,20 +2,11 @@
 Changelog for package moveit_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.3.2 (2021-12-29)
+2.2.3 (2022-01-07)
 ------------------
 
-2.3.1 (2021-12-23)
+2.2.2 (2021-11-16)
 ------------------
-* Enforce package.xml format 3 Schema (`#779 <https://github.com/ros-planning/moveit2/issues/779>`_)
-* Update Maintainers of MoveIt package (`#697 <https://github.com/ros-planning/moveit2/issues/697>`_)
-* Add backward_ros to moveit_common (`#794 <https://github.com/ros-planning/moveit2/issues/794>`_)
-* Contributors: Dave Coleman, Henning Kayser, Tyler Weaver
-
-2.3.0 (2021-10-08)
-------------------
-* Upgrade to C++17
-* Contributors: Henning Kayser, Tyler Weaver
 
 2.2.1 (2021-07-12)
 ------------------

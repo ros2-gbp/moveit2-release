@@ -37,11 +37,7 @@
 #include <moveit/moveit_cpp/moveit_cpp.h>
 #include <moveit/move_group/move_group_capability.h>
 #include <moveit/robot_state/conversions.h>
-#if __has_include(<tf2_geometry_msgs/tf2_geometry_msgs.hpp>)
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#else
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#endif
 
 #include <sstream>
 #include <string>
@@ -131,7 +127,7 @@ std::string move_group::MoveGroupCapability::getActionResultString(const moveit_
     else
     {
       if (plan_only)
-        return "Motion plan was computed successfully.";
+        return "Motion plan was computed succesfully.";
       else
         return "Solution was found and executed.";
     }

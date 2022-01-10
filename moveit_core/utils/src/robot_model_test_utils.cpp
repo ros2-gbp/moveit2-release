@@ -242,7 +242,7 @@ void RobotModelBuilder::addCollisionBox(const std::string& link_name, const std:
 {
   if (dims.size() != 3)
   {
-    RCLCPP_ERROR(LOGGER, "There can only be 3 dimensions of a box (given %zu!)", dims.size());
+    RCLCPP_ERROR(LOGGER, "There can only be 3 dimensions of a box (given %zu!)");
     is_valid_ = false;
     return;
   }
@@ -396,7 +396,7 @@ moveit::core::RobotModelPtr RobotModelBuilder::build()
     return robot_model;
   }
   srdf_writer_->updateSRDFModel(*urdf_model_);
-  robot_model = std::make_shared<moveit::core::RobotModel>(urdf_model_, srdf_writer_->srdf_model_);
+  robot_model.reset(new moveit::core::RobotModel(urdf_model_, srdf_writer_->srdf_model_));
   return robot_model;
 }
 }  // namespace core

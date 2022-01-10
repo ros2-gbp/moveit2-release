@@ -32,7 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#pragma once
+#ifndef MOTIONPLANREQUESTCONVERTIBLE_H
+#define MOTIONPLANREQUESTCONVERTIBLE_H
 
 #include <moveit/robot_model/robot_model.h>
 #include <moveit/planning_interface/planning_interface.h>
@@ -49,3 +50,5 @@ public:
   virtual planning_interface::MotionPlanRequest toRequest() const = 0;
 };
 }  // namespace pilz_industrial_motion_planner_testutils
+
+#endif  // MOTIONPLANREQUESTCONVERTIBLE_H

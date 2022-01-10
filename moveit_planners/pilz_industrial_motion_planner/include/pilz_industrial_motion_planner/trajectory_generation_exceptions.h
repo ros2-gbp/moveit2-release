@@ -37,12 +37,12 @@
 #include <stdexcept>
 #include <string>
 
-#include <moveit_msgs/msg/move_it_error_codes.hpp>
+#include <moveit_msgs/MoveItErrorCodes.h>
 
 namespace pilz_industrial_motion_planner
 {
 /**
- * @brief Exception storing an moveit_msgs::msg::MoveItErrorCodes value.
+ * @brief Exception storing an moveit_msgs::MoveItErrorCodes value.
  */
 class MoveItErrorCodeException : public std::runtime_error
 {
@@ -58,22 +58,21 @@ protected:
   MoveItErrorCodeException& operator=(MoveItErrorCodeException&&) = default;
 
 public:
-  virtual const moveit_msgs::msg::MoveItErrorCodes::_val_type& getErrorCode() const = 0;
+  virtual const moveit_msgs::MoveItErrorCodes::_val_type& getErrorCode() const = 0;
 };
 
-template <moveit_msgs::msg::MoveItErrorCodes::_val_type ERROR_CODE = moveit_msgs::msg::MoveItErrorCodes::FAILURE>
+template <moveit_msgs::MoveItErrorCodes::_val_type ERROR_CODE = moveit_msgs::MoveItErrorCodes::FAILURE>
 class TemplatedMoveItErrorCodeException : public MoveItErrorCodeException
 {
 public:
   TemplatedMoveItErrorCodeException(const std::string& msg);
-  TemplatedMoveItErrorCodeException(const std::string& msg,
-                                    const moveit_msgs::msg::MoveItErrorCodes::_val_type& error_code);
+  TemplatedMoveItErrorCodeException(const std::string& msg, const moveit_msgs::MoveItErrorCodes::_val_type& error_code);
 
 public:
-  const moveit_msgs::msg::MoveItErrorCodes::_val_type& getErrorCode() const override;
+  const moveit_msgs::MoveItErrorCodes::_val_type& getErrorCode() const override;
 
 private:
-  const moveit_msgs::msg::MoveItErrorCodes::_val_type error_code_{ ERROR_CODE };
+  const moveit_msgs::MoveItErrorCodes::_val_type error_code_{ ERROR_CODE };
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -81,21 +80,21 @@ inline MoveItErrorCodeException::MoveItErrorCodeException(const std::string& msg
 {
 }
 
-template <moveit_msgs::msg::MoveItErrorCodes::_val_type ERROR_CODE>
+template <moveit_msgs::MoveItErrorCodes::_val_type ERROR_CODE>
 inline TemplatedMoveItErrorCodeException<ERROR_CODE>::TemplatedMoveItErrorCodeException(const std::string& msg)
   : MoveItErrorCodeException(msg)
 {
 }
 
-template <moveit_msgs::msg::MoveItErrorCodes::_val_type ERROR_CODE>
+template <moveit_msgs::MoveItErrorCodes::_val_type ERROR_CODE>
 inline TemplatedMoveItErrorCodeException<ERROR_CODE>::TemplatedMoveItErrorCodeException(
-    const std::string& msg, const moveit_msgs::msg::MoveItErrorCodes::_val_type& error_code)
+    const std::string& msg, const moveit_msgs::MoveItErrorCodes::_val_type& error_code)
   : MoveItErrorCodeException(msg), error_code_(error_code)
 {
 }
 
-template <moveit_msgs::msg::MoveItErrorCodes::_val_type ERROR_CODE>
-inline const moveit_msgs::msg::MoveItErrorCodes::_val_type&
+template <moveit_msgs::MoveItErrorCodes::_val_type ERROR_CODE>
+inline const moveit_msgs::MoveItErrorCodes::_val_type&
 TemplatedMoveItErrorCodeException<ERROR_CODE>::getErrorCode() const
 {
   return error_code_;
@@ -113,7 +112,7 @@ TemplatedMoveItErrorCodeException<ERROR_CODE>::getErrorCode() const
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    EXCEPTION_CLASS_NAME(const std::string& msg, const moveit_msgs::msg::MoveItErrorCodes::_val_type& error_code)      \
+    EXCEPTION_CLASS_NAME(const std::string& msg, const moveit_msgs::MoveItErrorCodes::_val_type& error_code)           \
       : TemplatedMoveItErrorCodeException(msg, error_code)                                                             \
     {                                                                                                                  \
     }                                                                                                                  \

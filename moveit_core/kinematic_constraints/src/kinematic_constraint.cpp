@@ -41,11 +41,7 @@
 #include <moveit/collision_detection_fcl/collision_env_fcl.h>
 #include <geometric_shapes/check_isometry.h>
 #include <boost/math/constants/constants.hpp>
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
-#include <tf2_eigen/tf2_eigen.hpp>
-#else
 #include <tf2_eigen/tf2_eigen.h>
-#endif
 #include <boost/bind.hpp>
 #include <limits>
 #include <memory>
@@ -324,17 +320,17 @@ void JointConstraint::print(std::ostream& out) const
 {
   if (joint_model_)
   {
-    out << "Joint constraint for joint " << joint_variable_name_ << ": \n";
+    out << "Joint constraint for joint " << joint_variable_name_ << ": " << std::endl;
     out << "  value = ";
     out << joint_position_ << "; ";
     out << "  tolerance below = ";
     out << joint_tolerance_below_ << "; ";
     out << "  tolerance above = ";
     out << joint_tolerance_above_ << "; ";
-    out << '\n';
+    out << std::endl;
   }
   else
-    out << "No constraint" << '\n';
+    out << "No constraint" << std::endl;
 }
 
 bool PositionConstraint::configure(const moveit_msgs::msg::PositionConstraint& pc, const moveit::core::Transforms& tf)
@@ -536,9 +532,9 @@ ConstraintEvaluationResult PositionConstraint::decide(const moveit::core::RobotS
 void PositionConstraint::print(std::ostream& out) const
 {
   if (enabled())
-    out << "Position constraint on link '" << link_model_->getName() << "'" << '\n';
+    out << "Position constraint on link '" << link_model_->getName() << "'" << std::endl;
   else
-    out << "No constraint" << '\n';
+    out << "No constraint" << std::endl;
 }
 
 void PositionConstraint::clear()
@@ -609,20 +605,7 @@ bool OrientationConstraint::configure(const moveit_msgs::msg::OrientationConstra
     constraint_weight_ = 1.0;
   }
   else
-  {
     constraint_weight_ = oc.weight;
-  }
-
-  parameterization_type_ = oc.parameterization;
-  // validate the parameterization, set to default value if invalid
-  if (parameterization_type_ != moveit_msgs::msg::OrientationConstraint::XYZ_EULER_ANGLES &&
-      parameterization_type_ != moveit_msgs::msg::OrientationConstraint::ROTATION_VECTOR)
-  {
-    RCLCPP_WARN(LOGGER,
-                "Unknown parameterization for orientation constraint tolerance, using default (XYZ_EULER_ANGLES).");
-    parameterization_type_ = moveit_msgs::msg::OrientationConstraint::XYZ_EULER_ANGLES;
-  }
-
   absolute_x_axis_tolerance_ = fabs(oc.absolute_x_axis_tolerance);
   if (absolute_x_axis_tolerance_ < std::numeric_limits<double>::epsilon())
     RCLCPP_WARN(LOGGER, "Near-zero value for absolute_x_axis_tolerance");
@@ -674,61 +657,44 @@ ConstraintEvaluationResult OrientationConstraint::decide(const moveit::core::Rob
   if (!link_model_)
     return ConstraintEvaluationResult(true, 0.0);
 
-  Eigen::Isometry3d diff;
+  std::tuple<Eigen::Vector3d, bool> euler_angles_error;
   if (mobile_frame_)
   {
     // getFrameTransform() returns a valid isometry by contract
     Eigen::Matrix3d tmp = state.getFrameTransform(desired_rotation_frame_id_).linear() * desired_rotation_matrix_;
     // getGlobalLinkTransform() returns a valid isometry by contract
-    diff = Eigen::Isometry3d(tmp.transpose() * state.getGlobalLinkTransform(link_model_).linear());  // valid isometry
+    Eigen::Isometry3d diff(tmp.transpose() * state.getGlobalLinkTransform(link_model_).linear());  // valid isometry
+    euler_angles_error = CalcEulerAngles(diff.linear());
   }
   else
   {
     // diff is valid isometry by construction
-    diff = Eigen::Isometry3d(desired_rotation_matrix_inv_ * state.getGlobalLinkTransform(link_model_).linear());
-  }
-
-  // This needs to live outside the if-block scope (as xyz_rotation points to its data).
-  std::tuple<Eigen::Vector3d, bool> euler_angles_error;
-  Eigen::Vector3d xyz_rotation;
-  if (parameterization_type_ == moveit_msgs::msg::OrientationConstraint::XYZ_EULER_ANGLES)
-  {
+    Eigen::Isometry3d diff(desired_rotation_matrix_inv_ * state.getGlobalLinkTransform(link_model_).linear());
     euler_angles_error = CalcEulerAngles(diff.linear());
-    // Converting from a rotation matrix to intrinsic XYZ Euler angles has 2 singularities:
-    // pitch ~= pi/2 ==> roll + yaw = theta
-    // pitch ~= -pi/2 ==> roll - yaw = theta
-    // in those cases CalcEulerAngles will set roll (xyz_rotation(0)) to theta and yaw (xyz_rotation(2)) to zero, so for
-    // us to be able to capture yaw tolerance violations we do the following: If theta violates the absolute yaw
-    // tolerance we think of it as a pure yaw rotation and set roll to zero.
-    xyz_rotation = std::get<Eigen::Vector3d>(euler_angles_error);
-    if (!std::get<bool>(euler_angles_error))
-    {
-      if (normalizeAbsoluteAngle(xyz_rotation(0)) > absolute_z_axis_tolerance_ + std::numeric_limits<double>::epsilon())
-      {
-        xyz_rotation(2) = xyz_rotation(0);
-        xyz_rotation(0) = 0;
-      }
-    }
-    // Account for angle wrapping
-    xyz_rotation = xyz_rotation.unaryExpr(&normalizeAbsoluteAngle);
-  }
-  else if (parameterization_type_ == moveit_msgs::msg::OrientationConstraint::ROTATION_VECTOR)
-  {
-    Eigen::AngleAxisd aa(diff.linear());
-    xyz_rotation = aa.axis() * aa.angle();
-    xyz_rotation(0) = fabs(xyz_rotation(0));
-    xyz_rotation(1) = fabs(xyz_rotation(1));
-    xyz_rotation(2) = fabs(xyz_rotation(2));
-  }
-  else
-  {
-    /* The parameterization type should be validated in configure, so this should never happen. */
-    RCLCPP_ERROR(LOGGER, "The parameterization type for the orientation constraints is invalid.");
   }
 
-  bool result = xyz_rotation(2) < absolute_z_axis_tolerance_ + std::numeric_limits<double>::epsilon() &&
-                xyz_rotation(1) < absolute_y_axis_tolerance_ + std::numeric_limits<double>::epsilon() &&
-                xyz_rotation(0) < absolute_x_axis_tolerance_ + std::numeric_limits<double>::epsilon();
+  // Converting from a rotation matrix to an intrinsic XYZ euler angles have 2 singularities:
+  // pitch ~= pi/2 ==> roll + yaw = theta
+  // pitch ~= -pi/2 ==> roll - yaw = theta
+  // in those cases CalcEulerAngles will set roll (xyz(0)) to theta and yaw (xyz(2)) to zero, so for us to be able to
+  // capture yaw tolerance violation we do the following, if theta violate the absolute yaw tolerance we think of it as
+  // pure yaw rotation and set roll to zero
+  auto& xyz = std::get<Eigen::Vector3d>(euler_angles_error);
+  if (!std::get<bool>(euler_angles_error))
+  {
+    if (normalizeAbsoluteAngle(xyz(0)) > absolute_z_axis_tolerance_ + std::numeric_limits<double>::epsilon())
+    {
+      xyz(2) = xyz(0);
+      xyz(0) = 0;
+    }
+  }
+  // Account for angle wrapping
+  xyz = xyz.unaryExpr(&normalizeAbsoluteAngle);
+
+  // 0,1,2 corresponds to XYZ, the convention used in sampling constraints
+  bool result = xyz(2) < absolute_z_axis_tolerance_ + std::numeric_limits<double>::epsilon() &&
+                xyz(1) < absolute_y_axis_tolerance_ + std::numeric_limits<double>::epsilon() &&
+                xyz(0) < absolute_x_axis_tolerance_ + std::numeric_limits<double>::epsilon();
 
   if (verbose)
   {
@@ -738,23 +704,23 @@ ConstraintEvaluationResult OrientationConstraint::decide(const moveit::core::Rob
                 "Orientation constraint %s for link '%s'. Quaternion desired: %f %f %f %f, quaternion "
                 "actual: %f %f %f %f, error: x=%f, y=%f, z=%f, tolerance: x=%f, y=%f, z=%f",
                 result ? "satisfied" : "violated", link_model_->getName().c_str(), q_des.x(), q_des.y(), q_des.z(),
-                q_des.w(), q_act.x(), q_act.y(), q_act.z(), q_act.w(), xyz_rotation(0), xyz_rotation(1),
-                xyz_rotation(2), absolute_x_axis_tolerance_, absolute_y_axis_tolerance_, absolute_z_axis_tolerance_);
+                q_des.w(), q_act.x(), q_act.y(), q_act.z(), q_act.w(), xyz(0), xyz(1), xyz(2),
+                absolute_x_axis_tolerance_, absolute_y_axis_tolerance_, absolute_z_axis_tolerance_);
   }
 
-  return ConstraintEvaluationResult(result, constraint_weight_ * (xyz_rotation(0) + xyz_rotation(1) + xyz_rotation(2)));
+  return ConstraintEvaluationResult(result, constraint_weight_ * (xyz(0) + xyz(1) + xyz(2)));
 }
 
 void OrientationConstraint::print(std::ostream& out) const
 {
   if (link_model_)
   {
-    out << "Orientation constraint on link '" << link_model_->getName() << "'" << '\n';
+    out << "Orientation constraint on link '" << link_model_->getName() << "'" << std::endl;
     Eigen::Quaterniond q_des(desired_rotation_matrix_);
-    out << "Desired orientation:" << q_des.x() << "," << q_des.y() << "," << q_des.z() << "," << q_des.w() << '\n';
+    out << "Desired orientation:" << q_des.x() << "," << q_des.y() << "," << q_des.z() << "," << q_des.w() << std::endl;
   }
   else
-    out << "No constraint" << '\n';
+    out << "No constraint" << std::endl;
 }
 
 VisibilityConstraint::VisibilityConstraint(const moveit::core::RobotModelConstPtr& model)
@@ -906,7 +872,7 @@ shapes::Mesh* VisibilityConstraint::getVisibilityCone(const moveit::core::RobotS
   std::unique_ptr<EigenSTL::vector_Vector3d> temp_points;
   if (mobile_target_frame_)
   {
-    temp_points = std::make_unique<EigenSTL::vector_Vector3d>(points_.size());
+    temp_points.reset(new EigenSTL::vector_Vector3d(points_.size()));
     for (std::size_t i = 0; i < points_.size(); ++i)
       temp_points->at(i) = tp * points_[i];
     points = temp_points.get();
@@ -985,7 +951,7 @@ void VisibilityConstraint::getMarkers(const moveit::core::RobotState& state,
   mk.pose.orientation.y = 0;
   mk.pose.orientation.z = 0;
   mk.pose.orientation.w = 1;
-  mk.lifetime = rclcpp::Duration::from_seconds(60);
+  mk.lifetime = rclcpp::Duration(60);
   // this scale necessary to make results look reasonable
   mk.scale.x = .01;
   mk.color.a = 1.0;
@@ -1168,11 +1134,11 @@ void VisibilityConstraint::print(std::ostream& out) const
   if (enabled())
   {
     out << "Visibility constraint for sensor in frame '" << sensor_frame_id_ << "' using target in frame '"
-        << target_frame_id_ << "'" << '\n';
-    out << "Target radius: " << target_radius_ << ", using " << cone_sides_ << " sides." << '\n';
+        << target_frame_id_ << "'" << std::endl;
+    out << "Target radius: " << target_radius_ << ", using " << cone_sides_ << " sides." << std::endl;
   }
   else
-    out << "No constraint" << '\n';
+    out << "No constraint" << std::endl;
 }
 
 void KinematicConstraintSet::clear()
@@ -1288,7 +1254,7 @@ ConstraintEvaluationResult KinematicConstraintSet::decide(const moveit::core::Ro
 
 void KinematicConstraintSet::print(std::ostream& out) const
 {
-  out << kinematic_constraints_.size() << " kinematic constraints" << '\n';
+  out << kinematic_constraints_.size() << " kinematic constraints" << std::endl;
   for (const KinematicConstraintPtr& kinematic_constraint : kinematic_constraints_)
     kinematic_constraint->print(out);
 }

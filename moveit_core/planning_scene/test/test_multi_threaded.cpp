@@ -42,7 +42,8 @@
 #include <thread>
 
 #include <moveit/collision_detection/collision_common.h>
-#include <moveit/collision_detection/collision_plugin_cache.h>
+#include <moveit/collision_detection/collision_env.h>
+#include <moveit/collision_detection/collision_detector_allocator.h>
 
 const int TRIALS = 1000;
 const int THREADS = 2;
@@ -66,7 +67,7 @@ void runCollisionDetectionAssert(unsigned int id, unsigned int trials, const pla
   ASSERT_EQ(expected_result, runCollisionDetection(id, trials, scene, state));
 }
 
-class CollisionDetectorTests : public testing::TestWithParam<const char*>
+class CollisionDetectorThreadedTest : public testing::Test
 {
 protected:
   void SetUp() override
@@ -74,8 +75,8 @@ protected:
     robot_model_ = moveit::core::loadTestingRobotModel("panda");
     ASSERT_TRUE(static_cast<bool>(robot_model_));
 
-    robot_state_ = std::make_shared<moveit::core::RobotState>(robot_model_);
-    planning_scene_ = std::make_shared<planning_scene::PlanningScene>(robot_model_);
+    robot_state_.reset(new moveit::core::RobotState(robot_model_));
+    planning_scene_.reset(new planning_scene::PlanningScene(robot_model_));
   }
 
   void TearDown() override
@@ -95,25 +96,12 @@ protected:
   planning_scene::PlanningScenePtr planning_scene_;
 };
 
-/** \brief Tests the collision detector in multiple threads. */
-TEST_P(CollisionDetectorTests, Threaded)
+/** \brief Tests the FCL collision detector in multiple threads. */
+TEST_F(CollisionDetectorThreadedTest, FCLThreaded)
 {
-  const std::string plugin_name = GetParam();
-  SCOPED_TRACE(plugin_name);
-
   std::vector<moveit::core::RobotStatePtr> states;
   std::vector<std::thread*> threads;
   std::vector<bool> collisions;
-
-  collision_detection::CollisionPluginCache loader;
-  if (!loader.activate(plugin_name, planning_scene_))
-  {
-#if defined(GTEST_SKIP_)
-    GTEST_SKIP_("Failed to load collision plugin");
-#else
-    return;
-#endif
-  }
 
   for (unsigned int i = 0; i < THREADS; ++i)
   {
@@ -134,16 +122,7 @@ TEST_P(CollisionDetectorTests, Threaded)
     threads[i]->join();
     delete threads[i];
   }
-
-  planning_scene_.reset();
 }
-
-#ifndef INSTANTIATE_TEST_SUITE_P  // prior to gtest 1.10
-#define INSTANTIATE_TEST_SUITE_P(...) INSTANTIATE_TEST_CASE_P(__VA_ARGS__)
-#endif
-
-// instantiate parameterized tests for common collision plugins
-INSTANTIATE_TEST_SUITE_P(PluginTests, CollisionDetectorTests, testing::Values("FCL", "Bullet"));
 
 int main(int argc, char** argv)
 {

@@ -80,8 +80,7 @@ void MoveGroupMoveAction::executeMoveCallback(std::shared_ptr<MGActionGoal> goal
   RCLCPP_INFO(LOGGER, "executing..");
   setMoveState(PLANNING, goal);
   // before we start planning, ensure that we have the latest robot state received...
-  auto node = context_->moveit_cpp_->getNode();
-  context_->planning_scene_monitor_->waitForCurrentRobotState(node->get_clock()->now());
+  context_->planning_scene_monitor_->waitForCurrentRobotState(rclcpp::Clock(RCL_ROS_TIME).now());
   context_->planning_scene_monitor_->updateFrameTransforms();
 
   auto action_res = std::make_shared<MGAction::Result>();

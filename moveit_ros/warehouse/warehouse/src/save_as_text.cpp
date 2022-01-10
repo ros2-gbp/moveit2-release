@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 
   if (vm.count("help"))
   {
-    std::cout << desc << '\n';
+    std::cout << desc << std::endl;
     return 1;
   }
   // Set up db
@@ -143,33 +143,33 @@ int main(int argc, char** argv)
       if (!(robot_state_names.empty() && constraint_names.empty()))
       {
         std::ofstream qfout((scene_name + ".queries").c_str());
-        qfout << scene_name << '\n';
+        qfout << scene_name << std::endl;
         if (!robot_state_names.empty())
         {
-          qfout << "start" << '\n';
-          qfout << robot_state_names.size() << '\n';
+          qfout << "start" << std::endl;
+          qfout << robot_state_names.size() << std::endl;
           for (const std::string& robot_state_name : robot_state_names)
           {
             RCLCPP_INFO(LOGGER, "Saving start state %s for scene %s", robot_state_name.c_str(), scene_name.c_str());
-            qfout << robot_state_name << '\n';
+            qfout << robot_state_name << std::endl;
             moveit_warehouse::RobotStateWithMetadata robot_state;
             rss.getRobotState(robot_state, robot_state_name);
             moveit::core::RobotState ks(km);
             moveit::core::robotStateMsgToRobotState(*robot_state, ks, false);
             ks.printStateInfo(qfout);
-            qfout << "." << '\n';
+            qfout << "." << std::endl;
           }
         }
 
         if (!constraint_names.empty())
         {
-          qfout << "goal" << '\n';
-          qfout << constraint_names.size() << '\n';
+          qfout << "goal" << std::endl;
+          qfout << constraint_names.size() << std::endl;
           for (const std::string& constraint_name : constraint_names)
           {
             RCLCPP_INFO(LOGGER, "Saving goal %s for scene %s", constraint_name.c_str(), scene_name.c_str());
-            qfout << "link_constraint" << '\n';
-            qfout << constraint_name << '\n';
+            qfout << "link_constraint" << std::endl;
+            qfout << constraint_name << std::endl;
             moveit_warehouse::ConstraintsWithMetadata constraints;
             cs.getConstraints(constraints, constraint_name);
 
@@ -179,13 +179,13 @@ int main(int argc, char** argv)
             {
               std::string link_name = iter.first;
               LinkConstraintPair lcp = iter.second;
-              qfout << link_name << '\n';
-              qfout << "xyz " << lcp.first.x << " " << lcp.first.y << " " << lcp.first.z << '\n';
+              qfout << link_name << std::endl;
+              qfout << "xyz " << lcp.first.x << " " << lcp.first.y << " " << lcp.first.z << std::endl;
               Eigen::Quaterniond orientation(lcp.second.w, lcp.second.x, lcp.second.y, lcp.second.z);
               Eigen::Vector3d rpy = orientation.matrix().eulerAngles(0, 1, 2);
-              qfout << "rpy " << rpy[0] << " " << rpy[1] << " " << rpy[2] << '\n';
+              qfout << "rpy " << rpy[0] << " " << rpy[1] << " " << rpy[2] << std::endl;
             }
-            qfout << "." << '\n';
+            qfout << "." << std::endl;
           }
         }
         qfout.close();

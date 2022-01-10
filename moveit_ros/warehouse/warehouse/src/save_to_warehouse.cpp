@@ -135,7 +135,7 @@ int main(int argc, char** argv)
 
   if (vm.count("help"))
   {
-    std::cout << desc << '\n';
+    std::cout << desc << std::endl;
     return 1;
   }
   // Set up db
@@ -145,7 +145,11 @@ int main(int argc, char** argv)
   if (!conn->connect())
     return 1;
 
-  planning_scene_monitor::PlanningSceneMonitor psm(node, ROBOT_DESCRIPTION);
+  rclcpp::Clock::SharedPtr clock = std::make_shared<rclcpp::Clock>(RCL_SYSTEM_TIME);
+  std::shared_ptr<tf2_ros::Buffer> tf_buffer = std::make_shared<tf2_ros::Buffer>(clock);
+  std::shared_ptr<tf2_ros::TransformListener> tf_listener =
+      std::make_shared<tf2_ros::TransformListener>(*tf_buffer, node);
+  planning_scene_monitor::PlanningSceneMonitor psm(node, ROBOT_DESCRIPTION, tf_buffer);
   if (!psm.getPlanningScene())
   {
     RCLCPP_ERROR(LOGGER, "Unable to initialize PlanningSceneMonitor");

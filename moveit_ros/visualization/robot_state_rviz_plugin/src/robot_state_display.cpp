@@ -54,12 +54,10 @@
 #include <OgreSceneManager.h>
 #include <OgreSceneNode.h>
 
-#include <memory>
-
 namespace moveit_rviz_plugin
 {
 // ******************************************************************************************
-// Base class constructor
+// Base class contructor
 // ******************************************************************************************
 RobotStateDisplay::RobotStateDisplay() : Display(), update_state_(false)
 {
@@ -122,7 +120,7 @@ void RobotStateDisplay::onInitialize()
   }
   robot_state_topic_property_->initialize(ros_node_abstraction);
   node_ = ros_node_abstraction->get_raw_node();
-  robot_ = std::make_shared<RobotStateVisualization>(scene_node_, context_, "Robot State", this);
+  robot_.reset(new RobotStateVisualization(scene_node_, context_, "Robot State", this));
   changedEnableVisualVisible();
   changedEnableCollisionVisible();
   robot_->setVisible(false);
@@ -312,7 +310,7 @@ void RobotStateDisplay::newRobotStateCallback(const moveit_msgs::msg::DisplayRob
   if (!robot_model_)
     return;
   if (!robot_state_)
-    robot_state_ = std::make_shared<moveit::core::RobotState>(robot_model_);
+    robot_state_.reset(new moveit::core::RobotState(robot_model_));
   // possibly use TF to construct a moveit::core::Transforms object to pass in to the conversion function?
   try
   {
@@ -378,7 +376,7 @@ void RobotStateDisplay::unsetLinkColor(rviz_default_plugins::robot::Robot* robot
 // ******************************************************************************************
 // Load
 // ******************************************************************************************
-void RobotStateDisplay::initializeLoader()
+void RobotStateDisplay::loadRobotModel()
 {
   if (robot_description_property_->getStdString().empty())
   {
@@ -386,22 +384,17 @@ void RobotStateDisplay::initializeLoader()
     return;
   }
 
-  rdf_loader_ = std::make_shared<rdf_loader::RDFLoader>(node_, robot_description_property_->getStdString(), true);
-  loadRobotModel();
-  rdf_loader_->setNewModelCallback(std::bind(&RobotStateDisplay::loadRobotModel, this));
-}
+  rdf_loader_.reset(new rdf_loader::RDFLoader(node_, robot_description_property_->getStdString()));
 
-void RobotStateDisplay::loadRobotModel()
-{
   if (rdf_loader_->getURDF())
   {
     try
     {
       const srdf::ModelSharedPtr& srdf =
-          rdf_loader_->getSRDF() ? rdf_loader_->getSRDF() : std::make_shared<srdf::Model>();
-      robot_model_ = std::make_shared<moveit::core::RobotModel>(rdf_loader_->getURDF(), srdf);
+          rdf_loader_->getSRDF() ? rdf_loader_->getSRDF() : srdf::ModelSharedPtr(new srdf::Model());
+      robot_model_.reset(new moveit::core::RobotModel(rdf_loader_->getURDF(), srdf));
       robot_->load(*robot_model_->getURDF());
-      robot_state_ = std::make_shared<moveit::core::RobotState>(robot_model_);
+      robot_state_.reset(new moveit::core::RobotState(robot_model_));
       robot_state_->setToDefaultValues();
       bool old_state = root_link_name_property_->blockSignals(true);
       root_link_name_property_->setStdString(getRobotModel()->getRootLinkName());
@@ -436,7 +429,7 @@ void RobotStateDisplay::onEnable()
 {
   Display::onEnable();
   if (!rdf_loader_)
-    initializeLoader();
+    loadRobotModel();
   changedRobotStateTopic();
   calculateOffsetPosition();
 }

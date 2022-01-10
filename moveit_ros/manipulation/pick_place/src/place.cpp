@@ -40,11 +40,7 @@
 #include <moveit/pick_place/plan_stage.h>
 #include <moveit/robot_state/conversions.h>
 #include <moveit/utils/message_checks.h>
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
-#include <tf2_eigen/tf2_eigen.hpp>
-#else
 #include <tf2_eigen/tf2_eigen.h>
-#endif
 #include <ros/console.h>
 
 namespace pick_place
@@ -72,7 +68,7 @@ struct OrderPlaceLocationQuality
 bool transformToEndEffectorGoal(const geometry_msgs::PoseStamped& goal_pose,
                                 const moveit::core::AttachedBody* attached_body, geometry_msgs::PoseStamped& place_pose)
 {
-  const EigenSTL::vector_Isometry3d& fixed_transforms = attached_body->getShapePosesInLinkFrame();
+  const EigenSTL::vector_Isometry3d& fixed_transforms = attached_body->getFixedTransforms();
   if (fixed_transforms.empty())
     return false;
 
@@ -155,7 +151,7 @@ bool PlacePlan::plan(const planning_scene::PlanningSceneConstPtr& planning_scene
           if (!attached_bodies.empty())
           {
             // if the user specified the name of the attached object to place, we check that indeed
-            // the group contains this attached body
+            // the group contains this attachd body
             if (!attached_object_name.empty())
             {
               bool found = false;
@@ -357,7 +353,7 @@ bool PlacePlan::plan(const planning_scene::PlanningSceneConstPtr& planning_scene
       p->retreat_posture_ = attached_body->getDetachPosture();
     pipeline_.push(p);
   }
-  ROS_INFO_NAMED("manipulation", "Added %d place locations", static_cast<int>(goal.place_locations.size()));
+  ROS_INFO_NAMED("manipulation", "Added %d place locations", (int)goal.place_locations.size());
 
   // wait till we're done
   waitForPipeline(endtime);

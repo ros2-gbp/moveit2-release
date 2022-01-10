@@ -32,7 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#pragma once
+#ifndef GRIPPER_H
+#define GRIPPER_H
 
 #include "ptp.h"
 #include "jointconfiguration.h"
@@ -43,3 +44,5 @@ class Gripper : public Ptp<JointConfiguration, JointConfiguration>
 {
 };
 }  // namespace pilz_industrial_motion_planner_testutils
+
+#endif  // GRIPPER_H

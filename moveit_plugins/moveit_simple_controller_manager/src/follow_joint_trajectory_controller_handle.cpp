@@ -48,10 +48,9 @@ bool FollowJointTrajectoryControllerHandle::sendTrajectory(const moveit_msgs::ms
   if (!controller_action_client_)
     return false;
 
-  if (!isConnected())
+  if (!trajectory.multi_dof_joint_trajectory.points.empty())
   {
-    RCLCPP_ERROR_STREAM(LOGGER, "Action client not connected to action server: " << getActionName());
-    return false;
+    RCLCPP_WARN_STREAM(LOGGER, name_ << " cannot execute multi-dof trajectories.");
   }
 
   if (done_)
@@ -61,7 +60,6 @@ bool FollowJointTrajectoryControllerHandle::sendTrajectory(const moveit_msgs::ms
 
   control_msgs::action::FollowJointTrajectory::Goal goal = goal_template_;
   goal.trajectory = trajectory.joint_trajectory;
-  goal.multi_dof_trajectory = trajectory.multi_dof_joint_trajectory;
 
   rclcpp_action::Client<control_msgs::action::FollowJointTrajectory>::SendGoalOptions send_goal_options;
   // Active callback
@@ -222,13 +220,13 @@ void FollowJointTrajectoryControllerHandle::controllerDoneCallback(
 {
   // Output custom error message for FollowJointTrajectoryResult if necessary
   if (!wrapped_result.result)
-    RCLCPP_WARN_STREAM(LOGGER, "Controller '" << name_ << "' done, no result returned");
+    RCLCPP_WARN_STREAM(LOGGER, "Controller " << name_ << " done, no result returned");
   else if (wrapped_result.result->error_code == control_msgs::action::FollowJointTrajectory::Result::SUCCESSFUL)
-    RCLCPP_INFO_STREAM(LOGGER, "Controller '" << name_ << "' successfully finished");
+    RCLCPP_INFO_STREAM(LOGGER, "Controller " << name_ << " successfully finished");
   else
-    RCLCPP_WARN_STREAM(LOGGER, "Controller '" << name_ << "' failed with error "
-                                              << errorCodeToMessage(wrapped_result.result->error_code) << ": "
-                                              << wrapped_result.result->error_string);
+    RCLCPP_WARN_STREAM(LOGGER, "Controller " << name_ << " failed with error "
+                                             << errorCodeToMessage(wrapped_result.result->error_code) << ": "
+                                             << wrapped_result.result->error_string);
   finishControllerExecution(wrapped_result.code);
 }
 

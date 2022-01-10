@@ -32,7 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#pragma once
+#ifndef CIRC_AUXILIARY_TYPES_H
+#define CIRC_AUXILIARY_TYPES_H
 
 #include "center.h"
 #include "interim.h"
@@ -44,3 +45,5 @@ namespace pilz_industrial_motion_planner_testutils
 using CartesianCenter = Center<CartesianConfiguration, CartesianPathConstraintsBuilder>;
 using CartesianInterim = Interim<CartesianConfiguration, CartesianPathConstraintsBuilder>;
 }  // namespace pilz_industrial_motion_planner_testutils
+
+#endif  // CIRC_AUXILIARY_TYPES_H

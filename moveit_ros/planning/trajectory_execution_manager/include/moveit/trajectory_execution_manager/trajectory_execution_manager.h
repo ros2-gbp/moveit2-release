@@ -254,11 +254,14 @@ public:
 private:
   struct ControllerInformation
   {
+    ControllerInformation() : last_update_(0, 0, RCL_ROS_TIME)
+    {
+    }
     std::string name_;
     std::set<std::string> joints_;
     std::set<std::string> overlapping_controllers_;
     moveit_controller_manager::MoveItControllerManager::ControllerState state_;
-    rclcpp::Time last_update_{ 0, 0, RCL_ROS_TIME };
+    rclcpp::Time last_update_;
 
     bool operator<(ControllerInformation& other) const
     {
