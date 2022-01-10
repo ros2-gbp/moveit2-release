@@ -1,0 +1,12 @@
+Source: ros-foxy-chomp-motion-planner
+Section: misc
+Priority: optional
+Maintainer: Chittaranjan Srinivas Swaminathan <chitt@live.in>
+Build-Depends: debhelper (>= 9.0.0), ros-foxy-ament-cmake, ros-foxy-ament-lint-auto, ros-foxy-ament-lint-common, ros-foxy-moveit-common, ros-foxy-moveit-core, ros-foxy-rclcpp, ros-foxy-trajectory-msgs, ros-foxy-ros-workspace
+Homepage: http://ros.org/wiki/chomp_motion_planner
+Standards-Version: 3.9.2
+
+Package: ros-foxy-chomp-motion-planner
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-foxy-moveit-core, ros-foxy-rclcpp, ros-foxy-trajectory-msgs, ros-foxy-ros-workspace
+Description: chomp_motion_planner
