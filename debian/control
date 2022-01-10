@@ -1,0 +1,12 @@
+Source: ros-foxy-moveit-ros-move-group
+Section: misc
+Priority: optional
+Maintainer: Michael Ferguson <mferguson@fetchrobotics.com>
+Build-Depends: debhelper (>= 9.0.0), ros-foxy-ament-cmake, ros-foxy-ament-lint-auto, ros-foxy-ament-lint-common, ros-foxy-moveit-common, ros-foxy-moveit-core, ros-foxy-moveit-resources-fanuc-moveit-config, ros-foxy-moveit-ros-occupancy-map-monitor, ros-foxy-moveit-ros-planning, ros-foxy-pluginlib (>= 1.11.2), ros-foxy-rclcpp, ros-foxy-rclcpp-action, ros-foxy-std-srvs, ros-foxy-tf2, ros-foxy-tf2-geometry-msgs, ros-foxy-tf2-ros, ros-foxy-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-foxy-moveit-ros-move-group
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-foxy-moveit-core, ros-foxy-moveit-kinematics, ros-foxy-moveit-ros-occupancy-map-monitor, ros-foxy-moveit-ros-planning, ros-foxy-pluginlib (>= 1.11.2), ros-foxy-rclcpp, ros-foxy-rclcpp-action, ros-foxy-std-srvs, ros-foxy-tf2, ros-foxy-tf2-geometry-msgs, ros-foxy-tf2-ros, ros-foxy-ros-workspace
+Description: The move_group node for MoveIt
