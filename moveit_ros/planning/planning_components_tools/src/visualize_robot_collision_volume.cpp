@@ -36,7 +36,6 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <moveit/planning_scene_monitor/planning_scene_monitor.h>
-#include <tf2_ros/transform_listener.h>
 #include <memory>
 
 static const std::string ROBOT_DESCRIPTION = "robot_description";
@@ -49,20 +48,16 @@ int main(int argc, char** argv)
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(node);
   double radius = 0.02;
-  double lifetime = 600.0;
+  int lifetime = 600;
 
-  std::shared_ptr<tf2_ros::Buffer> tf_buffer = std::make_shared<tf2_ros::Buffer>(node->get_clock());
-  std::shared_ptr<tf2_ros::TransformListener> tf_listener =
-      std::make_shared<tf2_ros::TransformListener>(*tf_buffer, node);
-  planning_scene_monitor::PlanningSceneMonitor psm(node, ROBOT_DESCRIPTION, tf_buffer);
+  planning_scene_monitor::PlanningSceneMonitor psm(node, ROBOT_DESCRIPTION);
   if (psm.getPlanningScene())
   {
     psm.startWorldGeometryMonitor();
     psm.startSceneMonitor();
     psm.startStateMonitor();
     auto pub_markers = node->create_publisher<visualization_msgs::msg::MarkerArray>("visualization_marker_array", 10);
-    std::cout << "\nListening for planning scene...\nType the number of spheres to generate and press Enter: "
-              << std::endl;
+    std::cout << "\nListening for planning scene...\nType the number of spheres to generate and press Enter: " << '\n';
     int num_spheres;
     std::cin >> num_spheres;
 
@@ -89,7 +84,7 @@ int main(int argc, char** argv)
     mk.color.g = 0.5f;
     mk.color.b = 1.0f;
     mk.color.a = 0.3f;
-    mk.lifetime = rclcpp::Duration(lifetime);
+    mk.lifetime = rclcpp::Duration::from_seconds(lifetime);
     visualization_msgs::msg::MarkerArray arr;
     arr.markers.push_back(mk);
     pub_markers->publish(arr);
@@ -136,7 +131,7 @@ int main(int argc, char** argv)
             mk.pose.orientation.w = 1.0;
             mk.scale.x = mk.scale.y = mk.scale.z = radius;
             mk.color = color;
-            mk.lifetime = rclcpp::Duration(lifetime);
+            mk.lifetime = rclcpp::Duration::from_seconds(lifetime);
             arr.markers.push_back(mk);
             pub_markers->publish(arr);
           }

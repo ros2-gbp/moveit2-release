@@ -2,17 +2,46 @@
 Changelog for package moveit_ros_planning_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.2.3 (2022-01-07)
+2.3.3 (2022-01-20)
+------------------
+* Fix boost linking errors for Windows (`#957 <https://github.com/ros-planning/moveit2/issues/957>`_) (`#1001 <https://github.com/ros-planning/moveit2/issues/1001>`_)
+* Contributors: mergify[bot]
+
+2.3.2 (2021-12-29)
 ------------------
 
-2.2.2 (2021-11-16)
+2.3.1 (2021-12-23)
 ------------------
-* Add getSharedRobotModelLoader to fix race condition when having multiple displays for the same node (`#525 <https://github.com/ros-planning/moveit2/issues/525>`_)
+* Add codespell to precommit, fix A LOT of spelling mistakes (`#934 <https://github.com/ros-planning/moveit2/issues/934>`_)
+* Consider simulated time (`#883 <https://github.com/ros-planning/moveit2/issues/883>`_)
+* Enforce package.xml format 3 Schema (`#779 <https://github.com/ros-planning/moveit2/issues/779>`_)
+* Update Maintainers of MoveIt package (`#697 <https://github.com/ros-planning/moveit2/issues/697>`_)
+* Find/replace deprecated spawner.py (`#737 <https://github.com/ros-planning/moveit2/issues/737>`_)
 * common_objects: getSharedRobotModelLoader fix deadlock (`#734 <https://github.com/ros-planning/moveit2/issues/734>`_)
-* Migrate to joint_state_broadcaster (`#656 <https://github.com/ros-planning/moveit2/issues/656>`_)
+* fix trajectory constraints for moveit commander (`#2429 <https://github.com/ros-planning/moveit/issues/2429>`_)
+* MGI::setStartState: Only fetch current state when new state is diff (`#2775 <https://github.com/ros-planning/moveit/issues/2775>`_)
+* clang-tidy: modernize-make-shared, modernize-make-unique (`#2762 <https://github.com/ros-planning/moveit/issues/2762>`_)
+* Contributors: AndyZe, Dave Coleman, David V. Lu!!, Felix von Drigalski, Gaël Écorchard, Henning Kayser, Jafar Abdi, Kevin Chang, Robert Haschke, pvanlaar
+
+2.3.0 (2021-10-08)
+------------------
+* Support passing MoveGroup's namespace to MoveGroupInterface (`#533 <https://github.com/ros-planning/moveit2/issues/533>`_)
+* Add getSharedRobotModelLoader to fix race condition when having multiple displays for the same node (`#525 <https://github.com/ros-planning/moveit2/issues/525>`_)
+* Make TF buffer & listener in PSM private (`#654 <https://github.com/ros-planning/moveit2/issues/654>`_)
+  * Add private buffer & tf listener to PSM
+  * Remove coupled deleter
+  * Decouple PSM from CSM
+  * Deprecate old constructors
+* getInterfaceDescription: Fix rclcpp API breakage (`#686 <https://github.com/ros-planning/moveit2/issues/686>`_)
+* [main] Migrate to joint_state_broadcaster (`#657 <https://github.com/ros-planning/moveit2/issues/657>`_)
+* Fix warnings in Galactic and Rolling (`#598 <https://github.com/ros-planning/moveit2/issues/598>`_)
+  * Use __has_includes preprocessor directive for deprecated headers
+  * Fix parameter template types
+  * Proper initialization of smart pointers, rclcpp::Duration
+* Create a transform subscribers to enable virtual joints (`#310 <https://github.com/ros-planning/moveit2/issues/310>`_)
 * Fix loading joint_limits.yaml in demo and test launch files (`#544 <https://github.com/ros-planning/moveit2/issues/544>`_)
 * Fixes for Windows (`#530 <https://github.com/ros-planning/moveit2/issues/530>`_)
-* Contributors: Akash, Lior Lustgarten, Tyler Weaver, Vatan Aksoy Tezer, Henning Kayser, Jorge Nicho, Nisala Kalupahana, Jafar Abdi
+* Contributors: Akash, Jafar Abdi, Nisala Kalupahana, Jorge Nicho, Henning Kayser, Vatan Aksoy Tezer, Tyler Weaver, Lior Lustgarten
 
 2.2.1 (2021-07-12)
 ------------------

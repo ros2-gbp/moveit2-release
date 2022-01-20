@@ -12,9 +12,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wno-pedantic)
 endif()
 
-# Finds Boost Components
-include(ConfigExtras.cmake)
-
 if(APPLE)
   find_package(X11 REQUIRED)
 endif()
@@ -26,6 +23,9 @@ find_package(Eigen3 REQUIRED)
 find_package(octomap REQUIRED)
 find_package(geometric_shapes REQUIRED)
 find_package(tf2_ros REQUIRED)
+
+# Finds Boost Components
+include(ConfigExtras.cmake)
 
 include_directories(include)
 include_directories(SYSTEM
@@ -45,13 +45,13 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
 
 add_library(${MOVEIT_LIB_NAME} SHARED
   src/occupancy_map_monitor.cpp
+  src/occupancy_map_monitor_middleware_handle.cpp
   src/occupancy_map_updater.cpp
 )
 set_target_properties(${MOVEIT_LIB_NAME} PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
 ament_target_dependencies(${MOVEIT_LIB_NAME}
   ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
-target_link_libraries(${MOVEIT_LIB_NAME} Boost::thread)
 
 add_executable(moveit_ros_occupancy_map_server src/occupancy_map_server.cpp)
 ament_target_dependencies(moveit_ros_occupancy_map_server
@@ -87,6 +87,15 @@ if(BUILD_TESTING)
 
   # Run all lint tests in package.xml except those listed above
   ament_lint_auto_find_test_dependencies()
+
+  find_package(ament_cmake_gmock REQUIRED)
+
+  ament_add_gmock(occupancy_map_monitor_tests
+    test/occupancy_map_monitor_tests.cpp
+  )
+  target_link_libraries(occupancy_map_monitor_tests
+    ${MOVEIT_LIB_NAME}
+  )
 endif()
 
 ament_package(CONFIG_EXTRAS ConfigExtras.cmake)

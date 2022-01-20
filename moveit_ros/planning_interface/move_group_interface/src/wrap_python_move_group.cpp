@@ -44,9 +44,17 @@
 #include <moveit/trajectory_processing/iterative_time_parameterization.h>
 #include <moveit/trajectory_processing/iterative_spline_parameterization.h>
 #include <moveit/trajectory_processing/time_optimal_trajectory_generation.h>
+#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
+#include <tf2_eigen/tf2_eigen.hpp>
+#else
 #include <tf2_eigen/tf2_eigen.h>
+#endif
 #include <tf2/LinearMath/Quaternion.h>
+#if __has_include(<tf2_geometry_msgs/tf2_geometry_msgs.hpp>)
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#else
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#endif
 #include <tf2_ros/buffer.h>
 
 #include <boost/python.hpp>
@@ -549,6 +557,19 @@ public:
     return py_bindings_tools::serializeMsg(constraints_msg);
   }
 
+  void setTrajectoryConstraintsFromMsg(const py_bindings_tools::ByteString& constraints_str)
+  {
+    moveit_msgs::TrajectoryConstraints constraints_msg;
+    py_bindings_tools::deserializeMsg(constraints_str, constraints_msg);
+    setTrajectoryConstraints(constraints_msg);
+  }
+
+  py_bindings_tools::ByteString getTrajectoryConstraintsPython()
+  {
+    moveit_msgs::TrajectoryConstraints constraints_msg(getTrajectoryConstraints());
+    return py_bindings_tools::serializeMsg(constraints_msg);
+  }
+
   py_bindings_tools::ByteString retimeTrajectory(const py_bindings_tools::ByteString& ref_state_str,
                                                  const py_bindings_tools::ByteString& traj_str,
                                                  double velocity_scaling_factor, double acceleration_scaling_factor,
@@ -757,6 +778,12 @@ static void wrap_move_group_interface()
   move_group_interface_class.def("set_path_constraints_from_msg", &MoveGroupInterfaceWrapper::setPathConstraintsFromMsg);
   move_group_interface_class.def("get_path_constraints", &MoveGroupInterfaceWrapper::getPathConstraintsPython);
   move_group_interface_class.def("clear_path_constraints", &MoveGroupInterfaceWrapper::clearPathConstraints);
+
+  move_group_interface_class.def("set_trajectory_constraints_from_msg",
+                                 &MoveGroupInterfaceWrapper::setTrajectoryConstraintsFromMsg);
+  move_group_interface_class.def("get_trajectory_constraints",
+                                 &MoveGroupInterfaceWrapper::getTrajectoryConstraintsPython);
+  move_group_interface_class.def("clear_trajectory_constraints", &MoveGroupInterfaceWrapper::clearTrajectoryConstraints);
   move_group_interface_class.def("get_known_constraints", &MoveGroupInterfaceWrapper::getKnownConstraintsList);
   move_group_interface_class.def("set_constraints_database", &MoveGroupInterfaceWrapper::setConstraintsDatabase);
   move_group_interface_class.def("set_workspace", &MoveGroupInterfaceWrapper::setWorkspace);

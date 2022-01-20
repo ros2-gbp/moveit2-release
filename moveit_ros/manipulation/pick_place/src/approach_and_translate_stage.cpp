@@ -38,7 +38,11 @@
 #include <moveit/pick_place/approach_and_translate_stage.h>
 #include <moveit/trajectory_processing/trajectory_tools.h>
 #include <moveit/robot_state/cartesian_interpolator.h>
+#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
+#include <tf2_eigen/tf2_eigen.hpp>
+#else
 #include <tf2_eigen/tf2_eigen.h>
+#endif
 #include <ros/console.h>
 
 namespace pick_place
@@ -229,7 +233,7 @@ bool ApproachAndTranslateStage::evaluate(const ManipulationPlanPtr& plan) const
                   &plan->approach_posture_, _1, _2, _3);
   plan->goal_sampler_->setVerbose(verbose_);
   std::size_t attempted_possible_goal_states = 0;
-  do  // continously sample possible goal states
+  do  // continuously sample possible goal states
   {
     for (std::size_t i = attempted_possible_goal_states; i < plan->possible_goal_states_.size() && !signal_stop_;
          ++i, ++attempted_possible_goal_states)

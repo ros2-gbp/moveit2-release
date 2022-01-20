@@ -2,16 +2,58 @@
 Changelog for package moveit_ros_planning
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.2.3 (2022-01-07)
+2.3.3 (2022-01-20)
 ------------------
 
-2.2.2 (2021-11-16)
+2.3.2 (2021-12-29)
 ------------------
-* MoveitCpp - path constraints added from PlanningComponent (`#752 <https://github.com/ros-planning/moveit2/issues/752>`_)
+* Add ros_testsing to moveit_ros_planning for rdf_loader (`#943 <https://github.com/ros-planning/moveit2/issues/943>`_)
+* Contributors: Tyler Weaver
+
+2.3.1 (2021-12-23)
+------------------
+* Replaced C-Style Cast with C++ Style Cast. (`#935 <https://github.com/ros-planning/moveit2/issues/935>`_)
+* Add codespell to precommit, fix A LOT of spelling mistakes (`#934 <https://github.com/ros-planning/moveit2/issues/934>`_)
+* Get rid of "std::endl" (`#918 <https://github.com/ros-planning/moveit2/issues/918>`_)
+* changed post-increments in loops to preincrements (`#888 <https://github.com/ros-planning/moveit2/issues/888>`_)
+* Latched Strings for URDF and SRDF (`#765 <https://github.com/ros-planning/moveit2/issues/765>`_)
+* Consider simulated time (`#883 <https://github.com/ros-planning/moveit2/issues/883>`_)
+* Make controller management logic more tolerant of missing or late ros2_control nodes (`#792 <https://github.com/ros-planning/moveit2/issues/792>`_)
+* Enforce package.xml format 3 Schema (`#779 <https://github.com/ros-planning/moveit2/issues/779>`_)
+* Update Maintainers of MoveIt package (`#697 <https://github.com/ros-planning/moveit2/issues/697>`_)
+* Tests for TrajectoryMonitor using dependency injection (`#570 <https://github.com/ros-planning/moveit2/issues/570>`_)
+* Update controller_manager_plugin to fix MoveIt-managed controller switching (`#785 <https://github.com/ros-planning/moveit2/issues/785>`_)
+* MoveitCpp - path constraints added from PlanningComponent (backport `#752 <https://github.com/ros-planning/moveit2/issues/752>`_) (`#781 <https://github.com/ros-planning/moveit2/issues/781>`_)
+* Split CollisionPluginLoader (`#2834 <https://github.com/ros-planning/moveit/issues/2834>`_)
+* Bugfix in RDFLoader (`#2806 <https://github.com/ros-planning/moveit/issues/2806>`_)
+* Fix obvious typo (`#2787 <https://github.com/ros-planning/moveit/issues/2787>`_)
+* clang-tidy: modernize-make-shared, modernize-make-unique (`#2762 <https://github.com/ros-planning/moveit/issues/2762>`_)
+* Contributors: Abishalini Sivaraman, Dave Coleman, David V. Lu!!, Felix von Drigalski, Gaël Écorchard, Henning Kayser, Joseph Schornak, Kaustubh, Mathias Lüdtke, Michael Görner, Parthasarathy Bana, Robert Haschke, Sencer Yazıcı, pvanlaar, werner291
+
+2.3.0 (2021-10-08)
+------------------
+* Make TF buffer & listener in PSM private (`#654 <https://github.com/ros-planning/moveit2/issues/654>`_)
+* kinematics_plugin_loader: Revert accidental change in logging level (`#692 <https://github.com/ros-planning/moveit2/issues/692>`_)
+* Add Ruckig trajectory_processing plugin (jerk-limited) (`#571 <https://github.com/ros-planning/moveit2/issues/571>`_)
+* PlanningSceneMonitor: Fix warning about having two publisher with the same node (`#662 <https://github.com/ros-planning/moveit2/issues/662>`_)
+* Port moveit ros control interface to ROS2 (`#545 <https://github.com/ros-planning/moveit2/issues/545>`_)
+* OccupancyMapMonitor tests using Dependency Injection (`#569 <https://github.com/ros-planning/moveit2/issues/569>`_)
+* Fix reversed check (`#623 <https://github.com/ros-planning/moveit2/issues/623>`_)
+* follow_joint_trajectory_controller_handle: publish new multi_dof_trajectory field (`#492 <https://github.com/ros-planning/moveit2/issues/492>`_)
+* Fix warnings in Galactic and Rolling (`#598 <https://github.com/ros-planning/moveit2/issues/598>`_)
+  * Use __has_includes preprocessor directive for deprecated headers
+  * Fix parameter template types
+  * Proper initialization of smart pointers, rclcpp::Duration
+* Create a transform subscribers to enable virtual joints (`#310 <https://github.com/ros-planning/moveit2/issues/310>`_)
+* Minor documentation and cleanup of TOTG plugin (`#584 <https://github.com/ros-planning/moveit2/issues/584>`_)
+* Wait for complete state duration fix (`#590 <https://github.com/ros-planning/moveit2/issues/590>`_)
+* Fix some format strings (`#587 <https://github.com/ros-planning/moveit2/issues/587>`_)
 * Fixes for Windows (`#530 <https://github.com/ros-planning/moveit2/issues/530>`_)
 * Tests for CurrentStateMonitor using dependency injection (`#562 <https://github.com/ros-planning/moveit2/issues/562>`_)
 * Fix joint's position limits loading (`#553 <https://github.com/ros-planning/moveit2/issues/553>`_)
-* Contributors: Akash, Marco Lapolla, Lior Lustgarten, Tyler Weaver, Vatan Aksoy Tezer, Henning Kayser, Jorge Nicho, Nisala Kalupahana, Jafar Abdi
+* Refactors for OccMapTree in PlanningScene (`#2684 <https://github.com/ros-planning/moveit2/issues/2684>`_)
+* Move OccMapTree to moveit_core/collision_detection
+* Contributors: Akash, AndyZe, Bjar Ne, Henning Kayser, Jafar Abdi, Nathan Brooks, Simon Schmeisser, Tyler Weaver, Vatan Aksoy Tezer, Wyatt Rees, Jack, Dave Coleman,  Joe Schornak, Nisala Kalupahana, Lior Lustgarten, Jorge Nicho
 
 2.2.1 (2021-07-12)
 ------------------

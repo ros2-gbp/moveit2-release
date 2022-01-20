@@ -2,19 +2,109 @@
 Changelog for package moveit_core
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.2.3 (2022-01-07)
+2.3.3 (2022-01-20)
 ------------------
-* Fix CHOMP motion planner build on Windows (`#890 <https://github.com/ros-planning/moveit2/issues/890>`_) (`#936 <https://github.com/ros-planning/moveit2/issues/936>`_)
-* Fix boost linking errors (`#900 <https://github.com/ros-planning/moveit2/issues/900>`_) (`#920 <https://github.com/ros-planning/moveit2/issues/920>`_)
-* Contributors: Vatan Aksoy Tezer, Akash
+* Fix boost linking errors for Windows (`#957 <https://github.com/ros-planning/moveit2/issues/957>`_) (`#1001 <https://github.com/ros-planning/moveit2/issues/1001>`_)
+* Contributors: mergify[bot]
 
-2.2.2 (2021-11-16)
+2.3.2 (2021-12-29)
 ------------------
-* collision_detection_bullet: Fix target installation (`#658 <https://github.com/ros-planning/moveit2/issues/658>`_)
-* Fix broken test (`#701 <https://github.com/ros-planning/moveit2/issues/701>`_)
+
+2.3.1 (2021-12-23)
+------------------
+* Convert to modern include guard `#882 <https://github.com/ros-planning/moveit2/issues/882>`_ (`#891 <https://github.com/ros-planning/moveit2/issues/891>`_)
+* Replaced C-Style Cast with C++ Style Cast. (`#935 <https://github.com/ros-planning/moveit2/issues/935>`_)
+* Fix CHOMP motion planner build on Windows (`#890 <https://github.com/ros-planning/moveit2/issues/890>`_)
+* Add codespell to precommit, fix A LOT of spelling mistakes (`#934 <https://github.com/ros-planning/moveit2/issues/934>`_)
+* Get rid of "std::endl" (`#918 <https://github.com/ros-planning/moveit2/issues/918>`_)
+* changed post-increments in loops to preincrements (`#888 <https://github.com/ros-planning/moveit2/issues/888>`_)
+* Fix boost linking errors (`#900 <https://github.com/ros-planning/moveit2/issues/900>`_)
+* Remove unused dependency from cmake (`#839 <https://github.com/ros-planning/moveit2/issues/839>`_)
+* Revert debug warning (`#884 <https://github.com/ros-planning/moveit2/issues/884>`_)
+* tf2_eigen header fix for galactic
+* Clang-tidy fixes (`#596 <https://github.com/ros-planning/moveit2/issues/596>`_)
+* Enforce package.xml format 3 Schema (`#779 <https://github.com/ros-planning/moveit2/issues/779>`_)
+* Update Maintainers of MoveIt package (`#697 <https://github.com/ros-planning/moveit2/issues/697>`_)
+* RobotTrajectory as standard container (`#720 <https://github.com/ros-planning/moveit2/issues/720>`_)
+  * Based on initial size/iterator implementations from https://github.com/ros-planning/moveit/pull/1162
+* Ruckig trajectory smoothing improvements (`#712 <https://github.com/ros-planning/moveit2/issues/712>`_)
+* Fixed Bullet collision checker not taking defaults into account. (`#2871 <https://github.com/ros-planning/moveit/issues/2871>`_)
+* PlanningScene::getPlanningSceneDiffMsg(): Do not list an object as destroyed when it got attached (`#2864 <https://github.com/ros-planning/moveit/issues/2864>`_)
+* Fix bullet-collision constructor not updating world objects (`#2830 <https://github.com/ros-planning/moveit/issues/2830>`_)
+  Ensure getting notified about any objects in the world.
+* Split CollisionPluginLoader (`#2834 <https://github.com/ros-planning/moveit/issues/2834>`_)
+* Use default copy constructor to clone attached objects (`#2855 <https://github.com/ros-planning/moveit/issues/2855>`_)
+* Remove unnecessary copy of global sub-frames map (`#2850 <https://github.com/ros-planning/moveit/issues/2850>`_)
+* update comments to current parameter name (`#2853 <https://github.com/ros-planning/moveit/issues/2853>`_)
+* Fix pose-not-set-bug (`#2852 <https://github.com/ros-planning/moveit/issues/2852>`_)
+* add API for passing RNG to setToRandomPositionsNearBy (`#2799 <https://github.com/ros-planning/moveit/issues/2799>`_)
+* PS: backwards compatibility for specifying poses for a single collision shape (`#2816 <https://github.com/ros-planning/moveit/issues/2816>`_)
+* Fix Bullet collision returning wrong contact type (`#2829 <https://github.com/ros-planning/moveit/issues/2829>`_)
+* Add RobotState::setToDefaultValues from group string (`#2828 <https://github.com/ros-planning/moveit/issues/2828>`_)
+* Fix issue `#2809 <https://github.com/ros-planning/moveit/issues/2809>`_ (broken test with clang) (`#2820 <https://github.com/ros-planning/moveit/issues/2820>`_)
+  Because std::make_pair uses the decayed type (std::string), the strings were actually copied into a temporary, which was subsequently referenced by the elements of std::pair, leading to a stack-use-after-scope error.
+  Explicitly passing const references into std::make_pair via std::cref() resolves the issue mentioned in `#2809 <https://github.com/ros-planning/moveit/issues/2809>`_.
+* [moveit_core] Fix export of FCL dependency (`#2819 <https://github.com/ros-planning/moveit/issues/2819>`_)
+  Regression of 93c3f63
+  Closes: `#2804 <https://github.com/ros-planning/moveit/issues/2804>`_
+* code fix on wrong substitution (`#2815 <https://github.com/ros-planning/moveit/issues/2815>`_)
+* Preserve metadata when detaching objects (`#2814 <https://github.com/ros-planning/moveit/issues/2814>`_)
+* [fix] RobotState constructor segfault (`#2790 <https://github.com/ros-planning/moveit/issues/2790>`_)
+* Fix compiler selecting the wrong function overload
+* more fixes for the clang-tidy job (`#2813 <https://github.com/ros-planning/moveit/issues/2813>`_)
+* fix clang-tidy CI job (`#2792 <https://github.com/ros-planning/moveit/issues/2792>`_)
+* Fix bullet plugin library path name (`#2783 <https://github.com/ros-planning/moveit/issues/2783>`_)
+* Trajectory: Improve docstrings (`#2781 <https://github.com/ros-planning/moveit/issues/2781>`_)
+* clang-tidy: modernize-make-shared, modernize-make-unique (`#2762 <https://github.com/ros-planning/moveit/issues/2762>`_)
+* Fix Windows CI (`#2776 <https://github.com/ros-planning/moveit/issues/2776>`_)
+* Fixup devel-space build after `#2604 <https://github.com/ros-planning/moveit/issues/2604>`_
+* Cleanup CollisionDetectorAllocatorTemplate::getName()
+* RobotTrajectory: add convenience constructor
+* Fix windows compilation failures
+* CMakeLists.txt and package.xml fixes for cross-platform CI
+* Contributors: Abishalini, Akash, AndyZe, Captain Yoshi, Dave Coleman, David V. Lu!!, Felix von Drigalski, Henning Kayser, Jafar Abdi, Jochen Sprickerhof, Kaustubh, Michael Görner, Michael Wiznitzer, Parthasarathy Bana, Peter Mitrano, Robert Haschke, Sencer Yazıcı, Silvio Traversaro, Simon Schmeisser, Tobias Fischer, Tyler Weaver, Vatan Aksoy Tezer, Wolf Vollprecht, Yuri Rocha, predystopic-dev, pvanlaar, toru-kuga, v4hn, werner291
+
+2.3.0 (2021-10-08)
+------------------
+* Add debug print function to RobotTrajectory (`#715 <https://github.com/ros-planning/moveit2/issues/715>`_)
+* Small matrix calc speedup in collision_distance_field_types (`#666 <https://github.com/ros-planning/moveit2/issues/666>`_)
+  * Use transpose of rotation matrix in collision_distance_field_types
+  * Add comment
+  Co-authored-by: Henning Kayser <henningkayser@picknik.ai>
+* Fix cmake install in collision_detection_bullet (`#685 <https://github.com/ros-planning/moveit2/issues/685>`_)
+  Co-authored-by: Henning Kayser <henningkayser@picknik.ai>
+* Fix cmake warnings (`#690 <https://github.com/ros-planning/moveit2/issues/690>`_)
+  * Fix -Wformat-security
+  * Fix -Wunused-variable
+  * Fix -Wunused-lambda-capture
+  * Fix -Wdeprecated-declarations
+  * Fix clang-tidy, readability-identifier-naming in moveit_kinematics
+* Add Ruckig trajectory_processing plugin (jerk-limited) (`#571 <https://github.com/ros-planning/moveit2/issues/571>`_)
+* New orientation constraint parameterization (`#550 <https://github.com/ros-planning/moveit2/issues/550>`_)
+* Pulled in changes from the ROS MoveIt PR 'New orientation constraint parameterization `#2402 <https://github.com/ros-planning/moveit2/issues/2402>`_'.
+* Fix constraint tolerance assignment (`#622 <https://github.com/ros-planning/moveit2/issues/622>`_)
+* Fix warnings in Galactic and Rolling (`#598 <https://github.com/ros-planning/moveit2/issues/598>`_)
+  * Use __has_includes preprocessor directive for deprecated headers
+  * Fix parameter template types
+  * Proper initialization of smart pointers, rclcpp::Duration
+* Check for nullptr on getGlobalLinkTransform (`#611 <https://github.com/ros-planning/moveit2/issues/611>`_)
+* Minor documentation and cleanup of TOTG plugin (`#584 <https://github.com/ros-planning/moveit2/issues/584>`_)
+* Fixed message when parameter was found (`#595 <https://github.com/ros-planning/moveit2/issues/595>`_)
+* Fix some format strings (`#587 <https://github.com/ros-planning/moveit2/issues/587>`_)
 * Fixes for Windows (`#530 <https://github.com/ros-planning/moveit2/issues/530>`_)
 * Tests for CurrentStateMonitor using dependency injection (`#562 <https://github.com/ros-planning/moveit2/issues/562>`_)
-* Contributors: Akash, Robert Haschke, Lior Lustgarten, Tyler Weaver, Vatan Aksoy Tezer, Henning Kayser, Jorge Nicho, Nisala Kalupahana, Jafar Abdi
+* Refactors for OccMapTree in PlanningScene (`#2684 <https://github.com/ros-planning/moveit2/issues/2684>`_)
+* Add new orientation constraint parameterization (`#2402 <https://github.com/ros-planning/moveit2/issues/2402>`_)
+* Avoid push_back within getAttachedBodyObjects (`#2732 <https://github.com/ros-planning/moveit2/issues/2732>`_)
+* Port `#2721 <https://github.com/ros-planning/moveit2/issues/2721>`_ (fixed padding collision attached objects) to Master (`#2731 <https://github.com/ros-planning/moveit2/issues/2731>`_)
+* New RobotState interpolation test (`#2665 <https://github.com/ros-planning/moveit2/issues/2665>`_)
+  * started interpolation test
+  * more tests
+  * test interpolation bounds checking
+* use lockable octomap for MotionPlanningDisplay
+* Implement checkCollision with default ACM as wrapper
+* Move OccMapTree to moveit_core/collision_detection
+* Contributors: AdamPettinger, Akash, AndyZe, Bjar Ne, David V. Lu!!, George Stavrinos, Henning Kayser, Jafar Abdi, Jeroen, John Stechschulte, Michael J. Park, Nathan Brooks, Robert Haschke, Simon Schmeisser, Tyler Weaver, Vatan Aksoy Tezer, Jack, Wyatt Rees, Nisala Kalupahana, Jorge Nicho, Lior Lustgarten
 
 2.2.1 (2021-07-12)
 ------------------

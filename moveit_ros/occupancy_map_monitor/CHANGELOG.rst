@@ -2,13 +2,32 @@
 Changelog for package moveit_ros_occupancy_map_monitor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.2.3 (2022-01-07)
+2.3.3 (2022-01-20)
 ------------------
-* Fix boost linking errors (`#900 <https://github.com/ros-planning/moveit2/issues/900>`_) (`#920 <https://github.com/ros-planning/moveit2/issues/920>`_)
-* Contributors: Vatan Aksoy Tezer
+* Fix boost linking errors for Windows (`#957 <https://github.com/ros-planning/moveit2/issues/957>`_) (`#1001 <https://github.com/ros-planning/moveit2/issues/1001>`_)
+* Contributors: mergify[bot]
 
-2.2.2 (2021-11-16)
+2.3.2 (2021-12-29)
 ------------------
+
+2.3.1 (2021-12-23)
+------------------
+* Replaced C-Style Cast with C++ Style Cast. (`#935 <https://github.com/ros-planning/moveit2/issues/935>`_)
+* Add codespell to precommit, fix A LOT of spelling mistakes (`#934 <https://github.com/ros-planning/moveit2/issues/934>`_)
+* Get rid of "std::endl" (`#918 <https://github.com/ros-planning/moveit2/issues/918>`_)
+* Fix boost linking errors (`#900 <https://github.com/ros-planning/moveit2/issues/900>`_)
+* Enforce package.xml format 3 Schema (`#779 <https://github.com/ros-planning/moveit2/issues/779>`_)
+* Update Maintainers of MoveIt package (`#697 <https://github.com/ros-planning/moveit2/issues/697>`_)
+* Prefer std::make_shared over new operator (`#2756 <https://github.com/ros-planning/moveit/issues/2756>`_)
+* Contributors: Dave Coleman, David V. Lu!!, Henning Kayser, Kaustubh, Michael Görner, Parthasarathy Bana, Robert Haschke, Vatan Aksoy Tezer
+
+2.3.0 (2021-10-08)
+------------------
+* Error if Octomap 'map_frame' is not provided (`#667 <https://github.com/ros-planning/moveit2/issues/667>`_)
+* OccupancyMapMonitor tests using Dependency Injection (`#569 <https://github.com/ros-planning/moveit2/issues/569>`_)
+* Refactors for OccMapTree in PlanningScene (`#2684 <https://github.com/ros-planning/moveit2/issues/2684>`_)
+* Move OccMapTree to moveit_core/collision_detection
+* Contributors: AndyZe, Henning Kayser, Simon Schmeisser, Tyler Weaver, Jafar Abdi
 
 2.2.1 (2021-07-12)
 ------------------

@@ -37,7 +37,11 @@
 #include <moveit/trajectory_execution_manager/trajectory_execution_manager.h>
 #include <moveit/robot_state/robot_state.h>
 #include <geometric_shapes/check_isometry.h>
+#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
+#include <tf2_eigen/tf2_eigen.hpp>
+#else
 #include <tf2_eigen/tf2_eigen.h>
+#endif
 
 namespace trajectory_execution_manager
 {
@@ -45,7 +49,7 @@ static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_ros.trajectory_e
 
 const std::string TrajectoryExecutionManager::EXECUTION_EVENT_TOPIC = "trajectory_execution_event";
 
-static const rclcpp::Duration DEFAULT_CONTROLLER_INFORMATION_VALIDITY_AGE(1.0);
+static const auto DEFAULT_CONTROLLER_INFORMATION_VALIDITY_AGE = rclcpp::Duration::from_seconds(1);
 static const double DEFAULT_CONTROLLER_GOAL_DURATION_MARGIN = 0.5;  // allow 0.5s more than the expected execution time
                                                                     // before triggering a trajectory cancel (applied
                                                                     // after scaling)
@@ -103,8 +107,9 @@ void TrajectoryExecutionManager::initialize()
   // load the controller manager plugin
   try
   {
-    controller_manager_loader_.reset(new pluginlib::ClassLoader<moveit_controller_manager::MoveItControllerManager>(
-        "moveit_core", "moveit_controller_manager::MoveItControllerManager"));
+    controller_manager_loader_ =
+        std::make_unique<pluginlib::ClassLoader<moveit_controller_manager::MoveItControllerManager>>(
+            "moveit_core", "moveit_controller_manager::MoveItControllerManager");
   }
   catch (pluginlib::PluginlibException& ex)
   {
@@ -310,10 +315,10 @@ bool TrajectoryExecutionManager::push(const moveit_msgs::msg::RobotTrajectory& t
       ss << "Pushed trajectory for execution using controllers [ ";
       for (const std::string& controller : context->controllers_)
         ss << controller << " ";
-      ss << "]:" << std::endl;
+      ss << "]:" << '\n';
       // TODO: Provide message serialization
       // for (const moveit_msgs::msg::RobotTrajectory& trajectory_part : context->trajectory_parts_)
-      // ss << trajectory_part << std::endl;
+      // ss << trajectory_part << '\n';
       RCLCPP_INFO_STREAM(LOGGER, ss.str());
     }
     trajectories_.push_back(context);
@@ -392,8 +397,8 @@ bool TrajectoryExecutionManager::pushAndExecute(const moveit_msgs::msg::RobotTra
       boost::mutex::scoped_lock slock(continuous_execution_mutex_);
       continuous_execution_queue_.push_back(context);
       if (!continuous_execution_thread_)
-        continuous_execution_thread_.reset(
-            new boost::thread(boost::bind(&TrajectoryExecutionManager::continuousExecutionThread, this)));
+        continuous_execution_thread_ =
+            std::make_unique<boost::thread>(boost::bind(&TrajectoryExecutionManager::continuousExecutionThread, this));
     }
     last_execution_status_ = moveit_controller_manager::ExecutionStatus::SUCCEEDED;
     continuous_execution_condition_.notify_all();
@@ -578,6 +583,10 @@ void TrajectoryExecutionManager::reloadControllerInformation()
           }
         }
   }
+  else
+  {
+    RCLCPP_ERROR(LOGGER, "Failed to reload controllers: `controller_manager_` does not exist.");
+  }
 }
 
 void TrajectoryExecutionManager::updateControllerState(const std::string& controller, const rclcpp::Duration& age)
@@ -640,7 +649,7 @@ bool TrajectoryExecutionManager::checkControllerCombination(std::vector<std::str
 void TrajectoryExecutionManager::generateControllerCombination(std::size_t start_index, std::size_t controller_count,
                                                                const std::vector<std::string>& available_controllers,
                                                                std::vector<std::string>& selected_controllers,
-                                                               std::vector<std::vector<std::string> >& selected_options,
+                                                               std::vector<std::vector<std::string>>& selected_options,
                                                                const std::set<std::string>& actuated_joints)
 {
   if (selected_controllers.size() == controller_count)
@@ -695,7 +704,7 @@ struct OrderPotentialControllerCombination
     return false;
   }
 
-  std::vector<std::vector<std::string> > selected_options;
+  std::vector<std::vector<std::string>> selected_options;
   std::vector<std::size_t> nrdefault;
   std::vector<std::size_t> nrjoints;
   std::vector<std::size_t> nractive;
@@ -710,7 +719,7 @@ bool TrajectoryExecutionManager::findControllers(const std::set<std::string>& ac
   // generate all combinations of controller_count controllers that operate on disjoint sets of joints
   std::vector<std::string> work_area;
   OrderPotentialControllerCombination order;
-  std::vector<std::vector<std::string> >& selected_options = order.selected_options;
+  std::vector<std::vector<std::string>>& selected_options = order.selected_options;
   generateControllerCombination(0, controller_count, available_controllers, work_area, selected_options,
                                 actuated_joints);
 
@@ -879,6 +888,7 @@ bool TrajectoryExecutionManager::distributeTrajectory(const moveit_msgs::msg::Ro
         for (std::size_t j = 0; j < jnames.size(); ++j)
           bijection[j] = index[jnames[j]];
 
+        parts[i].multi_dof_joint_trajectory.header.frame_id = trajectory.multi_dof_joint_trajectory.header.frame_id;
         parts[i].multi_dof_joint_trajectory.points.resize(trajectory.multi_dof_joint_trajectory.points.size());
         for (std::size_t j = 0; j < trajectory.multi_dof_joint_trajectory.points.size(); ++j)
         {
@@ -1071,6 +1081,8 @@ bool TrajectoryExecutionManager::configure(TrajectoryExecutionContext& context,
     // empty trajectories don't need to configure anything
     return true;
   }
+
+  reloadControllerInformation();
   std::set<std::string> actuated_joints;
 
   auto is_actuated = [this](const std::string& joint_name) -> bool {
@@ -1151,14 +1163,14 @@ bool TrajectoryExecutionManager::configure(TrajectoryExecutionContext& context,
 
   std::stringstream ss2;
   std::map<std::string, ControllerInformation>::const_iterator mi;
-  for (mi = known_controllers_.begin(); mi != known_controllers_.end(); mi++)
+  for (mi = known_controllers_.begin(); mi != known_controllers_.end(); ++mi)
   {
     ss2 << "controller '" << mi->second.name_ << "' controls joints:\n";
 
     std::set<std::string>::const_iterator ji;
-    for (ji = mi->second.joints_.begin(); ji != mi->second.joints_.end(); ji++)
+    for (ji = mi->second.joints_.begin(); ji != mi->second.joints_.end(); ++ji)
     {
-      ss2 << "  " << *ji << std::endl;
+      ss2 << "  " << *ji << '\n';
     }
   }
   RCLCPP_ERROR(LOGGER, "Known controllers and their joints:\n%s", ss2.str().c_str());
@@ -1256,8 +1268,8 @@ void TrajectoryExecutionManager::execute(const ExecutionCompleteCallback& callba
 
   // start the execution thread
   execution_complete_ = false;
-  execution_thread_.reset(
-      new boost::thread(&TrajectoryExecutionManager::executeThread, this, callback, part_callback, auto_clear));
+  execution_thread_ = std::make_unique<boost::thread>(&TrajectoryExecutionManager::executeThread, this, callback,
+                                                      part_callback, auto_clear);
 }
 
 moveit_controller_manager::ExecutionStatus TrajectoryExecutionManager::waitForExecution()
@@ -1431,11 +1443,11 @@ bool TrajectoryExecutionManager::executePart(std::size_t part_index)
 
     // compute the expected duration of the trajectory and find the part of the trajectory that takes longest to execute
     rclcpp::Time current_time = node_->now();
-    rclcpp::Duration expected_trajectory_duration(0.0);
+    auto expected_trajectory_duration = rclcpp::Duration::from_seconds(0);
     int longest_part = -1;
     for (std::size_t i = 0; i < context.trajectory_parts_.size(); ++i)
     {
-      rclcpp::Duration d(0.0);
+      auto d = rclcpp::Duration::from_seconds(0);
       if (!(context.trajectory_parts_[i].joint_trajectory.points.empty() &&
             context.trajectory_parts_[i].multi_dof_joint_trajectory.points.empty()))
       {
@@ -1446,10 +1458,10 @@ bool TrajectoryExecutionManager::executePart(std::size_t part_index)
                               current_time);
         d = d +
             std::max(context.trajectory_parts_[i].joint_trajectory.points.empty() ?
-                         rclcpp::Duration(0.0) :
+                         rclcpp::Duration::from_seconds(0) :
                          rclcpp::Duration(context.trajectory_parts_[i].joint_trajectory.points.back().time_from_start),
                      context.trajectory_parts_[i].multi_dof_joint_trajectory.points.empty() ?
-                         rclcpp::Duration(0.0) :
+                         rclcpp::Duration::from_seconds(0) :
                          rclcpp::Duration(
                              context.trajectory_parts_[i].multi_dof_joint_trajectory.points.back().time_from_start));
 
@@ -1489,7 +1501,7 @@ bool TrajectoryExecutionManager::executePart(std::size_t part_index)
       if (context.trajectory_parts_[longest_part].joint_trajectory.points.size() >=
           context.trajectory_parts_[longest_part].multi_dof_joint_trajectory.points.size())
       {
-        rclcpp::Duration d(0.0);
+        auto d = rclcpp::Duration::from_seconds(0);
         if (rclcpp::Time(context.trajectory_parts_[longest_part].joint_trajectory.header.stamp) > current_time)
           d = rclcpp::Time(context.trajectory_parts_[longest_part].joint_trajectory.header.stamp) - current_time;
         for (trajectory_msgs::msg::JointTrajectoryPoint& point :
@@ -1498,7 +1510,7 @@ bool TrajectoryExecutionManager::executePart(std::size_t part_index)
       }
       else
       {
-        rclcpp::Duration d(0.0);
+        auto d = rclcpp::Duration::from_seconds(0);
         if (rclcpp::Time(context.trajectory_parts_[longest_part].multi_dof_joint_trajectory.header.stamp) > current_time)
           d = rclcpp::Time(context.trajectory_parts_[longest_part].multi_dof_joint_trajectory.header.stamp) -
               current_time;
@@ -1634,11 +1646,11 @@ std::pair<int, int> TrajectoryExecutionManager::getCurrentExpectedTrajectoryInde
   if (current_context_ < 0)
     return std::make_pair(-1, -1);
   if (time_index_.empty())
-    return std::make_pair((int)current_context_, -1);
+    return std::make_pair(static_cast<int>(current_context_), -1);
   std::vector<rclcpp::Time>::const_iterator time_index_it =
       std::lower_bound(time_index_.begin(), time_index_.end(), node_->now());
   int pos = time_index_it - time_index_.begin();
-  return std::make_pair((int)current_context_, pos);
+  return std::make_pair(static_cast<int>(current_context_), pos);
 }
 
 const std::vector<TrajectoryExecutionManager::TrajectoryExecutionContext*>&
@@ -1693,6 +1705,8 @@ bool TrajectoryExecutionManager::ensureActiveController(const std::string& contr
 
 bool TrajectoryExecutionManager::ensureActiveControllers(const std::vector<std::string>& controllers)
 {
+  reloadControllerInformation();
+
   updateControllersState(DEFAULT_CONTROLLER_INFORMATION_VALIDITY_AGE);
 
   if (manage_controllers_)
@@ -1706,7 +1720,12 @@ bool TrajectoryExecutionManager::ensureActiveControllers(const std::vector<std::
       std::map<std::string, ControllerInformation>::const_iterator it = known_controllers_.find(controller);
       if (it == known_controllers_.end())
       {
-        RCLCPP_ERROR_STREAM(LOGGER, "Controller " << controller << " is not known");
+        std::stringstream stream;
+        for (const auto& controller : known_controllers_)
+        {
+          stream << " `" << controller.first << "`";
+        }
+        RCLCPP_WARN_STREAM(LOGGER, "Controller " << controller << " is not known. Known controllers: " << stream.str());
         return false;
       }
       if (!it->second.state_.active_)
@@ -1765,11 +1784,11 @@ bool TrajectoryExecutionManager::ensureActiveControllers(const std::vector<std::
         for (const std::string& controller_to_activate : controllers_to_activate)
         {
           ControllerInformation& ci = known_controllers_[controller_to_activate];
-          ci.last_update_ = rclcpp::Time();
+          ci.last_update_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
         }
         // reset the state update cache
         for (const std::string& controller_to_activate : controllers_to_deactivate)
-          known_controllers_[controller_to_activate].last_update_ = rclcpp::Time();
+          known_controllers_[controller_to_activate].last_update_ = rclcpp::Time(0, 0, RCL_ROS_TIME);
         return controller_manager_->switchControllers(controllers_to_activate, controllers_to_deactivate);
       }
       else

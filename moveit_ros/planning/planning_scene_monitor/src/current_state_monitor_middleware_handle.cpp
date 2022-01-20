@@ -34,9 +34,13 @@
 
 /* Author: Tyler Weaver */
 
-#include <moveit/planning_scene_monitor/current_state_monitor_middleware_handle.hpp>
-#include <rclcpp/rclcpp.hpp>
+#include <chrono>
 #include <string>
+#include <tf2_ros/qos.hpp>
+
+#include <rclcpp/rclcpp.hpp>
+
+#include <moveit/planning_scene_monitor/current_state_monitor_middleware_handle.hpp>
 
 namespace planning_scene_monitor
 {
@@ -77,6 +81,39 @@ std::string CurrentStateMonitorMiddlewareHandle::getJointStateTopicName() const
   {
     return "";
   }
+}
+
+bool CurrentStateMonitorMiddlewareHandle::sleepFor(const std::chrono::nanoseconds& nanoseconds) const
+{
+  return rclcpp::sleep_for(nanoseconds);
+}
+
+void CurrentStateMonitorMiddlewareHandle::createStaticTfSubscription(TfCallback callback)
+{
+  static_transform_subscriber_ =
+      node_->create_subscription<tf2_msgs::msg::TFMessage>("/tf", tf2_ros::DynamicListenerQoS(), callback);
+}
+
+void CurrentStateMonitorMiddlewareHandle::createDynamicTfSubscription(TfCallback callback)
+{
+  transform_subscriber_ =
+      node_->create_subscription<tf2_msgs::msg::TFMessage>("/tf_static", tf2_ros::StaticListenerQoS(), callback);
+}
+
+std::string CurrentStateMonitorMiddlewareHandle::getStaticTfTopicName() const
+{
+  return static_transform_subscriber_ ? static_transform_subscriber_->get_topic_name() : "";
+}
+
+std::string CurrentStateMonitorMiddlewareHandle::getDynamicTfTopicName() const
+{
+  return transform_subscriber_ ? transform_subscriber_->get_topic_name() : "";
+}
+
+void CurrentStateMonitorMiddlewareHandle::resetTfSubscriptions()
+{
+  transform_subscriber_.reset();
+  static_transform_subscriber_.reset();
 }
 
 }  // namespace planning_scene_monitor

@@ -2,15 +2,40 @@
 Changelog for package moveit_planners_ompl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.2.3 (2022-01-07)
+2.3.3 (2022-01-20)
 ------------------
-* Link boost serializaiton (`#925 <https://github.com/ros-planning/moveit2/issues/925>`_)
-* Contributors: Vatan Aksoy Tezer
 
-2.2.2 (2021-11-16)
+2.3.2 (2021-12-29)
 ------------------
+
+2.3.1 (2021-12-23)
+------------------
+* Add codespell to precommit, fix A LOT of spelling mistakes (`#934 <https://github.com/ros-planning/moveit2/issues/934>`_)
+* Get rid of "std::endl" (`#918 <https://github.com/ros-planning/moveit2/issues/918>`_)
+* changed post-increments in loops to preincrements (`#888 <https://github.com/ros-planning/moveit2/issues/888>`_)
+* Enforce package.xml format 3 Schema (`#779 <https://github.com/ros-planning/moveit2/issues/779>`_)
+* Update Maintainers of MoveIt package (`#697 <https://github.com/ros-planning/moveit2/issues/697>`_)
+* Reduce log verbosity, improved info message (`#714 <https://github.com/ros-planning/moveit2/issues/714>`_)
+* Fix `#2811 <https://github.com/ros-planning/moveit/issues/2811>`_ (`#2872 <https://github.com/ros-planning/moveit/issues/2872>`_)
+  This is a PR for `#2811 <https://github.com/ros-planning/moveit/issues/2811>`_
+* Add missing dependencies to generated dynamic_reconfigure headers
+* clang-tidy: modernize-make-shared, modernize-make-unique (`#2762 <https://github.com/ros-planning/moveit/issues/2762>`_)
+* Contributors: Dave Coleman, David V. Lu!!, Henning Kayser, Mathias Lüdtke, Parthasarathy Bana, Robert Haschke, Sencer Yazıcı, pvanlaar, v4hn, werner291
+
+2.3.0 (2021-10-08)
+------------------
+* Fix cmake warnings (`#690 <https://github.com/ros-planning/moveit2/issues/690>`_)
+  * Fix -Wformat-security
+  * Fix -Wunused-variable
+  * Fix -Wunused-lambda-capture
+  * Fix -Wdeprecated-declarations
+  * Fix clang-tidy, readability-identifier-naming in moveit_kinematics
+* Fix warnings in Galactic and Rolling (`#598 <https://github.com/ros-planning/moveit2/issues/598>`_)
+  * Use __has_includes preprocessor directive for deprecated headers
+  * Fix parameter template types
+  * Proper initialization of smart pointers, rclcpp::Duration
 * Fix linking issues for ODE on macOS (`#549 <https://github.com/ros-planning/moveit2/issues/549>`_)
-* Contributors: Nisala Kalupahana, Henning Kayser
+* Contributors: Henning Kayser, Nisala Kalupahana, Vatan Aksoy Tezer, David V. Lu, Jafar Abdi
 
 2.2.1 (2021-07-12)
 ------------------

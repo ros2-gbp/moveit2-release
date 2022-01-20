@@ -2,6 +2,33 @@
 Changelog for package moveit_ros_control_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.3.3 (2022-01-20)
+------------------
+
+2.3.2 (2021-12-29)
+------------------
+
+2.3.1 (2021-12-23)
+------------------
+* Fix installation of moveit_ros_control_interface header files (`#789 <https://github.com/ros-planning/moveit2/issues/789>`_)
+* Enforce package.xml format 3 Schema (`#779 <https://github.com/ros-planning/moveit2/issues/779>`_)
+* Update Maintainers of MoveIt package (`#697 <https://github.com/ros-planning/moveit2/issues/697>`_)
+* Update controller_manager_plugin to fix MoveIt-managed controller switching (`#785 <https://github.com/ros-planning/moveit2/issues/785>`_)
+* moveit_ros_control_interface: Small comment cleanup (`#754 <https://github.com/ros-planning/moveit2/issues/754>`_)
+* Contributors: AndyZe, Dave Coleman, Henning Kayser, Joseph Schornak, Robert Haschke
+
+2.3.0 (2021-10-08)
+------------------
+* moveit_ros_control_interface: Fix dangling reference (`#710 <https://github.com/ros-planning/moveit2/issues/710>`_)
+* Port moveit ros control interface to ROS2 (`#545 <https://github.com/ros-planning/moveit2/issues/545>`_)
+  * Port moveit_ros_control_interface to ROS2
+  * Multiple fixes to trajectory_execution_manager
+* Fix reversed check in switchControllers (`#2726 <https://github.com/ros-planning/moveit2/issues/2726>`_)
+* Contributors: Jafar Abdi, Nathan Brooks, Joe Schornak, Henning Kayser
+
+2.2.1 (2021-07-12)
+------------------
+
 1.1.1 (2020-10-13)
 ------------------
 * [maint] Add comment to MOVEIT_CLASS_FORWARD (`#2315 <https://github.com/ros-planning/moveit/issues/2315>`_)
