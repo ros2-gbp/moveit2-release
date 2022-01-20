@@ -2,12 +2,16 @@
 Changelog for package moveit_kinematics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.3.3 (2022-01-20)
+2.4.0 (2022-01-20)
 ------------------
-* Fix IKFast test dependency (`#993 <https://github.com/ros-planning/moveit2/issues/993>`_) (`#1002 <https://github.com/ros-planning/moveit2/issues/1002>`_)
-  (cherry picked from commit d01ef481e2a65323842496f3732b0fa3bd03548b)
-  Co-authored-by: Henning Kayser <henningkayser@picknik.ai>
-* Contributors: mergify[bot]
+* Fix IKFast test dependency (`#993 <https://github.com/ros-planning/moveit2/issues/993>`_)
+* Replace NULL with nullptr (`#961 <https://github.com/ros-planning/moveit2/issues/961>`_)
+  * Fixes `#841 <https://github.com/ros-planning/moveit2/issues/841>`_
+* moveit_build_options()
+  Declare common build options like CMAKE_CXX_STANDARD, CMAKE_BUILD_TYPE,
+  and compiler options (namely warning flags) once.
+  Each package depending on moveit_core can use these via moveit_build_options().
+* Contributors: Henning Kayser, Robert Haschke, Stephanie Eng
 
 2.3.2 (2021-12-29)
 ------------------
