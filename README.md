@@ -6,9 +6,9 @@ The MoveIt Motion Planning Framework for **ROS 2**. For ROS 1, see [MoveIt 1](ht
 
 ## Continuous Integration Status
 
-[![Formatting (pre-commit)](https://github.com/ros-planning/moveit2/actions/workflows/format.yaml/badge.svg?branch=main)](https://github.com/ros-planning/moveit2/actions/workflows/format.yaml?query=branch%3Amain)
-[![CI (Rolling and Galactic)](https://github.com/ros-planning/moveit2/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/ros-planning/moveit2/actions/workflows/ci.yaml?query=branch%3Amain)
-[![Code Coverage](https://codecov.io/gh/ros-planning/moveit2/branch/main/graph/badge.svg?token=W7uHKcY0ly)](https://codecov.io/gh/ros-planning/moveit2)
+[![Formatting (pre-commit)](https://github.com/ros-planning/moveit2/actions/workflows/format.yaml/badge.svg?branch=galactic)](https://github.com/ros-planning/moveit2/actions/workflows/format.yaml?query=branch%3Agalactic)
+[![CI (Rolling and Galactic)](https://github.com/ros-planning/moveit2/actions/workflows/ci.yaml/badge.svg?branch=galactic)](https://github.com/ros-planning/moveit2/actions/workflows/ci.yaml?query=branch%3Agalactic)
+[![Code Coverage](https://codecov.io/gh/ros-planning/moveit2/branch/galactic/graph/badge.svg?token=W7uHKcY0ly)](https://codecov.io/gh/ros-planning/moveit2)
 
 ## General MoveIt Documentation
 
@@ -34,6 +34,9 @@ See the [MoveItCpp Tutorial](https://moveit.picknik.ai/foxy/doc/moveit_cpp/movei
 
 The [Move Group C++ Interface](https://moveit.picknik.ai/foxy/doc/move_group_interface/move_group_interface_tutorial.html) provides a simple launch file for running a MoveGroup setup.
 You can test it using the MotionPlanning display in RViz or by implementing your own MoveGroupInterface application.
+
+## Having Doxygen Reference Locally
+See [How To Generate API Doxygen Reference Locally](https://moveit.picknik.ai/main/doc/how_to_guides/how_to_generate_api_doxygen_locally.html)
 
 ## Supporters
 
