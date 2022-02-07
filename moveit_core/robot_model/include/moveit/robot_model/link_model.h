@@ -73,13 +73,7 @@ class LinkModel
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  /**
-   * @brief      Construct a link model named \e name
-   *
-   * @param[in]  name        The name of the link
-   * @param[in]  link_index  The link index in the RobotModel
-   */
-  LinkModel(const std::string& name, size_t link_index);
+  LinkModel(const std::string& name);
   ~LinkModel();
 
   /** \brief The name of this link */
@@ -89,9 +83,14 @@ public:
   }
 
   /** \brief The index of this joint when traversing the kinematic tree in depth first fashion */
-  size_t getLinkIndex() const
+  int getLinkIndex() const
   {
     return link_index_;
+  }
+
+  void setLinkIndex(int index)
+  {
+    link_index_ = index;
   }
 
   int getFirstCollisionBodyTransformIndex() const
@@ -113,7 +112,7 @@ public:
   void setParentJointModel(const JointModel* joint);
 
   /** \brief Get the link model whose child this link is (through some joint). There may not always be a parent link
-   * (nullptr is returned for the root link) */
+   * (NULL is returned for the root link) */
   const LinkModel* getParentLinkModel() const
   {
     return parent_link_model_;
@@ -232,13 +231,10 @@ private:
   /** \brief Name of the link */
   std::string name_;
 
-  /** \brief Index of the transform for this link in the full robot frame */
-  size_t link_index_;
-
   /** \brief JointModel that connects this link to the parent link */
   const JointModel* parent_joint_model_;
 
-  /** \brief The parent link model (nullptr for the root link) */
+  /** \brief The parent link model (NULL for the root link) */
   const LinkModel* parent_link_model_;
 
   /** \brief List of directly descending joints (each connects to a child link) */
@@ -284,6 +280,9 @@ private:
   /** \brief Index of the transform for the first shape that makes up the geometry of this link in the full robot state
    */
   int first_collision_body_transform_index_;
+
+  /** \brief Index of the transform for this link in the full robot frame */
+  int link_index_;
 };
 }  // namespace core
 }  // namespace moveit

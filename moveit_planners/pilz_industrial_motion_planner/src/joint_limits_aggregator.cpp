@@ -57,7 +57,7 @@ pilz_industrial_motion_planner::JointLimitsAggregator::getAggregatedLimits(
   // Iterate over all joint models and generate the map
   for (auto joint_model : joint_models)
   {
-    pilz_industrial_motion_planner::JointLimit joint_limit;
+    JointLimit joint_limit;
 
     // NOTE: declareParameters fails (=returns false) if the parameters have already been declared.
     // The function should be checked in the if condition below when we disable

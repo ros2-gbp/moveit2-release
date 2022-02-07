@@ -2,22 +2,13 @@
 Changelog for package moveit_hybrid_planning
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.4.0 (2022-01-20)
+2.3.4 (2022-02-07)
 ------------------
-* hybrid_planning: Fix global_planner action name (`#960 <https://github.com/ros-planning/moveit2/issues/960>`_)
-* Put hybrid planning actions under a common namespace (`#932 <https://github.com/ros-planning/moveit2/issues/932>`_)
-  * Put hybrid planning actions under a common namespace
-  * Use ~
-  * New pkg for common resources. Does not work.
-  * Use inline rather than anonymous namespace
-  Co-authored-by: Jafar Abdi <cafer.abdi@gmail.com>
-  * Revert "Use inline rather than anonymous namespace"
-  This reverts commit 29a7d279776be21f4666c7e0fadeaa6b7ef8debf.
-  * Revert "New pkg for common resources. Does not work."
-  This reverts commit 68a173baee4b7f8b2c1f74285f96c8e3892c5909.
-  * Some progress toward loading common parameters
-  Co-authored-by: Jafar Abdi <cafer.abdi@gmail.com>
-* Contributors: AndyZe
+* Remove unused parameters. (`#1018 <https://github.com/ros-planning/moveit2/issues/1018>`_) (`#1023 <https://github.com/ros-planning/moveit2/issues/1023>`_)
+* Contributors: Tyler Weaver, Vatan Aksoy Tezer, Cory Crean
+
+2.3.3 (2022-01-20)
+------------------
 
 2.3.2 (2021-12-29)
 ------------------

@@ -38,8 +38,6 @@
 
 #include "servo_launch_test_common.hpp"
 
-using namespace std::chrono_literals;
-
 namespace moveit_servo
 {
 TEST_F(ServoFixture, SendTwistStampedTest)

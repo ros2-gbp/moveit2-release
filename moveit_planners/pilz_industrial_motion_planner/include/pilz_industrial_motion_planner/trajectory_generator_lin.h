@@ -41,6 +41,8 @@
 #include "pilz_industrial_motion_planner/trajectory_generator.h"
 #include "pilz_industrial_motion_planner/velocity_profile_atrap.h"
 
+using namespace pilz_industrial_motion_planner;
+
 namespace pilz_industrial_motion_planner
 {
 // TODO date type of units

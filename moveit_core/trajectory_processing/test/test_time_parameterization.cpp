@@ -78,7 +78,10 @@ int initRepeatedPointTrajectory(robot_trajectory::RobotTrajectory& trajectory)
 }
 
 // Initialize one-joint, straight-line trajectory
-int initStraightTrajectory(robot_trajectory::RobotTrajectory& trajectory)
+// Can specify init/final velocity/acceleration,
+// but not all time parameterization methods may accept it.
+int initStraightTrajectory(robot_trajectory::RobotTrajectory& trajectory, double vel_i = 0.0, double vel_f = 0.0,
+                           double acc_i = 0.0, double acc_f = 0.0)
 {
   const int num = 10;
   const double max = 2.0;

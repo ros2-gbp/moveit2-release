@@ -2,16 +2,15 @@
 Changelog for package moveit_ros_occupancy_map_monitor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.4.0 (2022-01-20)
+2.3.4 (2022-02-07)
 ------------------
-* Fix boost linking errors for Windows (`#957 <https://github.com/ros-planning/moveit2/issues/957>`_)
-* Replace NULL with nullptr (`#961 <https://github.com/ros-planning/moveit2/issues/961>`_)
-  * Fixes `#841 <https://github.com/ros-planning/moveit2/issues/841>`_
-* moveit_build_options()
-  Declare common build options like CMAKE_CXX_STANDARD, CMAKE_BUILD_TYPE,
-  and compiler options (namely warning flags) once.
-  Each package depending on moveit_core can use these via moveit_build_options().
-* Contributors: Akash, Robert Haschke, Stephanie Eng
+* Remove unused parameters. (`#1018 <https://github.com/ros-planning/moveit2/issues/1018>`_) (`#1023 <https://github.com/ros-planning/moveit2/issues/1023>`_)
+* Contributors: Tyler Weaver, Vatan Aksoy Tezer, Cory Crean
+
+2.3.3 (2022-01-20)
+------------------
+* Fix boost linking errors for Windows (`#957 <https://github.com/ros-planning/moveit2/issues/957>`_) (`#1001 <https://github.com/ros-planning/moveit2/issues/1001>`_)
+* Contributors: mergify[bot]
 
 2.3.2 (2021-12-29)
 ------------------

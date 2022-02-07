@@ -11,7 +11,6 @@ ament_target_dependencies(${MOVEIT_LIB_NAME}
   urdf
   Boost
   moveit_core
-  moveit_msgs
 )
 target_link_libraries(${MOVEIT_LIB_NAME}
   moveit_rdf_loader

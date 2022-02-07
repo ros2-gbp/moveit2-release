@@ -77,9 +77,6 @@ def generate_common_hybrid_launch_description():
     }
 
     # Any parameters that are unique to your plugins go here
-    common_hybrid_planning_param = load_yaml(
-        "moveit_hybrid_planning", "config/common_hybrid_planning_params.yaml"
-    )
     global_planner_param = load_yaml(
         "moveit_hybrid_planning", "config/global_planner.yaml"
     )
@@ -102,7 +99,6 @@ def generate_common_hybrid_launch_description():
                 plugin="moveit::hybrid_planning::GlobalPlannerComponent",
                 name="global_planner",
                 parameters=[
-                    common_hybrid_planning_param,
                     global_planner_param,
                     robot_description,
                     robot_description_semantic,
@@ -116,7 +112,6 @@ def generate_common_hybrid_launch_description():
                 plugin="moveit::hybrid_planning::LocalPlannerComponent",
                 name="local_planner",
                 parameters=[
-                    common_hybrid_planning_param,
                     local_planner_param,
                     robot_description,
                     robot_description_semantic,
@@ -127,10 +122,7 @@ def generate_common_hybrid_launch_description():
                 package="moveit_hybrid_planning",
                 plugin="moveit::hybrid_planning::HybridPlanningManager",
                 name="hybrid_planning_manager",
-                parameters=[
-                    common_hybrid_planning_param,
-                    hybrid_planning_manager_param,
-                ],
+                parameters=[hybrid_planning_manager_param],
             ),
         ],
         output="screen",
@@ -204,11 +196,7 @@ def generate_common_hybrid_launch_description():
         executable="hybrid_planning_demo_node",
         name="hybrid_planning_demo_node",
         output="screen",
-        parameters=[
-            robot_description,
-            robot_description_semantic,
-            common_hybrid_planning_param,
-        ],
+        parameters=[robot_description, robot_description_semantic],
     )
 
     launched_nodes = [

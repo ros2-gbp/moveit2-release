@@ -200,7 +200,7 @@ void PlanningSceneDisplay::onInitialize()
   node_ = ros_node_abstraction->get_raw_node();
   planning_scene_topic_property_->initialize(ros_node_abstraction);
 
-  // the scene node that contains everything and is located at the planning frame
+  // the scene node that contains everything
   planning_scene_node_ = scene_node_->createChildSceneNode();
 
   if (robot_category_)
@@ -652,8 +652,6 @@ void PlanningSceneDisplay::update(float wall_dt, float ros_dt)
 
   executeMainLoopJobs();
 
-  calculateOffsetPosition();
-
   if (planning_scene_monitor_)
     updateInternal(wall_dt, ros_dt);
 }
@@ -666,6 +664,7 @@ void PlanningSceneDisplay::updateInternal(float wall_dt, float /*ros_dt*/)
        planning_scene_needs_render_))
   {
     renderPlanningScene();
+    calculateOffsetPosition();
     current_scene_time_ = 0.0f;
     robot_state_needs_render_ = false;
     planning_scene_needs_render_ = false;

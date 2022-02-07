@@ -63,6 +63,8 @@
 
 #pragma once
 
+using namespace std::chrono_literals;
+
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_servo.servo_launch_test_common.hpp");
 
 namespace moveit_servo
@@ -141,7 +143,7 @@ public:
         return false;
       }
       RCLCPP_INFO(LOGGER, "client_servo_start_ service not available, waiting again...");
-      rclcpp::sleep_for(std::chrono::milliseconds(500));
+      rclcpp::sleep_for(500ms);
     }
 
     // If we setup the start client, also setup the stop client...
@@ -154,7 +156,7 @@ public:
         return false;
       }
       RCLCPP_INFO(LOGGER, "client_servo_stop_ service not available, waiting again...");
-      rclcpp::sleep_for(std::chrono::milliseconds(500));
+      rclcpp::sleep_for(500ms);
     }
 
     // Status sub (we need this to check that we've started / stopped)
@@ -175,7 +177,7 @@ public:
         return false;
       }
       RCLCPP_INFO(LOGGER, "client_servo_pause_ service not available, waiting again...");
-      rclcpp::sleep_for(std::chrono::milliseconds(500));
+      rclcpp::sleep_for(500ms);
     }
     return true;
   }
@@ -191,7 +193,7 @@ public:
         return false;
       }
       RCLCPP_INFO(LOGGER, "client_servo_unpause_ service not available, waiting again...");
-      rclcpp::sleep_for(std::chrono::milliseconds(500));
+      rclcpp::sleep_for(500ms);
     }
     return true;
   }
@@ -208,7 +210,7 @@ public:
         return false;
       }
       RCLCPP_INFO(LOGGER, "client_change_control_dims_ service not available, waiting again...");
-      rclcpp::sleep_for(std::chrono::milliseconds(500));
+      rclcpp::sleep_for(500ms);
     }
     return true;
   }
@@ -225,7 +227,7 @@ public:
         return false;
       }
       RCLCPP_INFO(LOGGER, "client_change_drift_dims_ service not available, waiting again...");
-      rclcpp::sleep_for(std::chrono::milliseconds(500));
+      rclcpp::sleep_for(500ms);
     }
     return true;
   }

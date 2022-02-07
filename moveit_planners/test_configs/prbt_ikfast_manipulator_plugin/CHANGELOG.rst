@@ -2,11 +2,13 @@
 Changelog for package moveit_resources_prbt_ikfast_manipulator_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.4.0 (2022-01-20)
+2.3.4 (2022-02-07)
 ------------------
-* Replace NULL with nullptr (`#961 <https://github.com/ros-planning/moveit2/issues/961>`_)
-  * Fixes `#841 <https://github.com/ros-planning/moveit2/issues/841>`_
-* Contributors: Stephanie Eng
+* Remove unused parameters. (`#1018 <https://github.com/ros-planning/moveit2/issues/1018>`_) (`#1023 <https://github.com/ros-planning/moveit2/issues/1023>`_)
+* Contributors: Tyler Weaver, Vatan Aksoy Tezer, Cory Crean
+
+2.3.3 (2022-01-20)
+------------------
 
 2.3.2 (2021-12-29)
 ------------------

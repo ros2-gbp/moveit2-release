@@ -2,14 +2,14 @@
 Changelog for package moveit_ros_benchmarks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.4.0 (2022-01-20)
+2.3.4 (2022-02-07)
 ------------------
-* Merge https://github.com/ros-planning/moveit/commit/f3ac6070497da90da33551fc1dc3a68938340413
-* moveit_build_options()
-  Declare common build options like CMAKE_CXX_STANDARD, CMAKE_BUILD_TYPE,
-  and compiler options (namely warning flags) once.
-  Each package depending on moveit_core can use these via moveit_build_options().
-* Contributors: Abishalini, Robert Haschke
+* Remove unused parameters. (`#1018 <https://github.com/ros-planning/moveit2/issues/1018>`_) (`#1023 <https://github.com/ros-planning/moveit2/issues/1023>`_)
+* Add moveit_configs_utils package to simplify loading paramters (backport `#591 <https://github.com/ros-planning/moveit2/issues/591>`_) (`#1019 <https://github.com/ros-planning/moveit2/issues/1019>`_)
+* Contributors: AndyZe, Cory Crean, Stephanie Eng, Tyler Weaver, Vatan Aksoy Tezer
+
+2.3.3 (2022-01-20)
+------------------
 
 2.3.2 (2021-12-29)
 ------------------

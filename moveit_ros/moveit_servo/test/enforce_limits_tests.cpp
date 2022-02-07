@@ -44,19 +44,20 @@ namespace
 {
 constexpr double PUBLISH_PERIOD = 0.01;
 
-void checkVelocityLimits(const moveit::core::JointModelGroup* joint_model_group, const Eigen::ArrayXd& velocity)
+void checkVelocityLimits(const moveit::core::JointModelGroup* joint_model_group, const Eigen::ArrayXd& delta_theta)
 {
-  std::size_t joint_index{ 0 };
+  std::size_t joint_delta_index{ 0 };
   for (const moveit::core::JointModel* joint : joint_model_group->getActiveJointModels())
   {
     const auto& bounds = joint->getVariableBounds(joint->getName());
 
     if (bounds.velocity_bounded_)
     {
-      EXPECT_GE(velocity(joint_index), bounds.min_velocity_) << "Joint " << joint_index << " violates velocity limit";
-      EXPECT_LE(velocity(joint_index), bounds.max_velocity_) << "Joint " << joint_index << " violates velocity limit";
+      auto velocity = delta_theta(joint_delta_index) / PUBLISH_PERIOD;
+      EXPECT_GE(velocity, bounds.min_velocity_) << "Joint " << joint_delta_index << " violates velocity limit";
+      EXPECT_LE(velocity, bounds.max_velocity_) << "Joint " << joint_delta_index << " violates velocity limit";
     }
-    ++joint_index;
+    ++joint_delta_index;
   }
 }
 
@@ -77,57 +78,65 @@ protected:
 
 TEST_F(EnforceLimitsTests, VelocityScalingTest)
 {
-  // Request velocities that are too fast
-  std::vector<double> joint_position{ 0, 0, 0, 0, 0, 0, 0 };
-  std::vector<double> joint_velocity{ 0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0 };
-  sensor_msgs::msg::JointState joint_state;
-  joint_state.position = joint_position;
-  joint_state.velocity = joint_velocity;
+  // Request joint angle changes that are too fast given the control period.
+  Eigen::ArrayXd delta_theta(7);
+  delta_theta[0] = 0;  // rad
+  delta_theta[1] = 0.01;
+  delta_theta[2] = 0.02;
+  delta_theta[3] = 0.03;
+  delta_theta[4] = 0.04;
+  delta_theta[5] = 0.05;
+  delta_theta[6] = 0.06;
 
-  moveit_servo::enforceVelocityLimits(joint_model_group_, PUBLISH_PERIOD, joint_state);
+  // Store the original joint commands for comparison before applying velocity scaling.
+  auto result_delta_theta = moveit_servo::enforceVelocityLimits(joint_model_group_, PUBLISH_PERIOD, delta_theta);
 
-  Eigen::ArrayXd eigen_velocity =
-      Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(joint_state.velocity.data(), joint_state.velocity.size());
-  checkVelocityLimits(joint_model_group_, eigen_velocity);
+  // Test that we don't violate velocity limits
+  checkVelocityLimits(joint_model_group_, result_delta_theta);
 }
 
 TEST_F(EnforceLimitsTests, NegativeJointAngleDeltasTest)
 {
-  // Negative velocities exceeding the limit
-  std::vector<double> joint_position{ 0, 0, 0, 0, 0, 0, 0 };
-  std::vector<double> joint_velocity{ 0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0 };
-  sensor_msgs::msg::JointState joint_state;
-  joint_state.position = joint_position;
-  joint_state.velocity = joint_velocity;
+  // Now, negative joint angle deltas. Some will result to velocities
+  // greater than the arm joint velocity limits.
+  Eigen::ArrayXd delta_theta(7);
+  delta_theta[0] = 0.01;  // rad
+  delta_theta[1] = -0.01;
+  delta_theta[2] = -0.02;
+  delta_theta[3] = -0.03;
+  delta_theta[4] = -0.04;
+  delta_theta[5] = -0.05;
+  delta_theta[6] = -0.06;
 
-  moveit_servo::enforceVelocityLimits(joint_model_group_, PUBLISH_PERIOD, joint_state);
+  // Store the original joint commands for comparison before applying velocity scaling.
+  auto result_delta_theta = moveit_servo::enforceVelocityLimits(joint_model_group_, PUBLISH_PERIOD, delta_theta);
 
-  Eigen::ArrayXd eigen_velocity =
-      Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(joint_state.velocity.data(), joint_state.velocity.size());
-  checkVelocityLimits(joint_model_group_, eigen_velocity);
+  // Test that we don't violate velocity limits
+  checkVelocityLimits(joint_model_group_, result_delta_theta);
 }
 
 TEST_F(EnforceLimitsTests, LowJointVelocityDeltaTest)
 {
-  // Final test with joint velocities that are acceptable
-  std::vector<double> joint_position{ 0, 0, 0, 0, 0, 0, 0 };
-  std::vector<double> joint_velocity{ 0, 0.001, 0.001, -0.001, 0.001, 0.001, 0.001 };
-  sensor_msgs::msg::JointState joint_state;
-  joint_state.position = joint_position;
-  joint_state.velocity = joint_velocity;
+  // Final test with joint angle deltas that will result in velocities
+  // below the lowest Panda arm joint velocity limit.
+  Eigen::ArrayXd delta_theta(7);
+  delta_theta[0] = 0;  // rad
+  delta_theta[1] = -0.013;
+  delta_theta[2] = 0.023;
+  delta_theta[3] = -0.004;
+  delta_theta[4] = 0.021;
+  delta_theta[5] = 0.012;
+  delta_theta[6] = 0.0075;
 
-  moveit_servo::enforceVelocityLimits(joint_model_group_, PUBLISH_PERIOD, joint_state);
+  // Store the original joint commands for comparison before applying velocity scaling.
+  auto result_delta_theta = moveit_servo::enforceVelocityLimits(joint_model_group_, PUBLISH_PERIOD, delta_theta);
 
-  Eigen::ArrayXd eigen_velocity =
-      Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(joint_state.velocity.data(), joint_state.velocity.size());
-  checkVelocityLimits(joint_model_group_, eigen_velocity);
+  // Test that we don't violate velocity limits
+  checkVelocityLimits(joint_model_group_, result_delta_theta);
 }
 
 int main(int argc, char** argv)
 {
-  rclcpp::init(argc, argv);
   ::testing::InitGoogleTest(&argc, argv);
-  int result = RUN_ALL_TESTS();
-  rclcpp::shutdown();
-  return result;
+  return RUN_ALL_TESTS();
 }

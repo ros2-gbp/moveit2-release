@@ -97,7 +97,7 @@ protected:
     for (const auto& jmg : robot_model_->getJointModelGroups())
     {
       std::vector<std::string> joint_names = jmg->getActiveJointModelNames();
-      pilz_industrial_motion_planner::JointLimit joint_limit;
+      JointLimit joint_limit;
       joint_limit.max_position = 3.124;
       joint_limit.min_position = -3.124;
       joint_limit.has_velocity_limits = true;
@@ -214,7 +214,7 @@ TEST_F(TrajectoryGeneratorPTPTest, missingVelocityLimits)
 
   JointLimitsContainer joint_limits;
   auto joint_models = robot_model_->getActiveJointModels();
-  pilz_industrial_motion_planner::JointLimit joint_limit;
+  JointLimit joint_limit;
   joint_limit.has_velocity_limits = false;
   joint_limit.has_acceleration_limits = true;
   joint_limit.max_deceleration = -1;
@@ -238,7 +238,7 @@ TEST_F(TrajectoryGeneratorPTPTest, missingDecelerationimits)
 
   JointLimitsContainer joint_limits;
   const auto& joint_models = robot_model_->getActiveJointModels();
-  pilz_industrial_motion_planner::JointLimit joint_limit;
+  JointLimit joint_limit;
   joint_limit.has_velocity_limits = true;
   joint_limit.has_acceleration_limits = true;
   joint_limit.has_deceleration_limits = false;
@@ -272,7 +272,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testInsufficientLimit)
   ASSERT_TRUE(joint_models.size());
 
   // joint limit with insufficient limits (no acc/dec limits)
-  pilz_industrial_motion_planner::JointLimit insufficient_limit;
+  JointLimit insufficient_limit;
   insufficient_limit.has_position_limits = true;
   insufficient_limit.max_position = 2.5;
   insufficient_limit.min_position = -2.5;
@@ -300,7 +300,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testInsufficientLimit)
   /* Step 2 */
   /**********/
   // joint limit with sufficient limits
-  pilz_industrial_motion_planner::JointLimit sufficient_limit;
+  JointLimit sufficient_limit;
   sufficient_limit.has_position_limits = true;
   sufficient_limit.max_position = 2.356;
   sufficient_limit.min_position = -2.356;
@@ -486,7 +486,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalAlreadyReached)
 TEST_F(TrajectoryGeneratorPTPTest, testScalingFactor)
 {
   // create ptp generator with different limits
-  pilz_industrial_motion_planner::JointLimit joint_limit;
+  JointLimit joint_limit;
   JointLimitsContainer joint_limits;
 
   // set the joint limits

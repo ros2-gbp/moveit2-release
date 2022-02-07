@@ -2,20 +2,22 @@
 Changelog for package pilz_industrial_motion_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.4.0 (2022-01-20)
+2.3.4 (2022-02-07)
 ------------------
-* Remove 'using namespace' from header files. (`#994 <https://github.com/ros-planning/moveit2/issues/994>`_)
-* Fix missing ament_cmake_gtest dependency (`#981 <https://github.com/ros-planning/moveit2/issues/981>`_)
-* Remove some Maintainers from Pilz Planner (`#971 <https://github.com/ros-planning/moveit2/issues/971>`_)
-* Fix usage of boost placeholder (`#958 <https://github.com/ros-planning/moveit2/issues/958>`_)
-* Merge https://github.com/ros-planning/moveit/commit/a0ee2020c4a40d03a48044d71753ed23853a665d
-* Remove '-W*' options from cmake files (`#2903 <https://github.com/ros-planning/moveit2/issues/2903>`_)
-* Add test for pilz planner with attached objects (`#2878 <https://github.com/ros-planning/moveit2/issues/2878>`_)
-  * Add test case for `#2824 <https://github.com/ros-planning/moveit2/issues/2824>`_
-  Co-authored-by: Cristian Beltran <cristianbehe@gmail.com>
-  Co-authored-by: Joachim Schleicher <joachimsl@gmx.de>
+* Add missing test dependencies (`#1027 <https://github.com/ros-planning/moveit2/issues/1027>`_) (`#1035 <https://github.com/ros-planning/moveit2/issues/1035>`_)
+* Add moveit_configs_utils package to simplify loading paramters (backport `#591 <https://github.com/ros-planning/moveit2/issues/591>`_) (`#1019 <https://github.com/ros-planning/moveit2/issues/1019>`_)
+* Contributors: AndyZe, Stephanie Eng, Henning Kayser, Tyler Weaver
+
+2.3.3 (2022-01-20)
+------------------
+* Fix missing ament_cmake_gtest dependency (`#981 <https://github.com/ros-planning/moveit2/issues/981>`_) (`#987 <https://github.com/ros-planning/moveit2/issues/987>`_)
+* Remove some Maintainers from Pilz Planner (`#971 <https://github.com/ros-planning/moveit2/issues/971>`_) (`#974 <https://github.com/ros-planning/moveit2/issues/974>`_)
+  (cherry picked from commit 79addb30a703f566f3d81b01dc4d34c0f8cce209)
   Co-authored-by: jschleicher <j.schleicher@pilz.de>
-* Contributors: Abishalini, Cory Crean, Leroy Rügemer, Tyler Weaver, Wolf Vollprecht, cambel, jschleicher
+* Fix usage of boost placeholder (`#958 <https://github.com/ros-planning/moveit2/issues/958>`_) (`#967 <https://github.com/ros-planning/moveit2/issues/967>`_)
+  (cherry picked from commit 53f9affaeb10cd077f9e5444f884d1c9b3ef6871)
+  Co-authored-by: Wolf Vollprecht <w.vollprecht@gmail.com>
+* Contributors: mergify[bot]
 
 2.3.2 (2021-12-29)
 ------------------
