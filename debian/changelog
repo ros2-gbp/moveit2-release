@@ -1,0 +1,35 @@
+ros-galactic-pilz-industrial-motion-planner-testutils (2.3.4-1focal) focal; urgency=high
+
+
+
+ -- Christian Henkel <c.henkel@pilz.de>  Mon, 07 Feb 2022 07:00:00 -0000
+
+ros-galactic-pilz-industrial-motion-planner-testutils (2.3.3-1focal) focal; urgency=high
+
+  * Remove some Maintainers from Pilz Planner (#971 <https://github.com/ros-planning/moveit2/issues/971>) (#974 <https://github.com/ros-planning/moveit2/issues/974>)
+    (cherry picked from commit 79addb30a703f566f3d81b01dc4d34c0f8cce209)
+    Co-authored-by: jschleicher <mailto:j.schleicher@pilz.de>
+  * Contributors: mergify[bot]
+
+ -- Christian Henkel <c.henkel@pilz.de>  Thu, 20 Jan 2022 07:00:00 -0000
+
+ros-galactic-pilz-industrial-motion-planner-testutils (2.3.2-1focal) focal; urgency=high
+
+
+
+ -- Alexander Gutenkunst <a.gutenkunst@pilz.de>  Wed, 29 Dec 2021 07:00:00 -0000
+
+ros-galactic-pilz-industrial-motion-planner-testutils (2.3.1-1focal) focal; urgency=high
+
+  * Convert to modern include guard #882 <https://github.com/ros-planning/moveit2/issues/882> (#891 <https://github.com/ros-planning/moveit2/issues/891>)
+  * Add codespell to precommit, fix A LOT of spelling mistakes (#934 <https://github.com/ros-planning/moveit2/issues/934>)
+  * PILZ: Build fixups, silence warnings, fix unit tests
+  * PILZ: Migrate and Restructure test directory
+  * PILZ: Migrate planner and testutils packages to ROS 2
+  * Enforce package.xml format 3 Schema (#779 <https://github.com/ros-planning/moveit2/issues/779>)
+  * clang-tidy: modernize-make-shared, modernize-make-unique (#2762 <https://github.com/ros-planning/moveit/issues/2762>)
+  * Contributors: David V. Lu!!, Henning Kayser, Robert Haschke, Sebastian Jahr, predystopic-dev, pvanlaar, Pilz GmbH and Co. KG, Christian Henkel, Immanuel Martini, Joachim Schleicher, rfeistenauer
+
+ -- Alexander Gutenkunst <a.gutenkunst@pilz.de>  Thu, 23 Dec 2021 07:00:00 -0000
+
+
