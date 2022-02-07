@@ -1,0 +1,12 @@
+Source: ros-galactic-pilz-industrial-motion-planner
+Section: misc
+Priority: optional
+Maintainer: Christian Henkel <c.henkel@pilz.de>
+Build-Depends: debhelper (>= 9.0.0), libboost-all-dev, ros-galactic-ament-cmake, ros-galactic-ament-cmake-gmock, ros-galactic-ament-cmake-gtest, ros-galactic-ament-lint-auto, ros-galactic-ament-lint-common, ros-galactic-eigen3-cmake-module, ros-galactic-geometry-msgs, ros-galactic-moveit-common, ros-galactic-moveit-core, ros-galactic-moveit-msgs, ros-galactic-moveit-resources-panda-moveit-config, ros-galactic-moveit-resources-prbt-moveit-config, ros-galactic-moveit-resources-prbt-pg70-support, ros-galactic-moveit-resources-prbt-support, ros-galactic-moveit-ros-move-group, ros-galactic-moveit-ros-planning, ros-galactic-moveit-ros-planning-interface, ros-galactic-orocos-kdl, ros-galactic-pilz-industrial-motion-planner-testutils, ros-galactic-pluginlib, ros-galactic-rclcpp, ros-galactic-ros-testing, ros-galactic-tf2, ros-galactic-tf2-eigen, ros-galactic-tf2-eigen-kdl, ros-galactic-tf2-geometry-msgs, ros-galactic-tf2-kdl, ros-galactic-tf2-ros, ros-galactic-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-galactic-pilz-industrial-motion-planner
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-galactic-eigen3-cmake-module, ros-galactic-geometry-msgs, ros-galactic-moveit-core, ros-galactic-moveit-msgs, ros-galactic-moveit-ros-move-group, ros-galactic-moveit-ros-planning, ros-galactic-moveit-ros-planning-interface, ros-galactic-orocos-kdl, ros-galactic-pluginlib, ros-galactic-rclcpp, ros-galactic-tf2, ros-galactic-tf2-eigen, ros-galactic-tf2-eigen-kdl, ros-galactic-tf2-geometry-msgs, ros-galactic-tf2-kdl, ros-galactic-tf2-ros, ros-galactic-ros-workspace
+Description: MoveIt plugin to generate industrial trajectories PTP, LIN, CIRC and sequences thereof.
