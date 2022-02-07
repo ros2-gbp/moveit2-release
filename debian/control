@@ -1,0 +1,12 @@
+Source: ros-galactic-moveit-configs-utils
+Section: misc
+Priority: optional
+Maintainer: MoveIt Release Team <moveit_releasers@googlegroups.com>
+Build-Depends: debhelper (>= 9.0.0), ros-galactic-ament-lint-auto, ros-galactic-ament-lint-common, ros-galactic-ros-workspace, python3-all, python3-setuptools
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-galactic-moveit-configs-utils
+Architecture: any
+Depends: ${python3:Depends}, ${misc:Depends}, ros-galactic-ament-index-python, ros-galactic-launch-param-builder, ros-galactic-ros-workspace
+Description: Python library for loading moveit config parameters in launch files

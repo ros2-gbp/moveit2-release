@@ -1,0 +1,8 @@
+ros-galactic-moveit-configs-utils (2.3.4-1focal) focal; urgency=high
+
+  * Add moveit_configs_utils package to simplify loading paramters (backport #591 <https://github.com/ros-planning/moveit2/issues/591>) (#1019 <https://github.com/ros-planning/moveit2/issues/1019>)
+  * Contributors: AndyZe, Stephanie Eng, Tyler Weaver
+
+ -- MoveIt Release Team <moveit_releasers@googlegroups.com>  Mon, 07 Feb 2022 07:00:00 -0000
+
+
