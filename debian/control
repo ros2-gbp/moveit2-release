@@ -1,0 +1,12 @@
+Source: ros-rolling-moveit-setup-assistant
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libyaml-cpp-dev, ros-rolling-ament-cmake, ros-rolling-ament-cmake-gtest <!nocheck>, ros-rolling-ament-index-cpp, ros-rolling-ament-lint-auto <!nocheck>, ros-rolling-ament-lint-common <!nocheck>, ros-rolling-moveit-common, ros-rolling-moveit-core, ros-rolling-moveit-resources-panda-moveit-config <!nocheck>, ros-rolling-moveit-ros-planning, ros-rolling-moveit-ros-visualization, ros-rolling-ompl, ros-rolling-rclcpp, ros-rolling-srdfdom, ros-rolling-urdf, ros-rolling-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-rolling-moveit-setup-assistant
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libyaml-cpp-dev, ros-rolling-ament-index-cpp, ros-rolling-moveit-common, ros-rolling-moveit-core, ros-rolling-moveit-ros-planning, ros-rolling-moveit-ros-visualization, ros-rolling-rclcpp, ros-rolling-srdfdom, ros-rolling-urdf, ros-rolling-xacro, ros-rolling-ros-workspace
+Description: Generates a configuration package that makes it easy to use MoveIt
