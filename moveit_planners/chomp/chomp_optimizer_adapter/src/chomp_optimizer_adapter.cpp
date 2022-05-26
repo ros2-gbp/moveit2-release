@@ -40,7 +40,6 @@
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/planning_request_adapter/planning_request_adapter.h>
 #include <moveit/robot_state/conversions.h>
-#include <moveit/trajectory_processing/iterative_time_parameterization.h>
 #include <moveit/trajectory_processing/trajectory_tools.h>
 
 #include <eigen3/Eigen/Core>
@@ -60,7 +59,7 @@ public:
   {
   }
 
-  void initialize(const rclcpp::Node::SharedPtr& node, const std::string& parameter_namespace) override
+  void initialize(const rclcpp::Node::SharedPtr& node, const std::string& /* unused */) override
   {
     if (!node->get_parameter("chomp.planning_time_limit", params_.planning_time_limit_))
     {
