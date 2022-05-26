@@ -2,7 +2,7 @@
 # ROS base image augmented with all MoveIt dependencies to use for CI
 
 ARG ROS_DISTRO=rolling
-FROM ros:${ROS_DISTRO}-ros-base-focal
+FROM ros:${ROS_DISTRO}-ros-base
 MAINTAINER Robert Haschke rhaschke@techfak.uni-bielefeld.de
 
 ENV TERM xterm
@@ -25,8 +25,12 @@ RUN \
         # Some basic requirements
         wget git sudo curl \
         # Preferred build tools
-        clang clang-format-10 clang-tidy clang-tools \
+        clang clang-format-12 clang-tidy clang-tools \
         ccache && \
+    #
+    # Globally disable git security
+    # https://github.blog/2022-04-12-git-security-vulnerability-announced
+    git config --global --add safe.directory "*" && \
     #
     # Fetch all dependencies from moveit2.repos
     vcs import src < src/moveit2/moveit2.repos && \
