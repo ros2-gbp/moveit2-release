@@ -2,10 +2,13 @@
 Changelog for package moveit_planners
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.3.4 (2022-02-07)
+2.5.0 (2022-05-26)
 ------------------
+* Merge pr `#3000 <https://github.com/ros-planning/moveit2/issues/3000>`_: Pilz planner: improve reporting of invalid start joints
+* add pilz planner to moveit_planners dependency
+* Contributors: Robert Haschke, v4hn
 
-2.3.3 (2022-01-20)
+2.4.0 (2022-01-20)
 ------------------
 
 2.3.2 (2021-12-29)

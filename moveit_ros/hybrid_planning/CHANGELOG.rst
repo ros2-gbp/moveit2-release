@@ -2,13 +2,77 @@
 Changelog for package moveit_hybrid_planning
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.3.4 (2022-02-07)
+2.5.0 (2022-05-26)
 ------------------
-* Remove unused parameters. (`#1018 <https://github.com/ros-planning/moveit2/issues/1018>`_) (`#1023 <https://github.com/ros-planning/moveit2/issues/1023>`_)
-* Contributors: Tyler Weaver, Vatan Aksoy Tezer, Cory Crean
+* Fix hybrid planning launching (`#1271 <https://github.com/ros-planning/moveit2/issues/1271>`_)
+* Enable cppcheck (`#1224 <https://github.com/ros-planning/moveit2/issues/1224>`_)
+  Co-authored-by: jeoseo <jeongwooseo2012@gmail.com>
+* Make moveit_common a 'depend' rather than 'build_depend' (`#1226 <https://github.com/ros-planning/moveit2/issues/1226>`_)
+* Avoid bind(), use lambdas instead (`#1204 <https://github.com/ros-planning/moveit2/issues/1204>`_)
+  Adaption of https://github.com/ros-planning/moveit/pull/3106
+* banish bind()
+  source:https://github.com/ros-planning/moveit/pull/3106/commits/a2911c80c28958c1fce8fb52333d770248c4ec05; required minor updates compared to original source commit in order to ensure compatibility with ROS2
+* RCLCPP Upgrade Bugfixes (`#1181 <https://github.com/ros-planning/moveit2/issues/1181>`_)
+* Enable rolling / jammy CI (again) (`#1134 <https://github.com/ros-planning/moveit2/issues/1134>`_)
+  * Use ros2_control binaries
+  * Use output screen instead of explicitly stating stderr
+* [hybrid planning] Adjust planning scene locking (`#1087 <https://github.com/ros-planning/moveit2/issues/1087>`_)
+  * Create a copy of the planning scene. const robot state.
+  * Use LockedPlanningSceneRO over lockSceneRead()
+  * Use lambda function
+* [Hybrid Planning] configurable planning scene topics (`#1052 <https://github.com/ros-planning/moveit2/issues/1052>`_)
+* [hybrid planning] Use a map of expected feedback codes (`#1065 <https://github.com/ros-planning/moveit2/issues/1065>`_)
+  * Use a map of expected feedback codes
+  * Use a constexpr function instead of unordered_map
+  * Don't need this #include
+  * Minor function renaming
+* Disable hybrid planning test, don't cache ci docker at all and don't cache upstream_ws if repos file is changed (`#1051 <https://github.com/ros-planning/moveit2/issues/1051>`_)
+  * Don't cache docker builds
+  * Don't cache upstream ws
+  * Use new action for getting the latest timestamp .repos file has been edited
+  * Debug
+  * Fix repos path
+  * Disable hybrid planning test
+  * Use more verbose name
+  Co-authored-by: Tyler Weaver <tylerjw@gmail.com>
+* [hybrid planning] Add action abortion and test; improve the existing test (`#980 <https://github.com/ros-planning/moveit2/issues/980>`_)
+  * Add action abortion and test; improve the existing test
+  * Add controller run-dependency
+  * Fix the clearing of robot trajectory when a collision would occur
+  * Fix replanning if local planner is stuck
+  * Lambda function everything
+  * Thread safety for stop_hybrid_planning\_
+  * Thread-safe state\_
+  * Clang tidy
+  * Update the planning scene properly
+  * Update Servo test initial_positions.yaml
+  Co-authored-by: Tyler Weaver <tyler@picknik.ai>
+* [hybrid planning] Delete the pass-through option (`#986 <https://github.com/ros-planning/moveit2/issues/986>`_)
+  * Delete the pass-through option
+  * Suppress clang warning
+  * Handle (waypoint_count < 0) possibility
+  Co-authored-by: Tyler Weaver <tyler@picknik.ai>
+* Remove unused parameters. (`#1018 <https://github.com/ros-planning/moveit2/issues/1018>`_)
+  Co-authored-by: Tyler Weaver <tyler@picknik.ai>
+  Co-authored-by: Vatan Aksoy Tezer <vatan@picknik.ai>
+* Contributors: AndyZe, Cory Crean, David V. Lu!!, Henning Kayser, Jafar, Vatan Aksoy Tezer, jeoseo, v4hn
 
-2.3.3 (2022-01-20)
+2.4.0 (2022-01-20)
 ------------------
+* hybrid_planning: Fix global_planner action name (`#960 <https://github.com/ros-planning/moveit2/issues/960>`_)
+* Put hybrid planning actions under a common namespace (`#932 <https://github.com/ros-planning/moveit2/issues/932>`_)
+  * Put hybrid planning actions under a common namespace
+  * Use ~
+  * New pkg for common resources. Does not work.
+  * Use inline rather than anonymous namespace
+  Co-authored-by: Jafar Abdi <cafer.abdi@gmail.com>
+  * Revert "Use inline rather than anonymous namespace"
+  This reverts commit 29a7d279776be21f4666c7e0fadeaa6b7ef8debf.
+  * Revert "New pkg for common resources. Does not work."
+  This reverts commit 68a173baee4b7f8b2c1f74285f96c8e3892c5909.
+  * Some progress toward loading common parameters
+  Co-authored-by: Jafar Abdi <cafer.abdi@gmail.com>
+* Contributors: AndyZe
 
 2.3.2 (2021-12-29)
 ------------------

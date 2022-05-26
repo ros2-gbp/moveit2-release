@@ -2,11 +2,24 @@
 Changelog for package moveit_ros_control_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.3.4 (2022-02-07)
+2.5.0 (2022-05-26)
 ------------------
+* Enable cppcheck (`#1224 <https://github.com/ros-planning/moveit2/issues/1224>`_)
+  Co-authored-by: jeoseo <jeongwooseo2012@gmail.com>
+* Make moveit_common a 'depend' rather than 'build_depend' (`#1226 <https://github.com/ros-planning/moveit2/issues/1226>`_)
+* 1.1.9
+* 1.1.8
+* 1.1.7
+* 1.1.6
+* Contributors: Jafar, Robert Haschke, jeoseo
 
-2.3.3 (2022-01-20)
+2.4.0 (2022-01-20)
 ------------------
+* moveit_build_options()
+  Declare common build options like CMAKE_CXX_STANDARD, CMAKE_BUILD_TYPE,
+  and compiler options (namely warning flags) once.
+  Each package depending on moveit_core can use these via moveit_build_options().
+* Contributors: Robert Haschke
 
 2.3.2 (2021-12-29)
 ------------------

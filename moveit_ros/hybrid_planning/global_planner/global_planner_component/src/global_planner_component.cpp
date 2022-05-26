@@ -43,7 +43,7 @@
 namespace
 {
 const rclcpp::Logger LOGGER = rclcpp::get_logger("global_planner_component");
-}
+}  // namespace
 
 namespace moveit::hybrid_planning
 {
@@ -62,8 +62,16 @@ GlobalPlannerComponent::GlobalPlannerComponent(const rclcpp::NodeOptions& option
 bool GlobalPlannerComponent::initializeGlobalPlanner()
 {
   // Initialize global planning request action server
+  std::string global_planning_action_name = "";
+  node_->declare_parameter("global_planning_action_name", "");
+  node_->get_parameter<std::string>("global_planning_action_name", global_planning_action_name);
+  if (global_planning_action_name.empty())
+  {
+    RCLCPP_ERROR(LOGGER, "global_planning_action_name was not defined");
+    return false;
+  }
   global_planning_request_server_ = rclcpp_action::create_server<moveit_msgs::action::GlobalPlanner>(
-      node_, "global_planning_action",
+      node_, global_planning_action_name,
       [](const rclcpp_action::GoalUUID& /*unused*/,
          std::shared_ptr<const moveit_msgs::action::GlobalPlanner::Goal> /*unused*/) {
         RCLCPP_INFO(LOGGER, "Received global planning goal request");
@@ -77,7 +85,9 @@ bool GlobalPlannerComponent::initializeGlobalPlanner()
         }
         return rclcpp_action::CancelResponse::ACCEPT;
       },
-      std::bind(&GlobalPlannerComponent::globalPlanningRequestCallback, this, std::placeholders::_1));
+      [this](std::shared_ptr<rclcpp_action::ServerGoalHandle<moveit_msgs::action::GlobalPlanner>> goal_handle) {
+        return globalPlanningRequestCallback(goal_handle);
+      });
 
   global_trajectory_pub_ = node_->create_publisher<moveit_msgs::msg::MotionPlanResponse>("global_trajectory", 1);
 

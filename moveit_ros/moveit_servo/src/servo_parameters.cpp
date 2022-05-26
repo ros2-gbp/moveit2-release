@@ -122,19 +122,26 @@ void ServoParameters::declare(const std::string& ns,
   node_parameters->declare_parameter(ns + ".scale.linear", ParameterValue{ parameters.linear_scale },
                                      ParameterDescriptorBuilder{}
                                          .type(PARAMETER_DOUBLE)
-                                         .description("Max linear velocity. Meters per publish_period. Unit is [m/s]. "
+                                         .description("Max linear velocity. Unit is [m/s]. "
                                                       "Only used for Cartesian commands."));
   node_parameters->declare_parameter(ns + ".scale.rotational", ParameterValue{ parameters.rotational_scale },
                                      ParameterDescriptorBuilder{}
                                          .type(PARAMETER_DOUBLE)
-                                         .description("Max angular velocity. Rads per publish_period. Unit is [rad/s]. "
+                                         .description("Max angular velocity. Unit is [rad/s]. "
                                                       "Only used for Cartesian commands."));
-  node_parameters->declare_parameter(
-      ns + ".scale.joint", ParameterValue{ parameters.joint_scale },
-      ParameterDescriptorBuilder{}
-          .type(PARAMETER_DOUBLE)
-          .description("Max joint angular/linear velocity. Rads or Meters per publish period. Only used for joint "
-                       "commands on joint_command_in_topic."));
+  node_parameters->declare_parameter(ns + ".scale.joint", ParameterValue{ parameters.joint_scale },
+                                     ParameterDescriptorBuilder{}
+                                         .type(PARAMETER_DOUBLE)
+                                         .description("Max joint angular/linear velocity. Only used for joint "
+                                                      "commands on joint_command_in_topic."));
+
+  // Properties of Servo calculations
+  node_parameters->declare_parameter(ns + ".override_velocity_scaling_factor",
+                                     ParameterValue{ parameters.override_velocity_scaling_factor },
+                                     ParameterDescriptorBuilder{}
+                                         .type(PARAMETER_DOUBLE)
+                                         .description("Override constant scalar of how fast the robot should jog."
+                                                      "Valid values are between 0-1.0"));
 
   // Properties of outgoing commands
   node_parameters->declare_parameter(
@@ -265,6 +272,10 @@ ServoParameters ServoParameters::get(const std::string& ns,
   parameters.linear_scale = node_parameters->get_parameter(ns + ".scale.linear").as_double();
   parameters.rotational_scale = node_parameters->get_parameter(ns + ".scale.rotational").as_double();
   parameters.joint_scale = node_parameters->get_parameter(ns + ".scale.joint").as_double();
+
+  // Properties of Servo calculations
+  parameters.override_velocity_scaling_factor =
+      node_parameters->get_parameter(ns + ".override_velocity_scaling_factor").as_double();
 
   // Properties of outgoing commands
   parameters.command_out_topic = node_parameters->get_parameter(ns + ".command_out_topic").as_string();
@@ -431,10 +442,10 @@ ServoParameters::SharedConstPtr ServoParameters::makeServoParameters(const rclcp
     // register parameter change callback
     if (dynamic_parameters)
     {
-      using std::placeholders::_1;
-      parameters_ptr->callback_handler_->on_set_parameters_callback_handler_ =
-          node->add_on_set_parameters_callback(std::bind(&ServoParameters::CallbackHandler::setParametersCallback,
-                                                         parameters_ptr->callback_handler_.get(), _1));
+      parameters_ptr->callback_handler_->on_set_parameters_callback_handler_ = node->add_on_set_parameters_callback(
+          [ptr = parameters_ptr->callback_handler_.get()](const std::vector<rclcpp::Parameter>& parameters) {
+            return ptr->setParametersCallback(parameters);
+          });
     }
 
     return parameters_ptr;

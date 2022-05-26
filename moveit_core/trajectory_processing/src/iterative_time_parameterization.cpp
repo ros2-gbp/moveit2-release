@@ -52,6 +52,7 @@ IterativeParabolicTimeParameterization::IterativeParabolicTimeParameterization(u
 {
 }
 
+#if 0  // unused functions
 namespace
 {
 void printPoint(const trajectory_msgs::msg::JointTrajectoryPoint& point, std::size_t i)
@@ -93,6 +94,7 @@ void printStats(const trajectory_msgs::msg::JointTrajectory& trajectory,
     printPoint(trajectory.points[i], i);
 }
 }  // namespace
+#endif
 
 // Applies velocity
 void IterativeParabolicTimeParameterization::applyVelocityConstraints(robot_trajectory::RobotTrajectory& rob_trajectory,
@@ -482,5 +484,14 @@ bool IterativeParabolicTimeParameterization::computeTimeStamps(robot_trajectory:
 
   updateTrajectory(trajectory, time_diff);
   return true;
+}
+
+bool IterativeParabolicTimeParameterization::computeTimeStamps(
+    robot_trajectory::RobotTrajectory& /*trajectory*/,
+    const std::unordered_map<std::string, double>& /*velocity_limits*/,
+    const std::unordered_map<std::string, double>& /*acceleration_limits*/) const
+{
+  RCLCPP_ERROR(LOGGER, "IPTP does not support this version of computeTimeStamps. Try TOTG instead?");
+  return false;
 }
 }  // namespace trajectory_processing
