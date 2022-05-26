@@ -41,7 +41,6 @@
 #include <moveit_msgs/srv/load_map.hpp>
 #include <moveit_msgs/srv/save_map.hpp>
 
-#include <boost/bind.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
@@ -159,13 +158,20 @@ void OccupancyMapMonitor::addUpdater(const OccupancyMapUpdaterPtr& updater)
       if (map_updaters_.size() == 2)
       {
         map_updaters_[0]->setTransformCacheCallback(
-            boost::bind(&OccupancyMapMonitor::getShapeTransformCache, this, 0, _1, _2, _3));
+            [this](const std::string& frame, const rclcpp::Time& stamp, ShapeTransformCache& cache) {
+              return getShapeTransformCache(0, frame, stamp, cache);
+            });
         map_updaters_[1]->setTransformCacheCallback(
-            boost::bind(&OccupancyMapMonitor::getShapeTransformCache, this, 1, _1, _2, _3));
+            [this](const std::string& frame, const rclcpp::Time& stamp, ShapeTransformCache& cache) {
+              return getShapeTransformCache(1, frame, stamp, cache);
+            });
       }
       else
         map_updaters_.back()->setTransformCacheCallback(
-            boost::bind(&OccupancyMapMonitor::getShapeTransformCache, this, map_updaters_.size() - 1, _1, _2, _3));
+            [this, i = map_updaters_.size() - 1](const std::string& frame, const rclcpp::Time& stamp,
+                                                 ShapeTransformCache& cache) {
+              return getShapeTransformCache(i, frame, stamp, cache);
+            });
     }
     else
       updater->setTransformCacheCallback(transform_cache_callback_);
@@ -263,7 +269,7 @@ bool OccupancyMapMonitor::getShapeTransformCache(std::size_t index, const std::s
     return false;
 }
 
-bool OccupancyMapMonitor::saveMapCallback(const std::shared_ptr<rmw_request_id_t> request_header,
+bool OccupancyMapMonitor::saveMapCallback(const std::shared_ptr<rmw_request_id_t> /* unused */,
                                           const std::shared_ptr<moveit_msgs::srv::SaveMap::Request> request,
                                           std::shared_ptr<moveit_msgs::srv::SaveMap::Response> response)
 {
@@ -281,7 +287,7 @@ bool OccupancyMapMonitor::saveMapCallback(const std::shared_ptr<rmw_request_id_t
   return true;
 }
 
-bool OccupancyMapMonitor::loadMapCallback(const std::shared_ptr<rmw_request_id_t> request_header,
+bool OccupancyMapMonitor::loadMapCallback(const std::shared_ptr<rmw_request_id_t> /* unused */,
                                           const std::shared_ptr<moveit_msgs::srv::LoadMap::Request> request,
                                           std::shared_ptr<moveit_msgs::srv::LoadMap::Response> response)
 {

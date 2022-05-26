@@ -36,7 +36,6 @@
 
 // MoveIt
 #include <moveit/rdf_loader/rdf_loader.h>
-#include <moveit/profiler/profiler.h>
 
 // ROS 2
 #include <rclcpp/rclcpp.hpp>
@@ -61,19 +60,16 @@ RDFLoader::RDFLoader(const std::shared_ptr<rclcpp::Node>& node, const std::strin
                      bool default_continuous_value, double default_timeout)
   : ros_name_(ros_name)
 {
-  moveit::tools::Profiler::ScopedStart prof_start;
-  moveit::tools::Profiler::ScopedBlock prof_block("RDFLoader(robot_description)");
-
   auto start = node->now();
 
-  urdf_string_ =
-      urdf_ssp_.loadInitialValue(node, ros_name, std::bind(&RDFLoader::urdfUpdateCallback, this, std::placeholders::_1),
-                                 default_continuous_value, default_timeout);
+  urdf_string_ = urdf_ssp_.loadInitialValue(
+      node, ros_name, [this](const std::string& new_urdf_string) { return urdfUpdateCallback(new_urdf_string); },
+      default_continuous_value, default_timeout);
 
   const std::string srdf_name = ros_name + "_semantic";
-  srdf_string_ = srdf_ssp_.loadInitialValue(node, srdf_name,
-                                            std::bind(&RDFLoader::srdfUpdateCallback, this, std::placeholders::_1),
-                                            default_continuous_value, default_timeout);
+  srdf_string_ = srdf_ssp_.loadInitialValue(
+      node, srdf_name, [this](const std::string& new_srdf_string) { return srdfUpdateCallback(new_srdf_string); },
+      default_continuous_value, default_timeout);
 
   if (!loadFromStrings())
   {
@@ -86,9 +82,6 @@ RDFLoader::RDFLoader(const std::shared_ptr<rclcpp::Node>& node, const std::strin
 RDFLoader::RDFLoader(const std::string& urdf_string, const std::string& srdf_string)
   : urdf_string_(urdf_string), srdf_string_(srdf_string)
 {
-  moveit::tools::Profiler::ScopedStart prof_start;
-  moveit::tools::Profiler::ScopedBlock prof_block("RDFLoader(string)");
-
   if (!loadFromStrings())
   {
     return;
@@ -158,6 +151,7 @@ bool RDFLoader::loadFileToString(std::string& buffer, const std::string& path)
 bool RDFLoader::loadXacroFileToString(std::string& buffer, const std::string& path,
                                       const std::vector<std::string>& xacro_args)
 {
+  buffer.clear();
   if (path.empty())
   {
     RCLCPP_ERROR(LOGGER, "Path is empty");
@@ -170,7 +164,7 @@ bool RDFLoader::loadXacroFileToString(std::string& buffer, const std::string& pa
     return false;
   }
 
-  std::string cmd = "ros2 run xacro xacro";
+  std::string cmd = "ros2 run xacro xacro ";
   for (const std::string& xacro_arg : xacro_args)
     cmd += xacro_arg + " ";
   cmd += path;
