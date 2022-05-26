@@ -85,8 +85,12 @@ bool pilz_industrial_motion_planner::computePoseIK(const planning_scene::Plannin
   rstate.setVariablePositions(seed);
 
   moveit::core::GroupStateValidityCallbackFn ik_constraint_function;
-  ik_constraint_function = std::bind(&pilz_industrial_motion_planner::isStateColliding, check_self_collision, scene,
-                                     std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+  ik_constraint_function = [check_self_collision, scene](moveit::core::RobotState* robot_state,
+                                                         const moveit::core::JointModelGroup* joint_group,
+                                                         const double* joint_group_variable_values) {
+    return pilz_industrial_motion_planner::isStateColliding(check_self_collision, scene, robot_state, joint_group,
+                                                            joint_group_variable_values);
+  };
 
   // call ik
   if (rstate.setFromIK(robot_model->getJointModelGroup(group_name), pose, link_name, timeout, ik_constraint_function))
@@ -604,4 +608,28 @@ void normalizeQuaternion(geometry_msgs::msg::Quaternion& quat)
   tf2::Quaternion q;
   tf2::convert<geometry_msgs::msg::Quaternion, tf2::Quaternion>(quat, q);
   quat = tf2::toMsg(q.normalized());
+}
+
+Eigen::Isometry3d getConstraintPose(const geometry_msgs::msg::Point& position,
+                                    const geometry_msgs::msg::Quaternion& orientation,
+                                    const geometry_msgs::msg::Vector3& offset)
+{
+  Eigen::Quaterniond quat;
+  tf2::fromMsg(orientation, quat);
+  quat.normalize();
+  Eigen::Vector3d v;
+  tf2::fromMsg(position, v);
+
+  Eigen::Isometry3d pose = Eigen::Translation3d(v) * quat;
+
+  tf2::fromMsg(offset, v);
+  pose.translation() -= quat * v;
+  return pose;
+}
+
+Eigen::Isometry3d getConstraintPose(const moveit_msgs::msg::Constraints& goal)
+{
+  return getConstraintPose(goal.position_constraints.front().constraint_region.primitive_poses.front().position,
+                           goal.orientation_constraints.front().orientation,
+                           goal.position_constraints.front().target_point_offset);
 }
