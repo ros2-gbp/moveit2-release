@@ -87,11 +87,12 @@ public:
 
   ~TrajectoryVisualization() override;
 
-  virtual void update(float wall_dt, float ros_dt);
+  virtual void update(float wall_dt, float sim_dt);
   virtual void reset();
 
   void onInitialize(const rclcpp::Node::SharedPtr& node, Ogre::SceneNode* scene_node,
                     rviz_common::DisplayContext* context);
+  void clearRobotModel();
   void onRobotModelLoaded(const moveit::core::RobotModelConstPtr& robot_model);
   void onEnable();
   void onDisable();
@@ -171,6 +172,7 @@ protected:
   rviz_common::properties::RosTopicProperty* trajectory_topic_property_;
   rviz_common::properties::FloatProperty* robot_path_alpha_property_;
   rviz_common::properties::BoolProperty* loop_display_property_;
+  rviz_common::properties::BoolProperty* use_sim_time_property_;
   rviz_common::properties::BoolProperty* trail_display_property_;
   rviz_common::properties::BoolProperty* interrupt_display_property_;
   rviz_common::properties::ColorProperty* robot_color_property_;
