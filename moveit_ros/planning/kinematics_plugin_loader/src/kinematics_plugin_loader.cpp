@@ -43,7 +43,6 @@
 #include <map>
 #include <memory>
 #include "rclcpp/rclcpp.hpp"
-#include <moveit/profiler/profiler.h>
 
 namespace kinematics_plugin_loader
 {
@@ -270,11 +269,10 @@ void KinematicsPluginLoader::status() const
 
 moveit::core::SolverAllocatorFn KinematicsPluginLoader::getLoaderFunction()
 {
-  moveit::tools::Profiler::ScopedStart prof_start;
-  moveit::tools::Profiler::ScopedBlock prof_block("KinematicsPluginLoader::getLoaderFunction");
-
   if (loader_)
-    return boost::bind(&KinematicsLoaderImpl::allocKinematicsSolverWithCache, loader_.get(), boost::placeholders::_1);
+    return [&loader = *loader_](const moveit::core::JointModelGroup* jmg) {
+      return loader.allocKinematicsSolverWithCache(jmg);
+    };
 
   rdf_loader::RDFLoader rml(node_, robot_description_);
   robot_description_ = rml.getRobotDescription();
@@ -283,9 +281,6 @@ moveit::core::SolverAllocatorFn KinematicsPluginLoader::getLoaderFunction()
 
 moveit::core::SolverAllocatorFn KinematicsPluginLoader::getLoaderFunction(const srdf::ModelSharedPtr& srdf_model)
 {
-  moveit::tools::Profiler::ScopedStart prof_start;
-  moveit::tools::Profiler::ScopedBlock prof_block("KinematicsPluginLoader::getLoaderFunction(SRDF)");
-
   if (!loader_)
   {
     RCLCPP_DEBUG(LOGGER, "Configuring kinematics solvers");
@@ -428,7 +423,8 @@ moveit::core::SolverAllocatorFn KinematicsPluginLoader::getLoaderFunction(const 
                                                      iksolver_to_tip_links);
   }
 
-  return boost::bind(&KinematicsPluginLoader::KinematicsLoaderImpl::allocKinematicsSolverWithCache, loader_.get(),
-                     boost::placeholders::_1);
+  return [&loader = *loader_](const moveit::core::JointModelGroup* jmg) {
+    return loader.allocKinematicsSolverWithCache(jmg);
+  };
 }
 }  // namespace kinematics_plugin_loader
