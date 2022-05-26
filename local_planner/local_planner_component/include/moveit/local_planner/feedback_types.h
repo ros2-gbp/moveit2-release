@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2020, PickNik Inc.
+ *  Copyright (c) 2022, PickNik Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,42 +32,38 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Sebastian Jahr
-   Description: Simple local solver plugin that forwards the next waypoint of the sampled local trajectory.
-   The local solver stops for two conditions: invalid waypoint (likely due to collision) or if it has been stuck for
-   several iterations.
+/* Author: Andy Zelenak
+   Description: Define the expected local planner feedback types (usually equivalent to failure
+   modes).
  */
 
 #pragma once
 
-#include <rclcpp/rclcpp.hpp>
-#include <moveit/local_planner/local_constraint_solver_interface.h>
+#include <string>
+#include <string_view>
+#include <unordered_map>
 
 namespace moveit::hybrid_planning
 {
-class ForwardTrajectory : public LocalConstraintSolverInterface
+/**
+ * \brief Expected feedback types
+ */
+enum LocalFeedbackEnum
 {
-public:
-  ForwardTrajectory() = default;
-  ~ForwardTrajectory() = default;
-  bool initialize(const rclcpp::Node::SharedPtr& node,
-                  const planning_scene_monitor::PlanningSceneMonitorPtr& planning_scene_monitor,
-                  const std::string& /* unused */) override;
-  bool reset() override;
-
-  moveit_msgs::action::LocalPlanner::Feedback
-  solve(const robot_trajectory::RobotTrajectory& local_trajectory,
-        const std::shared_ptr<const moveit_msgs::action::LocalPlanner::Goal> /* unused */,
-        trajectory_msgs::msg::JointTrajectory& local_solution) override;
-
-private:
-  rclcpp::Node::SharedPtr node_;
-  planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
-  bool path_invalidation_event_send_;  // Send path invalidation event only once
-  bool stop_before_collision_;
-
-  // Detect when the local planner gets stuck
-  size_t num_iterations_stuck_;
-  moveit::core::RobotStatePtr prev_waypoint_target_;
+  COLLISION_AHEAD = 1,
+  LOCAL_PLANNER_STUCK = 2
 };
+
+[[nodiscard]] constexpr std::string_view toString(const LocalFeedbackEnum& code)
+{
+  switch (code)
+  {
+    case COLLISION_AHEAD:
+      return "Collision ahead";
+    case LOCAL_PLANNER_STUCK:
+      return "Local planner is stuck";
+    default:
+      __builtin_unreachable();
+  }
+}
 }  // namespace moveit::hybrid_planning
