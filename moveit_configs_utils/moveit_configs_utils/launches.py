@@ -50,7 +50,7 @@ def generate_moveit_rviz_launch(moveit_config):
     ld.add_action(
         DeclareLaunchArgument(
             "rviz_config",
-            default_value=str(moveit_config.package_path / "launch/moveit.rviz"),
+            default_value=str(moveit_config.package_path / "config/moveit.rviz"),
         )
     )
 
@@ -199,6 +199,10 @@ def generate_move_group_launch(moveit_config):
     # inhibit these default MoveGroup capabilities (space separated)
     ld.add_action(DeclareLaunchArgument("disable_capabilities", default_value=""))
 
+    # do not copy dynamics information from /joint_states to internal robot monitoring
+    # default to false, because almost nothing in move_group relies on this information
+    ld.add_action(DeclareBooleanLaunchArg("monitor_dynamics", default_value=False))
+
     should_publish = LaunchConfiguration("publish_monitored_planning_scene")
 
     move_group_configuration = {
@@ -216,11 +220,12 @@ def generate_move_group_launch(moveit_config):
         "publish_geometry_updates": should_publish,
         "publish_state_updates": should_publish,
         "publish_transforms_updates": should_publish,
+        "monitor_dynamics": False,
     }
 
     move_group_params = [
-        move_group_configuration,
         moveit_config.to_dict(),
+        move_group_configuration,
     ]
 
     add_debuggable_node(
