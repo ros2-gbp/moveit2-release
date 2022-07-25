@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2022, Bielefeld University, Inc.
+ *  Copyright (c) 2012, Willow Garage, Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of Bielefeld University nor the names of its
+ *   * Neither the name of Willow Garage nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,28 +32,56 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Robert Haschke */
+/* Author: Dave Coleman */
 
 #pragma once
-#include <tinyxml.h>
-#include <vector>
 
-namespace moveit_setup_assistant
+#include <QListView>
+#include <QStyledItemDelegate>
+class QStandardItemModel;
+
+namespace moveit_setup
 {
-struct Attribute
+namespace assistant
 {
-  const char* name;
-  const char* value;
-  bool required = false;
+/**
+ * Widget for showing a left hand side list of navigation items
+ *
+ * @param parent
+ *
+ * @return
+ */
+class NavigationWidget : public QListView
+{
+  Q_OBJECT
+public:
+  explicit NavigationWidget(QWidget* parent = nullptr);
+
+  void setNavs(const QList<QString>& navs);
+  void setEnabled(const int& index, bool enabled);
+  void setSelected(const int& index);
+
+  bool isEnabled(const int& index) const;
+
+private:
+  QStandardItemModel* model_;
 };
 
-/** Insert a new XML element with given tag, attributes and text value
+/**
+ * Class for drawing the style of the navigation box
  *
- *  If a corresponding element already exists (and has required attribute values), it is just reused.
- *  All attributes are created or overwritten with given values.
- *  A text value is created or overwritten with given value (if not NULL).
- *  The element is returned */
-TiXmlElement* uniqueInsert(TiXmlElement& element, const char* tag, const std::vector<Attribute>& attributes = {},
-                           const char* text = nullptr);
+ * @param parent
+ *
+ * @return
+ */
+class NavDelegate : public QStyledItemDelegate
+{
+  Q_OBJECT
+public:
+  explicit NavDelegate(QObject* parent = nullptr);
 
-}  // namespace moveit_setup_assistant
+  QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+  void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+};
+}  // namespace assistant
+}  // namespace moveit_setup
