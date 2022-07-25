@@ -34,14 +34,16 @@
 
 /* Author: Dave Coleman */
 
-#include "navigation_widget.h"
+#include "moveit_setup_assistant/navigation_widget.hpp"
 #include <QApplication>
 #include <QPainter>
 #include <QScrollBar>
 #include <QStandardItemModel>
 #include <iostream>
 
-namespace moveit_setup_assistant
+namespace moveit_setup
+{
+namespace assistant
 {
 // ******************************************************************************************
 // CLASS
@@ -111,6 +113,11 @@ void NavigationWidget::setSelected(const int& index)
   selectionModel()->select(selection, QItemSelectionModel::Select);
 }
 
+bool NavigationWidget::isEnabled(const int& index) const
+{
+  return model_->item(index)->flags() > Qt::NoItemFlags;
+}
+
 // ******************************************************************************************
 // CLASS
 // ******************************************************************************************
@@ -174,4 +181,5 @@ void NavDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, c
 
   painter->restore();
 }
-}  // namespace moveit_setup_assistant
+}  // namespace assistant
+}  // namespace moveit_setup
