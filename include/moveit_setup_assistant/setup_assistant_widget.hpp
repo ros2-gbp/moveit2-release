@@ -36,102 +36,138 @@
 
 #pragma once
 
+// ROS
+#include <pluginlib/class_loader.hpp>
+#include <rviz_common/ros_integration/ros_client_abstraction.hpp>
+
+// Qt
 #include <QWidget>
-class QLabel;
-class QLineEdit;
-class QTreeWidget;
-class QTreeWidgetItem;
+#include <QStackedWidget>
+#include <QAbstractTableModel>
+class QSplitter;
+
+// Setup Assistant
+#include "moveit_setup_framework/qt/setup_step_widget.hpp"
+#include "moveit_setup_framework/qt/rviz_panel.hpp"
+#include "moveit_setup_framework/data_warehouse.hpp"
+#include "moveit_setup_assistant/navigation_widget.hpp"
 
 #ifndef Q_MOC_RUN
-#include <moveit/setup_assistant/tools/moveit_config_data.h>
+// Other
+#include <boost/program_options/variables_map.hpp>  // for parsing input arguments
 #endif
 
-namespace moveit_setup_assistant
+namespace moveit_setup
 {
-class KinematicChainWidget : public QWidget
+namespace assistant
+{
+class SetupAssistantWidget : public QWidget
 {
   Q_OBJECT
 
-  // ******************************************************************************************
-  // Reusable double list widget for selecting and deselecting a subset from a set
-  // ******************************************************************************************
 public:
   // ******************************************************************************************
   // Public Functions
   // ******************************************************************************************
 
-  /// Constructor
-  KinematicChainWidget(QWidget* parent, const MoveItConfigDataPtr& config_data);
+  /**
+   * Construct the setup assistant widget, the primary window for this application
+   * @param parent - used by Qt for destructing all elements
+   * @return
+   */
+  SetupAssistantWidget(rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr node, QWidget* parent,
+                       const boost::program_options::variables_map& args);
 
-  /// Loads the available data list
-  void setAvailable();
+  /**
+   * Changes viewable screen
+   * @param index screen index to switch to
+   */
 
-  /// Set the link field with previous value
-  void setSelected(const std::string& base_link, const std::string& tip_link);
+  void moveToScreen(const int index);
 
-  void addLinktoTreeRecursive(const moveit::core::LinkModel* link, const moveit::core::LinkModel* parent);
+  /**
+   * Qt close event function for reminding user to save
+   * @param event A Qt paramenter
+   */
+  void closeEvent(QCloseEvent* event) override;
 
-  bool addLinkChildRecursive(QTreeWidgetItem* parent, const moveit::core::LinkModel* link,
-                             const std::string& parent_name);
+  /**
+   * Qt error handling function
+   *
+   * @param rec
+   * @param ev
+   * @return bool
+   */
+  virtual bool notify(QObject* rec, QEvent* ev);
+
+  /**
+   * Show/hide the Rviz right panel
+   * @param show bool - whether to show
+   */
+  // void showRviz( bool show );
 
   // ******************************************************************************************
   // Qt Components
   // ******************************************************************************************
 
-  QLabel* title_;  // specify the title from the parent widget
-  QTreeWidget* link_tree_;
-  QLineEdit* base_link_field_;
-  QLineEdit* tip_link_field_;
-
 private Q_SLOTS:
-
   // ******************************************************************************************
   // Slot Event Functions
   // ******************************************************************************************
 
-  /// Choose the base link
-  void baseLinkTreeClick();
+  /**
+   * Event for changing screens by user clicking
+   * @param index screen id
+   */
+  void navigationClicked(const QModelIndex& index);
 
-  /// Choose the tip link
-  void tipLinkTreeClick();
+  /**
+   * Event for spinning the ros node
+   */
+  void updateTimer();
 
-  /// Expand/Collapse Tree
-  void alterTree(const QString& link);
+  /**
+   * Function for handling the dataUpdated event
+   */
+  void onDataUpdate();
 
-  /// Highlight the selected link in the kinematic chain
-  void itemSelected();
+  /**
+   * Advance to the next step
+   */
+  void onAdvanceRequest();
 
-Q_SIGNALS:
-
-  // ******************************************************************************************
-  // Emitted Signals
-  // ******************************************************************************************
-
-  /// Event sent when this widget is done making data changes and parent widget can save
-  void doneEditing();
-
-  /// Event sent when user presses cancel button
-  void cancelEditing();
-
-  /// Event for telling rviz to highlight a link of the robot
-  void highlightLink(const std::string& name, const QColor& /*_t2*/);
-
-  /// Event for telling rviz to unhighlight all links of the robot
-  void unhighlightAll();
+  /**
+   * Change the widget modal state based on subwidgets state
+   *
+   * @param isModal if true disable left navigation
+   */
+  void onModalModeUpdate(bool isModal);
 
 private:
   // ******************************************************************************************
   // Variables
   // ******************************************************************************************
+  rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr node_abstraction_;
+  rclcpp::Node::SharedPtr node_;
+  QList<QString> nav_name_list_;
+  NavigationWidget* navs_view_;
+
+  RVizPanel* rviz_panel_;
+  QSplitter* splitter_;
+  QStackedWidget* main_content_;
+  int current_index_;
+  std::mutex change_screen_lock_;
+
+  // Setup Steps
+  pluginlib::ClassLoader<SetupStepWidget> widget_loader_;
+  std::vector<std::shared_ptr<SetupStepWidget>> steps_;
 
   /// Contains all the configuration data for the setup assistant
-  moveit_setup_assistant::MoveItConfigDataPtr config_data_;
-
-  /// Remember if the chain tree has been loaded
-  bool kinematic_chain_loaded_;
+  DataWarehousePtr config_data_;
 
   // ******************************************************************************************
   // Private Functions
   // ******************************************************************************************
 };
-}  // namespace moveit_setup_assistant
+}  // namespace assistant
+}  // namespace moveit_setup

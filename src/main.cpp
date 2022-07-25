@@ -34,8 +34,8 @@
 
 /* Author: Dave Coleman */
 
-#include "widgets/setup_assistant_widget.h"
-#include <ros/ros.h>
+#include "moveit_setup_assistant/setup_assistant_widget.hpp"
+#include <rviz_common/ros_integration/ros_client_abstraction.hpp>
 #include <QApplication>
 #include <QMessageBox>
 #include <boost/program_options.hpp>
@@ -55,6 +55,14 @@ void usage(boost::program_options::options_description& desc, int exit_code)
 
 int main(int argc, char** argv)
 {
+  std::vector<std::string> remaining_args = rclcpp::remove_ros_arguments(argc, argv);
+  std::vector<char*> clean_argv;
+  clean_argv.reserve(remaining_args.size());
+  for (const std::string& arg : remaining_args)
+  {
+    clean_argv.push_back(const_cast<char*>(arg.c_str()));
+  }
+
   // Parse parameters
   namespace po = boost::program_options;
 
@@ -62,7 +70,7 @@ int main(int argc, char** argv)
   // clang-format off
   po::options_description desc("Allowed options");
   desc.add_options()("help,h", "Show help message")("debug,g", "Run in debug/test mode")(
-      "urdf_path,u", po::value<std::string>(), "Optional, path to URDF file in ROS package")(
+      "urdf_path,u", po::value<std::filesystem::path>(), "Optional, path to URDF file in ROS package")(
       "config_pkg,c", po::value<std::string>(), "Optional, pass in existing config package to load");
   // clang-format on
 
@@ -70,7 +78,7 @@ int main(int argc, char** argv)
   po::variables_map vm;
   try
   {
-    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::store(po::parse_command_line(clean_argv.size(), &clean_argv[0], desc), vm);
     po::notify(vm);
 
     if (vm.count("help"))
@@ -82,13 +90,8 @@ int main(int argc, char** argv)
     usage(desc, 1);
   }
   // Start ROS Node
-  ros::init(argc, argv, "moveit_setup_assistant", ros::init_options::NoSigintHandler);
-
-  // ROS Spin
-  ros::AsyncSpinner spinner(1);
-  spinner.start();
-
-  ros::NodeHandle nh;
+  auto client = std::make_unique<rviz_common::ros_integration::RosClientAbstraction>();
+  auto node = client->init(argc, argv, "moveit_setup_assistant", false);
 
   // Create Qt Application
   QApplication qt_app(argc, argv);
@@ -96,7 +99,7 @@ int main(int argc, char** argv)
   setlocale(LC_NUMERIC, "C");
 
   // Load Qt Widget
-  moveit_setup_assistant::SetupAssistantWidget saw(nullptr, vm);
+  moveit_setup::assistant::SetupAssistantWidget saw(node, nullptr, vm);
   saw.setMinimumWidth(1090);
   saw.setMinimumHeight(600);
   //  saw.setWindowState( Qt::WindowMaximized );
@@ -109,7 +112,7 @@ int main(int argc, char** argv)
   const int result = qt_app.exec();
 
   // Shutdown ROS
-  ros::shutdown();
+  rclcpp::shutdown();
 
   return result;
 }
