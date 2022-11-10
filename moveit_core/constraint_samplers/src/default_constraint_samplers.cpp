@@ -181,11 +181,6 @@ bool JointConstraintSampler::sample(moveit::core::RobotState& state,
   return true;
 }
 
-bool JointConstraintSampler::project(moveit::core::RobotState& state, unsigned int max_attempts)
-{
-  return sample(state, state, max_attempts);
-}
-
 void JointConstraintSampler::clear()
 {
   ConstraintSampler::clear();
@@ -535,7 +530,7 @@ void samplingIkCallbackFnAdapter(moveit::core::RobotState* state, const moveit::
                                  const moveit::core::GroupStateValidityCallbackFn& constraint,
                                  const std::vector<double>& ik_sol, moveit_msgs::msg::MoveItErrorCodes& error_code)
 {
-  const std::vector<unsigned int>& bij = jmg->getKinematicsSolverJointBijection();
+  const std::vector<size_t>& bij = jmg->getKinematicsSolverJointBijection();
   std::vector<double> solution(bij.size());
   for (std::size_t i = 0; i < bij.size(); ++i)
     solution[i] = ik_sol[bij[i]];
@@ -549,11 +544,11 @@ void samplingIkCallbackFnAdapter(moveit::core::RobotState* state, const moveit::
 bool IKConstraintSampler::sample(moveit::core::RobotState& state, const moveit::core::RobotState& reference_state,
                                  unsigned int max_attempts)
 {
-  return sampleHelper(state, reference_state, max_attempts, false);
+  return sampleHelper(state, reference_state, max_attempts);
 }
 
 bool IKConstraintSampler::sampleHelper(moveit::core::RobotState& state, const moveit::core::RobotState& reference_state,
-                                       unsigned int max_attempts, bool project)
+                                       unsigned int max_attempts)
 {
   if (!is_valid_)
   {
@@ -611,15 +606,10 @@ bool IKConstraintSampler::sampleHelper(moveit::core::RobotState& state, const mo
     ik_query.orientation.z = quat.z();
     ik_query.orientation.w = quat.w();
 
-    if (callIK(ik_query, adapted_ik_validity_callback, ik_timeout_, state, project && a == 0))
+    if (callIK(ik_query, adapted_ik_validity_callback, ik_timeout_, state, a == 0))
       return true;
   }
   return false;
-}
-
-bool IKConstraintSampler::project(moveit::core::RobotState& state, unsigned int max_attempts)
-{
-  return sampleHelper(state, state, max_attempts, true);
 }
 
 bool IKConstraintSampler::validate(moveit::core::RobotState& state) const
@@ -635,7 +625,7 @@ bool IKConstraintSampler::callIK(const geometry_msgs::msg::Pose& ik_query,
                                  const kinematics::KinematicsBase::IKCallbackFn& adapted_ik_validity_callback,
                                  double timeout, moveit::core::RobotState& state, bool use_as_seed)
 {
-  const std::vector<unsigned int>& ik_joint_bijection = jmg_->getKinematicsSolverJointBijection();
+  const std::vector<size_t>& ik_joint_bijection = jmg_->getKinematicsSolverJointBijection();
   std::vector<double> seed(ik_joint_bijection.size(), 0.0);
   std::vector<double> vals;
 
