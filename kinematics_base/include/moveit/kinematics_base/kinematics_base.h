@@ -156,7 +156,7 @@ public:
 
   /** @brief Signature for a cost function used to evaluate IK solutions. */
   using IKCostFn = std::function<double(const geometry_msgs::msg::Pose&, const moveit::core::RobotState&,
-                                        moveit::core::JointModelGroup*, const std::vector<double>&)>;
+                                        moveit::core::JointModelGroup const*, const std::vector<double>&)>;
 
   /**
    * @brief Given a desired pose of the end-effector, compute the joint angles to reach it
@@ -604,8 +604,8 @@ protected:
    * as the predominant configuration but also allows groupwise specifications.
    */
   template <typename T>
-  inline bool lookupParam(const rclcpp::Node::SharedPtr& node, const std::string& param, T& val,
-                          const T& default_val) const
+  [[deprecated("Use generate_parameter_library instead")]] inline bool
+  lookupParam(const rclcpp::Node::SharedPtr& node, const std::string& param, T& val, const T& default_val) const
   {
     if (node->has_parameter({ group_name_ + "." + param }))
     {
