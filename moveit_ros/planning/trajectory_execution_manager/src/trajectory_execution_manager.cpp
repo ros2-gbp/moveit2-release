@@ -37,11 +37,7 @@
 #include <moveit/trajectory_execution_manager/trajectory_execution_manager.h>
 #include <moveit/robot_state/robot_state.h>
 #include <geometric_shapes/check_isometry.h>
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
 #include <tf2_eigen/tf2_eigen.hpp>
-#else
-#include <tf2_eigen/tf2_eigen.h>
-#endif
 
 namespace trajectory_execution_manager
 {
@@ -138,6 +134,18 @@ void TrajectoryExecutionManager::initialize()
                              "identify the plugin to use for interacting with controllers. No paths can "
                              "be executed.");
       }
+    }
+
+    // Deprecation warnings, October 2022
+    if (controller == "moveit_ros_control_interface/MoveItControllerManager")
+    {
+      RCLCPP_WARN(LOGGER, "moveit_ros_control_interface/MoveItControllerManager is deprecated. Replace with "
+                          "`moveit_ros_control_interface/MoveItControllerManager.`");
+    }
+    if (controller == "moveit_ros_control_interface/MoveItMultiControllerManager")
+    {
+      RCLCPP_WARN(LOGGER, "moveit_ros_control_interface/MoveItMultiControllerManager is deprecated. Replace with "
+                          "`moveit_ros_control_interface/Ros2ControlMultiManager.`");
     }
 
     if (!controller.empty())

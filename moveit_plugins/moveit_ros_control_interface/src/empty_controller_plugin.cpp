@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2011, Willow Garage, Inc.
+ *  Copyright (c) 2022, PickNik Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the copyright holder nor the names of its
+ *   * Neither the name of Fraunhofer IPA nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,34 +32,33 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <moveit/collision_detection/collision_common.h>
-#include <rclcpp/clock.hpp>
-#include <rclcpp/logger.hpp>
-#include <rclcpp/logging.hpp>
+/* Author: Paul Gesel */
 
-static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_collision_detection.collision_common");
-constexpr size_t LOG_THROTTLE_PERIOD{ 5 };
+#include <pluginlib/class_list_macros.hpp>
+#include <moveit_simple_controller_manager/empty_controller_handle.h>
+#include <rclcpp/node.hpp>
 
-namespace collision_detection
+namespace moveit_ros_control_interface
 {
-void CollisionResult::print() const
+/**
+ * \brief This class allows MoveIt's controller manager to start and stop a controller that does not have a
+ * corresponding controller handle implementation without actually executing MoveIt trajectories through the controller
+ * handle.
+ */
+/**
+ * @brief Allocator plugin for the EmptyControllerAllocator.
+ */
+class EmptyControllerAllocator : public ControllerHandleAllocator
 {
-  rclcpp::Clock clock;
-  if (!contacts.empty())
+public:
+  moveit_controller_manager::MoveItControllerHandlePtr alloc(const rclcpp::Node::SharedPtr& /* node */,
+                                                             const std::string& name,
+                                                             const std::vector<std::string>& /* resources */) override
   {
-    RCLCPP_WARN_STREAM_THROTTLE(LOGGER, clock, LOG_THROTTLE_PERIOD,
-                                "Objects in collision (printing 1st of "
-                                    << contacts.size() << " pairs): " << contacts.begin()->first.first << ", "
-                                    << contacts.begin()->first.second);
-
-    // Log all collisions at the debug level
-    RCLCPP_DEBUG_STREAM_THROTTLE(LOGGER, clock, LOG_THROTTLE_PERIOD, "Objects in collision:");
-    for (const auto& contact : contacts)
-    {
-      RCLCPP_DEBUG_STREAM_THROTTLE(LOGGER, clock, LOG_THROTTLE_PERIOD,
-                                   "\t" << contact.first.first << ", " << contact.first.second);
-    }
+    return std::make_shared<moveit_simple_controller_manager::EmptyControllerHandle>(name, "empty_controller_handle");
   }
-}
+};
+}  // namespace moveit_ros_control_interface
 
-}  // namespace collision_detection
+PLUGINLIB_EXPORT_CLASS(moveit_ros_control_interface::EmptyControllerAllocator,
+                       moveit_ros_control_interface::ControllerHandleAllocator);
