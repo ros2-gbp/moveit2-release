@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2012, Willow Garage, Inc.
+ *  Copyright (c) 2022, PickNik Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of Willow Garage nor the names of its
+ *   * Neither the name of Fraunhofer IPA nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,13 +32,58 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Ioan Sucan */
+/* Author: Paul Gesel */
 
 #pragma once
 
-#include <string>
+#include <moveit_ros_control_interface/ControllerHandle.h>
+#include <rclcpp/rclcpp.hpp>
 
-namespace move_group
+namespace moveit_simple_controller_manager
 {
-static const std::string NODE_NAME = "move_group";  // name of node
-}
+/*
+ * An interface for controllers that have no handle, e.g. chained controllers like an Admittance controller
+ */
+class EmptyControllerHandle : public moveit_controller_manager::MoveItControllerHandle
+{
+public:
+  /* Topics will map to name/ns/goal, name/ns/result, etc */
+  EmptyControllerHandle(const std::string& name, const std::string& logger_name)
+    : moveit_controller_manager::MoveItControllerHandle(name), LOGGER(rclcpp::get_logger(logger_name))
+  {
+  }
+
+  bool sendTrajectory(const moveit_msgs::msg::RobotTrajectory& trajectory) override
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, "This controller handle does not support trajectory execution.");
+    return false;
+  }
+
+  bool cancelExecution() override
+  {
+    return true;
+  }
+
+  /**
+   * @brief Function called when the TrajectoryExecutionManager waits for a trajectory to finish.
+   * @return Always returns true because a trajectory is never in progress.
+   */
+  bool waitForExecution(const rclcpp::Duration& /* timeout */) override
+  {
+    return true;
+  }
+
+  /**
+   * @brief Gets the last trajectory execution status.
+   * @return Always returns ExecutionStatus::FAILED.
+   */
+  moveit_controller_manager::ExecutionStatus getLastExecutionStatus() override
+  {
+    return moveit_controller_manager::ExecutionStatus::FAILED;
+  }
+
+private:
+  const rclcpp::Logger LOGGER;
+};
+
+}  // end namespace moveit_simple_controller_manager
