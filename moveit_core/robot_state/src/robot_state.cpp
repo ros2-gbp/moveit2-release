@@ -44,11 +44,7 @@
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
 #include <rclcpp/time.hpp>
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
 #include <tf2_eigen/tf2_eigen.hpp>
-#else
-#include <tf2_eigen/tf2_eigen.h>
-#endif
 #include <cassert>
 #include <functional>
 #include <moveit/macros/console_colors.h>
@@ -1313,25 +1309,22 @@ bool RobotState::getJacobian(const JointModelGroup* group, const LinkModel* link
   Eigen::Isometry3d link_transform = reference_transform * getGlobalLinkTransform(link);  // valid isometry
   Eigen::Vector3d point_transform = link_transform * reference_point_position;
 
-  /*
-  RCLCPP_DEBUG(LOGGER, "Point from reference origin expressed in world coordinates: %f %f %f",
-           point_transform.x(),
-           point_transform.y(),
-           point_transform.z());
-  */
+  // RCLCPP_DEBUG(LOGGER, "Point from reference origin expressed in world coordinates: %f %f %f",
+  //         point_transform.x(),
+  //         point_transform.y(),
+  //         point_transform.z());
 
   Eigen::Vector3d joint_axis;
   Eigen::Isometry3d joint_transform;
 
   while (link)
   {
-    /*
-    RCLCPP_DEBUG(LOGGER, "Link: %s, %f %f %f",link_state->getName().c_str(),
-             link_state->getGlobalLinkTransform().translation().x(),
-             link_state->getGlobalLinkTransform().translation().y(),
-             link_state->getGlobalLinkTransform().translation().z());
-    RCLCPP_DEBUG(LOGGER, "Joint: %s",link_state->getParentJointState()->getName().c_str());
-    */
+    // RCLCPP_DEBUG(LOGGER, "Link: %s, %f %f %f",link_state->getName().c_str(),
+    //         link_state->getGlobalLinkTransform().translation().x(),
+    //         link_state->getGlobalLinkTransform().translation().y(),
+    //         link_state->getGlobalLinkTransform().translation().z());
+    // RCLCPP_DEBUG(LOGGER, "Joint: %s",link_state->getParentJointState()->getName().c_str());
+
     const JointModel* pjm = link->getParentJointModel();
     if (pjm->getVariableCount() > 0)
     {
@@ -1520,7 +1513,7 @@ bool ikCallbackFnAdapter(RobotState* state, const JointModelGroup* group,
                          const GroupStateValidityCallbackFn& constraint, const geometry_msgs::msg::Pose& /*unused*/,
                          const std::vector<double>& ik_sol, moveit_msgs::msg::MoveItErrorCodes& error_code)
 {
-  const std::vector<unsigned int>& bij = group->getKinematicsSolverJointBijection();
+  const std::vector<size_t>& bij = group->getKinematicsSolverJointBijection();
   std::vector<double> solution(bij.size());
   for (std::size_t i = 0; i < bij.size(); ++i)
     solution[bij[i]] = ik_sol[i];
@@ -1794,7 +1787,7 @@ bool RobotState::setFromIK(const JointModelGroup* jmg, const EigenSTL::vector_Is
     };
 
   // Bijection
-  const std::vector<unsigned int>& bij = jmg->getKinematicsSolverJointBijection();
+  const std::vector<size_t>& bij = jmg->getKinematicsSolverJointBijection();
 
   std::vector<double> initial_values;
   copyJointGroupPositions(jmg, initial_values);
@@ -1968,7 +1961,7 @@ bool RobotState::setFromIKSubgroups(const JointModelGroup* jmg, const EigenSTL::
     bool found_solution = true;
     for (std::size_t sg = 0; sg < sub_groups.size(); ++sg)
     {
-      const std::vector<unsigned int>& bij = sub_groups[sg]->getKinematicsSolverJointBijection();
+      const std::vector<size_t>& bij = sub_groups[sg]->getKinematicsSolverJointBijection();
       std::vector<double> seed(bij.size());
       // the first seed is the initial state
       if (first_seed)
