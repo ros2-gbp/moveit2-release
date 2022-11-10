@@ -124,7 +124,10 @@ class MoveItConfigs:
         parameters.update(self.sensors_3d)
         parameters.update(self.joint_limits)
         parameters.update(self.moveit_cpp)
-        parameters.update(self.pilz_cartesian_limits)
+        # Update robot_description_planning with pilz cartesian limits
+        parameters["robot_description_planning"].update(
+            self.pilz_cartesian_limits["robot_description_planning"]
+        )
         return parameters
 
 
@@ -349,7 +352,7 @@ class MoveItConfigsBuilder(ParameterBuilder):
         return self
 
     def sensors_3d(self, file_path: Optional[str] = None):
-        """Load sensors_3d paramerss.
+        """Load sensors_3d parameters.
 
         :param file_path: Absolute or relative path to the sensors_3d yaml file (w.r.t. robot_name_moveit_config).
         :return: Instance of MoveItConfigsBuilder with robot_description_planning loaded.
@@ -431,7 +434,7 @@ class MoveItConfigsBuilder(ParameterBuilder):
         :return: Instance of MoveItConfigsBuilder with pilz_cartesian_limits loaded.
         """
         deprecated_path = self._package_path / (
-            file_path or self.__config_dir_path / "cartesian_limits.yaml"
+            self.__config_dir_path / "cartesian_limits.yaml"
         )
         if deprecated_path.exists():
             logging.warning(
@@ -471,8 +474,9 @@ class MoveItConfigsBuilder(ParameterBuilder):
         # TODO(JafarAbdi): We should have a default moveit_cpp.yaml as port of a moveit config package
         # if not self.__moveit_configs.moveit_cpp:
         #     self.moveit_cpp()
-        if not self.__moveit_configs.pilz_cartesian_limits:
-            self.pilz_cartesian_limits()
+        if "pilz_industrial_motion_planner" in self.__moveit_configs.planning_pipelines:
+            if not self.__moveit_configs.pilz_cartesian_limits:
+                self.pilz_cartesian_limits()
         return self.__moveit_configs
 
     def to_dict(self, include_moveit_configs: bool = True):
