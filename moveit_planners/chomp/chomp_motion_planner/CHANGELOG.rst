@@ -2,19 +2,14 @@
 Changelog for package chomp_motion_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.5.4 (2022-11-04)
+2.6.0 (2022-11-10)
 ------------------
-* updated comment formatting for correct doxygen generation (`#1582 <https://github.com/ros-planning/moveit2/issues/1582>`_) (`#1664 <https://github.com/ros-planning/moveit2/issues/1664>`_)
-  (cherry picked from commit 71e6d903927116a59b9a142ef7b501f4f6cd1022)
-  Co-authored-by: Michael Wrock <michael.wrock@picknik.ai>
-* Replace C array with std::array in std::vector template argument (backport `#1612 <https://github.com/ros-planning/moveit2/issues/1612>`_) (`#1621 <https://github.com/ros-planning/moveit2/issues/1621>`_)
+* Replace C array with std::array in std::vector template argument to improve compatibility with clang compiler and libc++ (`#1612 <https://github.com/ros-planning/moveit2/issues/1612>`_)
   Co-authored-by: Tyler Weaver <tyler@picknik.ai>
-  (cherry picked from commit a8326ace6bb3e7d17191769533b85ec994a1bdd7)
-  Co-authored-by: light-tech <lightech@outlook.com>
-* Improve CMake usage (`#1550 <https://github.com/ros-planning/moveit2/issues/1550>`_) (`#1555 <https://github.com/ros-planning/moveit2/issues/1555>`_)
-  Co-authored-by: Sebastian Jahr <sebastian.jahr@picknik.ai>
-* Remove __has_include statements (`#1481 <https://github.com/ros-planning/moveit2/issues/1481>`_) (`#1483 <https://github.com/ros-planning/moveit2/issues/1483>`_)
-* Contributors: mergify[bot]
+* updated comment formatting for correct doxygen generation (`#1582 <https://github.com/ros-planning/moveit2/issues/1582>`_)
+* Improve CMake usage (`#1550 <https://github.com/ros-planning/moveit2/issues/1550>`_)
+* Remove __has_include statements (`#1481 <https://github.com/ros-planning/moveit2/issues/1481>`_)
+* Contributors: Michael Wrock, Sebastian Jahr, Vatan Aksoy Tezer, light-tech
 
 2.5.3 (2022-07-28)
 ------------------

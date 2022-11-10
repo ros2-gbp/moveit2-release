@@ -2,28 +2,34 @@
 Changelog for package moveit_planners_ompl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.5.4 (2022-11-04)
+2.6.0 (2022-11-10)
 ------------------
-* simplify_solution per planning context (`#1437 <https://github.com/ros-planning/moveit2/issues/1437>`_) (`#1646 <https://github.com/ros-planning/moveit2/issues/1646>`_)
-  (cherry picked from commit 048062cc8749a1e1e224ff99a3bfa12e8c3ae3ba)
-  Co-authored-by: Antoine Duplex <106062275+AntoineDevop@users.noreply.github.com>
-* Convert OMPL status to MoveItErrorCode in the OMPL interface (`#1606 <https://github.com/ros-planning/moveit2/issues/1606>`_) (`#1668 <https://github.com/ros-planning/moveit2/issues/1668>`_)
-  (cherry picked from commit baba9b041225ed5518d5235996afb9aa3c5a61f8)
-  Co-authored-by: AndyZe <zelenak@picknik.ai>
-* size_t bijection index type (`#1544 <https://github.com/ros-planning/moveit2/issues/1544>`_) (`#1659 <https://github.com/ros-planning/moveit2/issues/1659>`_)
-  (cherry picked from commit af7bd63a084d62de0821bb0e451008f2b1b11954)
-* Fix logic with enforcing constrained planning state space in OMPL (backport `#1589 <https://github.com/ros-planning/moveit2/issues/1589>`_) (`#1641 <https://github.com/ros-planning/moveit2/issues/1641>`_)
-  (cherry picked from commit 67e08b7999e252971907dab5cf17b789d1336863)
-  Co-authored-by: Stephanie Eng <stephanie-eng@users.noreply.github.com>
-* Improve CMake usage (`#1550 <https://github.com/ros-planning/moveit2/issues/1550>`_) (`#1555 <https://github.com/ros-planning/moveit2/issues/1555>`_)
-  Co-authored-by: Sebastian Jahr <sebastian.jahr@picknik.ai>
-* Fixes for using generate_state_database (backport `#1412 <https://github.com/ros-planning/moveit2/issues/1412>`_) (`#1493 <https://github.com/ros-planning/moveit2/issues/1493>`_)
+* Fix logic with enforcing constrained planning state space in OMPL (`#1589 <https://github.com/ros-planning/moveit2/issues/1589>`_)
+* Convert OMPL status to MoveItErrorCode in the OMPL interface (`#1606 <https://github.com/ros-planning/moveit2/issues/1606>`_)
+* Factor of 2 in OMPL orientation constraints, to match kinematic_constraints (`#1592 <https://github.com/ros-planning/moveit2/issues/1592>`_)
+* Merge PR `#1553 <https://github.com/ros-planning/moveit2/issues/1553>`_: Improve cmake files
+* Use standard exported targets: export\_${PROJECT_NAME} -> ${PROJECT_NAME}Targets
+* Improve CMake usage (`#1550 <https://github.com/ros-planning/moveit2/issues/1550>`_)
+* size_t bijection index type (`#1544 <https://github.com/ros-planning/moveit2/issues/1544>`_)
+* Fixes for using generate_state_database (`#1412 <https://github.com/ros-planning/moveit2/issues/1412>`_)
+* simplify_solution per planning context (`#1437 <https://github.com/ros-planning/moveit2/issues/1437>`_)
+  * Allowing to dynamically change the parameter simplify_solutions
+  * Delete this configuration because it overrides the configuration loaded
+  The parameters simplify_solutions is passed to the context trough the configuration of each planner but this function overrides it and seems to be contradictory to rest of the implementation. simplify_solutions shouldn't be considered as the rest of the other parameters, like interpolate or hybridize ?
+  * Remove simplify_solutions\_ from OMPL interface and all its setter/getter
+  * Clean-up code without ConfigureContext and unneeded code related to simplify_solution
 * correctly initialize rmw_serialized_message_t
-  (cherry picked from commit cf714d5407d5100e4587e9ead740c665e5a70507)
 * automatically declare parameters from overrides
-  (cherry picked from commit b961e9c14d66a6a7abd91490a76ee2bef0fe08dc)
-* Remove __has_include statements (`#1481 <https://github.com/ros-planning/moveit2/issues/1481>`_) (`#1483 <https://github.com/ros-planning/moveit2/issues/1483>`_)
-* Contributors: Alaa, Henning Kayser, mergify[bot]
+* Remove __has_include statements (`#1481 <https://github.com/ros-planning/moveit2/issues/1481>`_)
+* Merge https://github.com/ros-planning/moveit/commit/a63580edd05b01d9480c333645036e5b2b222da9
+* Remove ConstraintSampler::project() (`#3170 <https://github.com/ros-planning/moveit2/issues/3170>`_)
+  * Remove unused ompl_interface::ValidConstrainedSampler
+  Last usage was removed in f2f6097ab7e272568d6ab258a53be3c7ca67cf3b.
+  * Remove ConstraintSampler::project()
+  sample() and project() only differ in whether they perform random sampling
+  of the reference joint pose or not. Both of them are sampling.
+  This was highly confusing, as from project() one wouldn't expect sampling.
+* Contributors: Alaa, AndyZe, Antoine Duplex, Henning Kayser, Robert Haschke, Sebastian Jahr, Stephanie Eng, Tyler Weaver, Vatan Aksoy Tezer, abishalini
 
 2.5.3 (2022-07-28)
 ------------------

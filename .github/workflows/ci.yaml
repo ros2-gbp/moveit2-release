@@ -8,7 +8,7 @@ on:
   pull_request:
   push:
     branches:
-      - humble
+      - main
 
 jobs:
   default:
@@ -16,13 +16,17 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - IMAGE: humble-ci
+          - IMAGE: rolling-ci
             CCOV: true
+            ROS_DISTRO: rolling
+          - IMAGE: rolling-ci-testing
+            ROS_DISTRO: rolling
+            IKFAST_TEST: true
+            CLANG_TIDY: pedantic
+          - IMAGE: humble-ci
             ROS_DISTRO: humble
           - IMAGE: humble-ci-testing
             ROS_DISTRO: humble
-            IKFAST_TEST: true
-            CLANG_TIDY: pedantic
     env:
       CXXFLAGS: >-
         -Wall -Wextra -Wwrite-strings -Wunreachable-code -Wpointer-arith -Wredundant-decls
@@ -31,9 +35,6 @@ jobs:
       UPSTREAM_WORKSPACE: moveit2.repos $(f="moveit2_$(sed 's/-.*$//' <<< "${{ matrix.env.IMAGE }}").repos"; test -r $f && echo $f)
       # Pull any updates to the upstream workspace (after restoring it from cache)
       AFTER_SETUP_UPSTREAM_WORKSPACE: vcs pull $BASEDIR/upstream_ws/src
-      # Uninstall binaries that are duplicated in the .repos file
-      # TODO(andyz): remove this once a sync containing 35b93c8 happens
-      AFTER_SETUP_UPSTREAM_WORKSPACE_EMBED: sudo apt remove ros-${{ matrix.env.ROS_DISTRO }}-moveit-msgs -y
       AFTER_SETUP_DOWNSTREAM_WORKSPACE: vcs pull $BASEDIR/downstream_ws/src
       # Clear the ccache stats before and log the stats after the build
       AFTER_SETUP_CCACHE: ccache --zero-stats --max-size=10.0G

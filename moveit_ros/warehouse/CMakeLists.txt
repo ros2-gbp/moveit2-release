@@ -85,22 +85,15 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/moveit_warehouse_export.h DESTINATION 
 
 install(
   TARGETS moveit_warehouse
-  EXPORT export_${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}Targets
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include
 )
 
-ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-
-ament_export_dependencies(rclcpp)
-ament_export_dependencies(moveit_core)
-ament_export_dependencies(warehouse_ros)
-ament_export_dependencies(moveit_ros_planning)
-ament_export_dependencies(tf2_eigen)
-ament_export_dependencies(tf2_ros)
-ament_export_dependencies(Boost)
+ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
+ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
