@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2011, Willow Garage, Inc.
+ *  Copyright (c) 2022, PickNik Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the copyright holder nor the names of its
+ *   * Neither the name of Fraunhofer IPA nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,34 +32,58 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <moveit/collision_detection/collision_common.h>
-#include <rclcpp/clock.hpp>
-#include <rclcpp/logger.hpp>
-#include <rclcpp/logging.hpp>
+/* Author: Paul Gesel */
 
-static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_collision_detection.collision_common");
-constexpr size_t LOG_THROTTLE_PERIOD{ 5 };
+#pragma once
 
-namespace collision_detection
+#include <moveit_ros_control_interface/ControllerHandle.h>
+#include <rclcpp/rclcpp.hpp>
+
+namespace moveit_simple_controller_manager
 {
-void CollisionResult::print() const
+/*
+ * An interface for controllers that have no handle, e.g. chained controllers like an Admittance controller
+ */
+class EmptyControllerHandle : public moveit_controller_manager::MoveItControllerHandle
 {
-  rclcpp::Clock clock;
-  if (!contacts.empty())
+public:
+  /* Topics will map to name/ns/goal, name/ns/result, etc */
+  EmptyControllerHandle(const std::string& name, const std::string& logger_name)
+    : moveit_controller_manager::MoveItControllerHandle(name), LOGGER(rclcpp::get_logger(logger_name))
   {
-    RCLCPP_WARN_STREAM_THROTTLE(LOGGER, clock, LOG_THROTTLE_PERIOD,
-                                "Objects in collision (printing 1st of "
-                                    << contacts.size() << " pairs): " << contacts.begin()->first.first << ", "
-                                    << contacts.begin()->first.second);
-
-    // Log all collisions at the debug level
-    RCLCPP_DEBUG_STREAM_THROTTLE(LOGGER, clock, LOG_THROTTLE_PERIOD, "Objects in collision:");
-    for (const auto& contact : contacts)
-    {
-      RCLCPP_DEBUG_STREAM_THROTTLE(LOGGER, clock, LOG_THROTTLE_PERIOD,
-                                   "\t" << contact.first.first << ", " << contact.first.second);
-    }
   }
-}
 
-}  // namespace collision_detection
+  bool sendTrajectory(const moveit_msgs::msg::RobotTrajectory& trajectory) override
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, "This controller handle does not support trajectory execution.");
+    return false;
+  }
+
+  bool cancelExecution() override
+  {
+    return true;
+  }
+
+  /**
+   * @brief Function called when the TrajectoryExecutionManager waits for a trajectory to finish.
+   * @return Always returns true because a trajectory is never in progress.
+   */
+  bool waitForExecution(const rclcpp::Duration& /* timeout */) override
+  {
+    return true;
+  }
+
+  /**
+   * @brief Gets the last trajectory execution status.
+   * @return Always returns ExecutionStatus::FAILED.
+   */
+  moveit_controller_manager::ExecutionStatus getLastExecutionStatus() override
+  {
+    return moveit_controller_manager::ExecutionStatus::FAILED;
+  }
+
+private:
+  const rclcpp::Logger LOGGER;
+};
+
+}  // end namespace moveit_simple_controller_manager

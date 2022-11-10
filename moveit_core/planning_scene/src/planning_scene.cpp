@@ -48,11 +48,7 @@
 #include <octomap_msgs/conversions.h>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
 #include <tf2_eigen/tf2_eigen.hpp>
-#else
-#include <tf2_eigen/tf2_eigen.h>
-#endif
 #include <memory>
 #include <set>
 
@@ -163,7 +159,7 @@ void PlanningScene::initialize()
   allocateCollisionDetector(collision_detection::CollisionDetectorAllocatorFCL::create());
 }
 
-/* return nullptr on failure */
+// return nullptr on failure
 moveit::core::RobotModelPtr PlanningScene::createRobotModel(const urdf::ModelInterfaceSharedPtr& urdf_model,
                                                             const srdf::ModelConstSharedPtr& srdf_model)
 {
