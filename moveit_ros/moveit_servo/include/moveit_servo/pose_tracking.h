@@ -44,11 +44,7 @@
 #include <moveit_servo/servo_parameters.h>
 #include <moveit_servo/servo.h>
 #include <optional>
-#if __has_include(<tf2_geometry_msgs/tf2_geometry_msgs.hpp>)
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#else
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#endif
 #include <tf2_ros/transform_listener.h>
 #include <rclcpp/rclcpp.hpp>
 
@@ -163,7 +159,7 @@ private:
   // Joint group used for controlling the motions
   std::string move_group_name_;
 
-  rclcpp::Rate loop_rate_;
+  rclcpp::WallRate loop_rate_;
 
   // ROS interface to Servo
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_stamped_pub_;
