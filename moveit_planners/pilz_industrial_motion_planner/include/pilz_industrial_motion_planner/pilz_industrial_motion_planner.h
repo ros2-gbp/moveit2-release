@@ -45,6 +45,8 @@
 #include <pluginlib/class_loader.hpp>
 #include <memory>
 
+#include <cartesian_limits_parameters.hpp>
+
 namespace pilz_industrial_motion_planner
 {
 /**
@@ -115,6 +117,12 @@ public:
    */
   void registerContextLoader(const pilz_industrial_motion_planner::PlanningContextLoaderPtr& planning_context_loader);
 
+  /**
+   * @brief Specify the settings to be used for an algorithms
+   * @param pcs Map of planner configurations
+   */
+  void setPlannerConfigurations(const planning_interface::PlannerConfigurationMap& pcs) override;
+
 private:
   /// Plugin loader
   std::unique_ptr<pluginlib::ClassLoader<PlanningContextLoader>> planner_context_loader;
@@ -132,7 +140,8 @@ private:
   pilz_industrial_motion_planner::JointLimitsContainer aggregated_limit_active_joints_;
 
   /// cartesian limit
-  pilz_industrial_motion_planner::CartesianLimit cartesian_limit_;
+  std::shared_ptr<cartesian_limits::ParamListener> param_listener_;
+  cartesian_limits::Params params_;
 };
 
 MOVEIT_CLASS_FORWARD(CommandPlanner);
