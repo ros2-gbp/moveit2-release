@@ -41,7 +41,6 @@
 #include <moveit/trajectory_execution_manager/trajectory_execution_manager.h>
 #include <moveit/planning_scene_monitor/planning_scene_monitor.h>
 #include <moveit/planning_scene_monitor/trajectory_monitor.h>
-#include <moveit/sensor_manager/sensor_manager.h>
 #include <pluginlib/class_loader.hpp>
 
 #include <atomic>
@@ -139,8 +138,6 @@ public:
   moveit_msgs::msg::MoveItErrorCodes executeAndMonitor(ExecutableMotionPlan& plan, bool reset_preempted = true);
 
   void stop();
-
-  std::string getErrorCodeString(const moveit_msgs::msg::MoveItErrorCodes& error_code);
 
 private:
   void planAndExecuteHelper(ExecutableMotionPlan& plan, const Options& opt);
