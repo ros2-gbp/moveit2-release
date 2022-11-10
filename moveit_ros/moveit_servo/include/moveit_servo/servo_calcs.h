@@ -58,11 +58,7 @@
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <std_msgs/msg/int8.hpp>
 #include <std_srvs/srv/empty.hpp>
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
 #include <tf2_eigen/tf2_eigen.hpp>
-#else
-#include <tf2_eigen/tf2_eigen.h>
-#endif
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 
 // moveit_core
@@ -315,7 +311,6 @@ protected:
   rclcpp::Subscription<control_msgs::msg::JointJog>::SharedPtr joint_cmd_sub_;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr collision_velocity_scale_sub_;
   rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr status_pub_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr worst_case_stop_time_pub_;
   rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr trajectory_outgoing_cmd_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr multiarray_outgoing_cmd_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr condition_pub_;
