@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2018 Pilz GmbH & Co. KG
+ *  Copyright (c) 2022, PickNik Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of Pilz GmbH & Co. KG nor the names of its
+ *   * Neither the name of Fraunhofer IPA nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,36 +32,33 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#pragma once
+/* Author: Paul Gesel */
 
-#include <rclcpp/rclcpp.hpp>
-#include "pilz_industrial_motion_planner/cartesian_limit.h"
+#include <pluginlib/class_list_macros.hpp>
+#include <moveit_simple_controller_manager/empty_controller_handle.h>
+#include <rclcpp/node.hpp>
 
-namespace pilz_industrial_motion_planner
+namespace moveit_ros_control_interface
 {
 /**
- * @brief Obtains cartesian limits from the node parameters
+ * \brief This class allows MoveIt's controller manager to start and stop a controller that does not have a
+ * corresponding controller handle implementation without actually executing MoveIt trajectories through the controller
+ * handle.
  */
-class CartesianLimitsAggregator
+/**
+ * @brief Allocator plugin for the EmptyControllerAllocator.
+ */
+class EmptyControllerAllocator : public ControllerHandleAllocator
 {
 public:
-  /**
-   * @brief Loads cartesian limits from the node parameters
-   *
-   * The parameters are expected to be under "~/cartesian_limits" of the given
-   * node handle.
-   * The following limits can be specified:
-   * - "max_trans_vel", the maximum translational velocity [m/s]
-   * - "max_trans_acc, the maximum translational acceleration [m/s^2]
-   * - "max_trans_dec", the maximum translational deceleration (<= 0) [m/s^2]
-   * - "max_rot_vel", the maximum rotational velocity [rad/s]
-   * - "max_rot_acc", the maximum rotational acceleration [rad/s^2]
-   * - "max_rot_dec", the maximum rotational deceleration (<= 0)[rad/s^2]
-   * @param node node to access the parameters
-   * @param param_namespace the parameter name to access the parameters
-   * @return the obtained cartesian limits
-   */
-  static CartesianLimit getAggregatedLimits(const rclcpp::Node::SharedPtr& node, const std::string& param_namespace);
+  moveit_controller_manager::MoveItControllerHandlePtr alloc(const rclcpp::Node::SharedPtr& /* node */,
+                                                             const std::string& name,
+                                                             const std::vector<std::string>& /* resources */) override
+  {
+    return std::make_shared<moveit_simple_controller_manager::EmptyControllerHandle>(name, "empty_controller_handle");
+  }
 };
+}  // namespace moveit_ros_control_interface
 
-}  // namespace pilz_industrial_motion_planner
+PLUGINLIB_EXPORT_CLASS(moveit_ros_control_interface::EmptyControllerAllocator,
+                       moveit_ros_control_interface::ControllerHandleAllocator);
