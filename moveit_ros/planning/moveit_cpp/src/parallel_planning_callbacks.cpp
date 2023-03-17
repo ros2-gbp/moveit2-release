@@ -1,8 +1,7 @@
 /*********************************************************************
- *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2012, Willow Garage, Inc.
+ *  Copyright (c) 2023, PickNik Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -15,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of Willow Garage, Inc. nor the names of its
+ *   * Neither the name of PickNik Inc. nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -31,62 +30,30 @@
  *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
- *
- * Author: Sachin Chitta
  *********************************************************************/
 
-#include <kinematics_cache_ros/kinematics_cache_ros.h>
-#include <ros/ros.h>
+/* Author: Sebastian Jahr */
 
-int main(int argc, char** argv)
+#include <moveit/moveit_cpp/parallel_planning_callbacks.hpp>
+
+namespace moveit_cpp
 {
-  ros::init(argc, argv, "kinematics_cache");
-  kinematics_cache::KinematicsCache::Options opt;
-  opt.origin.x = 0.0;
-  opt.origin.y = -1.0;
-  opt.origin.z = -1.0;
-
-  opt.workspace_size[0] = 2.0;
-  opt.workspace_size[1] = 2.0;
-  opt.workspace_size[2] = 2.0;
-
-  opt.resolution[0] = 0.01;
-  opt.resolution[1] = 0.01;
-  opt.resolution[2] = 0.01;
-  opt.max_solutions_per_grid_location = 2;
-
-  kinematics_cache_ros::KinematicsCacheROS pr2_kinematics_cache;
-  ros::NodeHandle private_handle("~");
-
-  if (!pr2_kinematics_cache.init(opt, "pr2_arm_kinematics/PR2ArmKinematicsPlugin", "right_arm", "torso_lift_link",
-                                 "r_wrist_roll_link", 0.01))
-    return (0);
-
-  pr2_kinematics_cache.generateCacheMap(10.0);
-
-  geometry_msgs::Pose point;
-  point.position.x = 0.0;
-  point.position.y = -1.0;
-  point.position.z = -1.0;
-
-  unsigned int max_num = 200;
-
-  for (unsigned int i = 0; i < max_num; ++i)
+/** \brief A callback function that can be used as a parallel planning stop criterion.
+ *          It stops parallel planning as soon as any planner finds a solution. */
+bool stopAtFirstSolution(PlanSolutions const& plan_solutions,
+                         PlanningComponent::MultiPipelinePlanRequestParameters const& /*plan_request_parameters*/)
+{
+  // Stop at the first successful plan
+  for (auto const& solution : plan_solutions.getSolutions())
   {
-    point.position.x = opt.origin.x + i / 100.0;
-    for (unsigned int j = 0; j < max_num; ++j)
+    // bool(solution) is shorthand to evaluate the error code of the solution, checking for SUCCESS
+    if (bool(solution))
     {
-      point.position.y = opt.origin.y + j / 100.0;
-      for (unsigned int k = 0; k < max_num; ++k)
-      {
-        point.position.z = opt.origin.z + k / 100.0;
-        unsigned int num_solutions(0);
-        if (!pr2_kinematics_cache.getNumSolutions(point, num_solutions))
-          ROS_ERROR("Outside grid");
-        else if (num_solutions > 0)
-          ROS_INFO("Num solutions: %d", num_solutions);
-      }
+      // Return true to abort the other pipelines
+      return true;
     }
   }
-  return (0);
+  // Return false when parallel planning should continue because it hasn't found a successful solution yet
+  return false;
 }
+}  // namespace moveit_cpp

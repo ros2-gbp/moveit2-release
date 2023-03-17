@@ -34,14 +34,14 @@
 
 #include <rclcpp/logging.hpp>
 
-#include "pilz_industrial_motion_planner/pilz_industrial_motion_planner.h"
+#include <pilz_industrial_motion_planner/pilz_industrial_motion_planner.h>
 
-#include "pilz_industrial_motion_planner/planning_context_loader.h"
-#include "pilz_industrial_motion_planner/planning_context_loader_ptp.h"
-#include "pilz_industrial_motion_planner/planning_exceptions.h"
+#include <pilz_industrial_motion_planner/planning_context_loader.h>
+#include <pilz_industrial_motion_planner/planning_context_loader_ptp.h>
+#include <pilz_industrial_motion_planner/planning_exceptions.h>
 
 #include "cartesian_limits_parameters.hpp"
-#include "pilz_industrial_motion_planner/joint_limits_aggregator.h"
+#include <pilz_industrial_motion_planner/joint_limits_aggregator.h>
 
 #include <pluginlib/class_list_macros.hpp>
 
@@ -82,7 +82,7 @@ bool CommandPlanner::initialize(const moveit::core::RobotModelConstPtr& model, c
   std::stringstream ss;
   for (const auto& factory : factories)
   {
-    ss << factory << " ";
+    ss << factory << ' ';
   }
 
   RCLCPP_INFO_STREAM(LOGGER, "Available plugins: " << ss.str());
@@ -102,19 +102,6 @@ bool CommandPlanner::initialize(const moveit::core::RobotModelConstPtr& model, c
 
     registerContextLoader(loader_pointer);
   }
-
-  // Specify for which joint model groups this planner is usable
-  planning_interface::PlannerConfigurationMap pconfig;
-
-  for (const auto& group : model_->getJointModelGroupNames())
-  {
-    const planning_interface::PlannerConfigurationSettings planner_config_settings{
-      group, group, std::map<std::string, std::string>()
-    };
-    pconfig[planner_config_settings.name] = planner_config_settings;
-  }
-
-  setPlannerConfigurations(pconfig);
 
   return true;
 }
@@ -179,18 +166,13 @@ void CommandPlanner::registerContextLoader(
   if (context_loader_map_.find(planning_context_loader->getAlgorithm()) == context_loader_map_.end())
   {
     context_loader_map_[planning_context_loader->getAlgorithm()] = planning_context_loader;
-    RCLCPP_INFO_STREAM(LOGGER, "Registered Algorithm [" << planning_context_loader->getAlgorithm() << "]");
+    RCLCPP_INFO_STREAM(LOGGER, "Registered Algorithm [" << planning_context_loader->getAlgorithm() << ']');
   }
   else
   {
     throw ContextLoaderRegistrationException("The command [" + planning_context_loader->getAlgorithm() +
                                              "] is already registered");
   }
-}
-
-void CommandPlanner::setPlannerConfigurations(const planning_interface::PlannerConfigurationMap& pcs)
-{
-  config_settings_ = pcs;
 }
 
 }  // namespace pilz_industrial_motion_planner
