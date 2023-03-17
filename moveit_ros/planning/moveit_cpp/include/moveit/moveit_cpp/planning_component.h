@@ -37,7 +37,7 @@
 
 #pragma once
 
-#include <geometry_msgs/msg/pose_stamped.h>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <moveit/moveit_cpp/moveit_cpp.h>
 #include <moveit/moveit_cpp/plan_solutions.hpp>
 #include <moveit/planning_interface/planning_response.h>
@@ -49,10 +49,10 @@
 namespace moveit_cpp
 {
 MOVEIT_CLASS_FORWARD(PlanningComponent);  // Defines PlanningComponentPtr, ConstPtr, WeakPtr... etc
+
 class PlanningComponent
 {
 public:
-  using MoveItErrorCode [[deprecated("Use moveit::core::MoveItErrorCode")]] = moveit::core::MoveItErrorCode;
   /// Planner parameters provided with the MotionPlanRequest
   struct PlanRequestParameters
   {
@@ -191,21 +191,22 @@ public:
   planning_interface::MotionPlanResponse plan();
   /** \brief Run a plan from start or current state to fulfill the last goal constraints provided by setGoal() using the
    * provided PlanRequestParameters. */
-  planning_interface::MotionPlanResponse plan(const PlanRequestParameters& parameters, const bool store_solution = true);
+  planning_interface::MotionPlanResponse plan(const PlanRequestParameters& parameters);
 
   /** \brief Run a plan from start or current state to fulfill the last goal constraints provided by setGoal() using the
-   * provided PlanRequestParameters. */
+   * provided PlanRequestParameters. This defaults to taking the full planning time (null stopping_criterion_callback)
+   * and finding the shortest solution in joint space. */
   planning_interface::MotionPlanResponse
   plan(const MultiPipelinePlanRequestParameters& parameters,
-       SolutionCallbackFunction solution_selection_callback = &getShortestSolution,
+       const SolutionCallbackFunction& solution_selection_callback = &getShortestSolution,
        StoppingCriterionFunction stopping_criterion_callback = nullptr);
 
   /** \brief Execute the latest computed solution trajectory computed by plan(). By default this function terminates
    * after the execution is complete. The execution can be run in background by setting blocking to false. */
-  bool execute(bool blocking = true);
-
-  /** \brief Return the last plan solution*/
-  const planning_interface::MotionPlanResponse& getLastMotionPlanResponse();
+  [[deprecated("Use MoveItCpp::execute()")]] bool execute(bool /*blocking */)
+  {
+    return false;
+  };
 
 private:
   // Core properties and instances
@@ -216,7 +217,6 @@ private:
   const moveit::core::JointModelGroup* joint_model_group_;
 
   // Planning
-  std::set<std::string> planning_pipeline_names_;
   // The start state used in the planning motion request
   moveit::core::RobotStatePtr considered_start_state_;
   std::vector<moveit_msgs::msg::Constraints> current_goal_constraints_;
@@ -225,7 +225,6 @@ private:
   PlanRequestParameters plan_request_parameters_;
   moveit_msgs::msg::WorkspaceParameters workspace_parameters_;
   bool workspace_parameters_set_ = false;
-  planning_interface::MotionPlanResponse last_plan_solution_;
 
   // common properties for goals
   // TODO(henningkayser): support goal tolerances
@@ -237,12 +236,3 @@ private:
   // std::unique_ptr<moveit_msgs::msg::TrajectoryConstraints> trajectory_constraints_;
 };
 }  // namespace moveit_cpp
-
-namespace moveit
-{
-namespace planning_interface
-{
-using PlanningComponent [[deprecated("use moveit_cpp")]] = moveit_cpp::PlanningComponent;
-[[deprecated("use moveit_cpp")]] MOVEIT_DECLARE_PTR(PlanningComponent, moveit_cpp::PlanningComponent);
-}  // namespace planning_interface
-}  // namespace moveit
