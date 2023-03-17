@@ -189,7 +189,7 @@ public:
     clone_cow->m_enabled = m_enabled;
     clone_cow->setBroadphaseHandle(nullptr);
     clone_cow->m_touch_links = m_touch_links;
-    clone_cow->setContactProcessingThreshold(this->getContactProcessingThreshold());
+    clone_cow->setContactProcessingThreshold(getContactProcessingThreshold());
     return clone_cow;
   }
 
@@ -366,9 +366,7 @@ inline void getAverageSupport(const btConvexShape* shape, const btVector3& local
         pt_sum = pt;
         max_support = sup;
       }
-      else if (sup < max_support - BULLET_EPSILON)
-      {
-      }
+      else if (sup < max_support - BULLET_EPSILON) {}
       else
       {
         pt_count += 1;
