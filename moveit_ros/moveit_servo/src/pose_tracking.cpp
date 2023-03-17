@@ -32,8 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include "moveit_servo/pose_tracking.h"
-#include "moveit_servo/servo_parameters.h"
+#include <moveit_servo/pose_tracking.h>
+#include <moveit_servo/servo_parameters.h>
 
 #include <chrono>
 using namespace std::literals;
@@ -99,7 +99,7 @@ PoseTracking::PoseTracking(const rclcpp::Node::SharedPtr& node, const ServoParam
   // Connect to Servo ROS interfaces
   target_pose_sub_ = node_->create_subscription<geometry_msgs::msg::PoseStamped>(
       "target_pose", rclcpp::SystemDefaultsQoS(),
-      [this](const geometry_msgs::msg::PoseStamped::ConstSharedPtr msg) { return targetPoseCallback(msg); });
+      [this](const geometry_msgs::msg::PoseStamped::ConstSharedPtr& msg) { return targetPoseCallback(msg); });
 
   // Publish outgoing twist commands to the Servo object
   twist_stamped_pub_ = node_->create_publisher<geometry_msgs::msg::TwistStamped>(
@@ -169,7 +169,10 @@ PoseTrackingStatusCode PoseTracking::moveToPose(const Eigen::Vector3d& positiona
 
     if (!loop_rate_.sleep())
     {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
       RCLCPP_WARN_STREAM_THROTTLE(LOGGER, *node_->get_clock(), LOG_THROTTLE_PERIOD, "Target control rate was missed");
+#pragma GCC diagnostic pop
     }
   }
 
@@ -253,7 +256,7 @@ bool PoseTracking::satisfiesPoseTolerance(const Eigen::Vector3d& positional_tole
           (std::abs(z_error) < positional_tolerance(2)) && (std::abs(*angular_error_) < angular_tolerance));
 }
 
-void PoseTracking::targetPoseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr msg)
+void PoseTracking::targetPoseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr& msg)
 {
   std::lock_guard<std::mutex> lock(target_pose_mtx_);
   target_pose_ = *msg;
