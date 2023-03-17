@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2012, Willow Garage, Inc.
+ *  Copyright (c) 2023, PickNik Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the Willow Garage nor the names of its
+ *   * Neither the name of PickNik Inc. nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,33 +32,17 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/** \author E. Gil Jones */
+/* Author: Sebastian Jahr
+   Desc: Common callback functions for parallel planning */
 
 #pragma once
 
-#include <ros/ros.h>
-#include <collision_distance_field_ros/collision_distance_field_ros_helpers.h>
-#include <collision_distance_field/collision_robot_distance_field.h>
+#include <moveit/moveit_cpp/planning_component.h>
 
-namespace collision_detection
+namespace moveit_cpp
 {
-class CollisionRobotDistanceFieldROS : public CollisionRobotDistanceField
-{
-public:
-  CollisionRobotDistanceFieldROS(const planning_models::RobotModelConstPtr& robot_model, double size_x = DEFAULT_SIZE_X,
-                                 double size_y = DEFAULT_SIZE_Y, double size_z = DEFAULT_SIZE_Z,
-                                 bool use_signed_distance_field = DEFAULT_USE_SIGNED_DISTANCE_FIELD,
-                                 double resolution = DEFAULT_RESOLUTION,
-                                 double collision_tolerance = DEFAULT_COLLISION_TOLERANCE,
-                                 double max_propogation_distance = DEFAULT_MAX_PROPOGATION_DISTANCE,
-                                 double padding = 0.0, double scale = 1.0)
-    : CollisionRobotDistanceField(robot_model)
-  {
-    ros::NodeHandle nh;
-    std::map<std::string, std::vector<CollisionSphere> > coll_spheres;
-    collision_detection::loadLinkBodySphereDecompositions(nh, getRobotModel(), coll_spheres);
-    initialize(coll_spheres, size_x, size_y, size_z, use_signed_distance_field, resolution, collision_tolerance,
-               max_propogation_distance);
-  }
-};
-}  // namespace collision_detection
+/** \brief A callback function that can be used as a parallel planning stop criterion.
+ *          It stops parallel planning as soon as any planner finds a solution. */
+bool stopAtFirstSolution(PlanSolutions const& plan_solutions,
+                         PlanningComponent::MultiPipelinePlanRequestParameters const& /*plan_request_parameters*/);
+}  // namespace moveit_cpp
