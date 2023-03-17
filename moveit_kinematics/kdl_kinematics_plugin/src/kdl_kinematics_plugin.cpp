@@ -74,8 +74,10 @@ bool KDLKinematicsPlugin::checkConsistency(const Eigen::VectorXd& seed_state,
                                            const Eigen::VectorXd& solution) const
 {
   for (std::size_t i = 0; i < dimension_; ++i)
+  {
     if (fabs(seed_state(i) - solution(i)) > consistency_limits[i])
       return false;
+  }
   return true;
 }
 
@@ -105,7 +107,7 @@ void KDLKinematicsPlugin::getJointWeights()
 
   RCLCPP_INFO_STREAM(
       LOGGER, "Joint weights for group '"
-                  << getGroupName() << "': \n"
+                  << getGroupName() << "': "
                   << Eigen::Map<const Eigen::VectorXd>(joint_weights_.data(), joint_weights_.size()).transpose());
 }
 
@@ -348,9 +350,9 @@ bool KDLKinematicsPlugin::searchPositionIK(const geometry_msgs::msg::Pose& ik_po
   tf2::fromMsg(ik_pose, pose_desired);
 
   RCLCPP_DEBUG_STREAM(LOGGER, "searchPositionIK: Position request pose is "
-                                  << ik_pose.position.x << " " << ik_pose.position.y << " " << ik_pose.position.z << " "
-                                  << ik_pose.orientation.x << " " << ik_pose.orientation.y << " "
-                                  << ik_pose.orientation.z << " " << ik_pose.orientation.w);
+                                  << ik_pose.position.x << ' ' << ik_pose.position.y << ' ' << ik_pose.position.z << ' '
+                                  << ik_pose.orientation.x << ' ' << ik_pose.orientation.y << ' '
+                                  << ik_pose.orientation.z << ' ' << ik_pose.orientation.w);
 
   unsigned int attempt = 0;
   do
@@ -359,9 +361,13 @@ bool KDLKinematicsPlugin::searchPositionIK(const geometry_msgs::msg::Pose& ik_po
     if (attempt > 1)  // randomly re-seed after first attempt
     {
       if (!consistency_limits_mimic.empty())
+      {
         getRandomConfiguration(jnt_seed_state.data, consistency_limits_mimic, jnt_pos_in.data);
+      }
       else
+      {
         getRandomConfiguration(jnt_pos_in.data);
+      }
       RCLCPP_DEBUG_STREAM(LOGGER, "New random configuration (" << attempt << "): " << jnt_pos_in);
     }
 
@@ -487,11 +493,17 @@ void KDLKinematicsPlugin::clipToJointLimits(const KDL::JntArray& q, KDL::JntArra
     const double delta_max = joint_max_(i) - q(i);
     const double delta_min = joint_min_(i) - q(i);
     if (q_delta(i) > delta_max)
+    {
       q_delta(i) = delta_max;
+    }
     else if (q_delta(i) < delta_min)
+    {
       q_delta(i) = delta_min;
+    }
     else
+    {
       continue;
+    }
 
     weighting[mimic_joints_[i].map_index] = 0.01;
   }
