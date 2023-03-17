@@ -84,7 +84,9 @@ static std::string getHostname()
   char buffer[BUF_SIZE];
   int err = gethostname(buffer, sizeof(buffer));
   if (err != 0)
+  {
     return std::string();
+  }
   else
   {
     buffer[BUF_SIZE - 1] = '\0';
@@ -142,7 +144,9 @@ void BenchmarkExecutor::initialize(const std::vector<std::string>& planning_pipe
 
   // Error check
   if (planning_pipelines_.empty())
+  {
     RCLCPP_ERROR(LOGGER, "No planning pipelines have been loaded. Nothing to do for the benchmarking service.");
+  }
   else
   {
     RCLCPP_INFO(LOGGER, "Available planning pipelines:");
@@ -732,9 +736,13 @@ bool BenchmarkExecutor::loadPathConstraints(const std::string& regex, std::vecto
     }
 
     if (constraints.empty())
+    {
       RCLCPP_WARN(LOGGER, "No path constraints found that match regex: '%s'", regex.c_str());
+    }
     else
+    {
       RCLCPP_INFO(LOGGER, "Loaded path constraints successfully");
+    }
   }
   return true;
 }
@@ -768,9 +776,13 @@ bool BenchmarkExecutor::loadTrajectoryConstraints(const std::string& regex,
     }
 
     if (constraints.empty())
+    {
       RCLCPP_WARN(LOGGER, "No trajectory constraints found that match regex: '%s'", regex.c_str());
+    }
     else
+    {
       RCLCPP_INFO(LOGGER, "Loaded trajectory constraints successfully");
+    }
   }
   return true;
 }
@@ -904,7 +916,7 @@ void BenchmarkExecutor::collectMetrics(PlannerRunData& metrics,
         if (d > 0.0)  // in case of collision, distance is negative
           clearance += d;
       }
-      clearance /= (double)p.getWayPointCount();
+      clearance /= static_cast<double>(p.getWayPointCount());
 
       // compute smoothness
       const auto smoothness = [&]() {
@@ -1121,7 +1133,7 @@ void BenchmarkExecutor::writeOutput(const BenchmarkRequest& brequest, const std:
     for (std::size_t i = 0; i < pipeline.second.size(); ++i, ++run_id)
     {
       // Write the name of the planner and the used pipeline
-      out << pipeline.second[i] << " (" << pipeline.first << ")" << '\n';
+      out << pipeline.second[i] << " (" << pipeline.first << ')' << '\n';
 
       // in general, we could have properties specific for a planner;
       // right now, we do not include such properties
@@ -1129,10 +1141,12 @@ void BenchmarkExecutor::writeOutput(const BenchmarkRequest& brequest, const std:
 
       // Create a list of the benchmark properties for this planner
       std::set<std::string> properties_set;
-      for (PlannerRunData& planner_run_data : benchmark_data_[run_id])  // each run of this planner
+      for (PlannerRunData& planner_run_data : benchmark_data_[run_id])
+      {  // each run of this planner
         for (PlannerRunData::const_iterator pit = planner_run_data.begin(); pit != planner_run_data.end();
              ++pit)  // each benchmark property of the given run
           properties_set.insert(pit->first);
+      }
 
       // Writing property list
       out << properties_set.size() << " properties for each run" << '\n';
@@ -1156,7 +1170,7 @@ void BenchmarkExecutor::writeOutput(const BenchmarkRequest& brequest, const std:
         }
         out << '\n';  // end of the run
       }
-      out << "." << '\n';  // end the planner
+      out << '.' << '\n';  // end the planner
     }
   }
 
