@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(moveit_resources_prbt_ikfast_manipulator_plugin)
+project(moveit_resources_prbt_ikfast_manipulator_plugin LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -7,7 +7,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 if(NOT WIN32)
   add_compile_options(-Wall)
   add_compile_options(-Wextra)
-  add_compile_options(-Wno-unused-parameter)
   add_compile_options(-Wno-unused-variable)
 endif()
 
