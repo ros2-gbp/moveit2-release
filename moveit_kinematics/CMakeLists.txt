@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(moveit_kinematics)
+project(moveit_kinematics LANGUAGES CXX)
 
 # Common cmake code applied to all moveit packages
 find_package(moveit_common REQUIRED)
@@ -69,7 +69,7 @@ install(
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
+  INCLUDES DESTINATION include/moveit_kinematics
 )
 
 ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
