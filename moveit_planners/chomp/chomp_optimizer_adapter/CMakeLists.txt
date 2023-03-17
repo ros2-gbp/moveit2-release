@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(moveit_chomp_optimizer_adapter)
+project(moveit_chomp_optimizer_adapter LANGUAGES CXX)
 
 # Common cmake code applied to all moveit packages
 find_package(moveit_common REQUIRED)
@@ -10,12 +10,14 @@ find_package(ament_cmake REQUIRED)
 find_package(chomp_motion_planner REQUIRED)
 find_package(moveit_core REQUIRED)
 find_package(pluginlib REQUIRED)
+find_package(rsl REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   chomp_motion_planner
   moveit_core
   pluginlib
   rclcpp
+  rsl
 )
 
 add_library(${PROJECT_NAME} SHARED src/chomp_optimizer_adapter.cpp)
