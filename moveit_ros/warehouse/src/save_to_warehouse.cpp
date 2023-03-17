@@ -71,8 +71,10 @@ void onSceneUpdate(planning_scene_monitor::PlanningSceneMonitor& psm, moveit_war
       pss.addPlanningScene(psmsg);
     }
     else
+    {
       RCLCPP_INFO(LOGGER, "Scene '%s' was previously added. Not adding again.",
                   psm.getPlanningScene()->getName().c_str());
+    }
   }
   else
     RCLCPP_INFO(LOGGER, "Scene name is empty. Not saving.");
@@ -168,7 +170,9 @@ int main(int argc, char** argv)
   std::vector<std::string> names;
   pss.getPlanningSceneNames(names);
   if (names.empty())
+  {
     RCLCPP_INFO(LOGGER, "There are no previously stored scenes");
+  }
   else
   {
     RCLCPP_INFO(LOGGER, "Previously stored scenes:");
@@ -177,7 +181,9 @@ int main(int argc, char** argv)
   }
   cs.getKnownConstraints(names);
   if (names.empty())
+  {
     RCLCPP_INFO(LOGGER, "There are no previously stored constraints");
+  }
   else
   {
     RCLCPP_INFO(LOGGER, "Previously stored constraints:");
@@ -186,7 +192,9 @@ int main(int argc, char** argv)
   }
   rs.getKnownRobotStates(names);
   if (names.empty())
+  {
     RCLCPP_INFO(LOGGER, "There are no previously stored robot states");
+  }
   else
   {
     RCLCPP_INFO(LOGGER, "Previously stored robot states:");
@@ -196,13 +204,13 @@ int main(int argc, char** argv)
 
   psm.addUpdateCallback([&](auto&&) { return onSceneUpdate(psm, pss); });
 
-  auto callback1 = [&](moveit_msgs::msg::MotionPlanRequest msg) -> void { return onMotionPlanRequest(msg, psm, pss); };
-  auto mplan_req_sub =
-      node->create_subscription<moveit_msgs::msg::MotionPlanRequest>("motion_plan_request", 100, callback1);
-  auto callback2 = [&](moveit_msgs::msg::Constraints msg) -> void { return onConstraints(msg, cs); };
-  auto constr_sub = node->create_subscription<moveit_msgs::msg::Constraints>("constraints", 100, callback2);
-  auto callback3 = [&](moveit_msgs::msg::RobotState msg) -> void { return onRobotState(msg, rs); };
-  auto state_sub = node->create_subscription<moveit_msgs::msg::RobotState>("robot_state", 100, callback3);
+  auto mplan_req_sub = node->create_subscription<moveit_msgs::msg::MotionPlanRequest>(
+      "motion_plan_request", 100,
+      [&](const moveit_msgs::msg::MotionPlanRequest& msg) { onMotionPlanRequest(msg, psm, pss); });
+  auto constr_sub = node->create_subscription<moveit_msgs::msg::Constraints>(
+      "constraints", 100, [&](const moveit_msgs::msg::Constraints& msg) { onConstraints(msg, cs); });
+  auto state_sub = node->create_subscription<moveit_msgs::msg::RobotState>(
+      "robot_state", 100, [&](const moveit_msgs::msg::RobotState& msg) { onRobotState(msg, rs); });
 
   std::vector<std::string> topics;
   psm.getMonitoredTopics(topics);
