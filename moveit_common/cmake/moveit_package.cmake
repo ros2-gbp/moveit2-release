@@ -41,10 +41,24 @@ macro(moveit_package)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
   set(CMAKE_CXX_EXTENSIONS OFF)
 
+  if(NOT DEFINED ENV{ROS_DISTRO})
+    message(FATAL_ERROR "ROS_DISTRO is not defined. Maybe you forgot to source /opt/ros/ROS_DISTRO/setup.bash?")
+  endif()
+  add_library(moveit_compatibility INTERFACE)
+  if("$ENV{ROS_DISTRO}" STREQUAL "humble")
+    message(STATUS "Build for ROS2 Humble")
+    target_compile_definitions(moveit_compatibility INTERFACE MOVEIT_HUMBLE)
+  elseif("$ENV{ROS_DISTRO}" STREQUAL "rolling")
+    message(STATUS "Build for ROS2 Rolling")
+    target_compile_definitions(moveit_compatibility INTERFACE MOVEIT_ROLLING)
+  else()
+    message(FATAL_ERROR "Unsupported ROS Distribution: $ENV{ROS_DISTRO}")
+  endif()
+
   if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # Enable warnings
     add_compile_options(-Wall -Wextra
-      -Wwrite-strings -Wunreachable-code -Wpointer-arith -Wredundant-decls -Wcast-qual -Wold-style-cast)
+      -Wwrite-strings -Wunreachable-code -Wpointer-arith -Wredundant-decls -Wcast-qual -Wold-style-cast -Wformat=2)
   else()
     # Defaults for Microsoft C++ compiler
     add_compile_options(/W3 /wd4251 /wd4068 /wd4275)
