@@ -1,0 +1,12 @@
+Source: ros-iron-pilz-industrial-motion-planner
+Section: misc
+Priority: optional
+Maintainer: Christian Henkel <c.henkel@pilz.de>
+Build-Depends: debhelper (>= 9.0.0), libboost-all-dev <!nocheck>, ros-iron-ament-cmake, ros-iron-ament-cmake-gmock <!nocheck>, ros-iron-ament-cmake-gtest <!nocheck>, ros-iron-ament-lint-auto <!nocheck>, ros-iron-ament-lint-common <!nocheck>, ros-iron-eigen3-cmake-module, ros-iron-generate-parameter-library, ros-iron-geometry-msgs, ros-iron-launch-param-builder <!nocheck>, ros-iron-moveit-common, ros-iron-moveit-configs-utils <!nocheck>, ros-iron-moveit-core, ros-iron-moveit-msgs, ros-iron-moveit-resources-panda-moveit-config <!nocheck>, ros-iron-moveit-resources-prbt-moveit-config <!nocheck>, ros-iron-moveit-resources-prbt-pg70-support <!nocheck>, ros-iron-moveit-resources-prbt-support <!nocheck>, ros-iron-moveit-ros-move-group, ros-iron-moveit-ros-planning, ros-iron-moveit-ros-planning-interface, ros-iron-orocos-kdl-vendor, ros-iron-pilz-industrial-motion-planner-testutils <!nocheck>, ros-iron-pluginlib, ros-iron-rclcpp, ros-iron-ros-testing <!nocheck>, ros-iron-tf2, ros-iron-tf2-eigen, ros-iron-tf2-eigen-kdl, ros-iron-tf2-geometry-msgs, ros-iron-tf2-kdl, ros-iron-tf2-ros, ros-iron-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-iron-pilz-industrial-motion-planner
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-iron-eigen3-cmake-module, ros-iron-generate-parameter-library, ros-iron-geometry-msgs, ros-iron-moveit-common, ros-iron-moveit-core, ros-iron-moveit-msgs, ros-iron-moveit-ros-move-group, ros-iron-moveit-ros-planning, ros-iron-moveit-ros-planning-interface, ros-iron-orocos-kdl-vendor, ros-iron-pluginlib, ros-iron-rclcpp, ros-iron-tf2, ros-iron-tf2-eigen, ros-iron-tf2-eigen-kdl, ros-iron-tf2-geometry-msgs, ros-iron-tf2-kdl, ros-iron-tf2-ros, ros-iron-ros-workspace
+Description: MoveIt plugin to generate industrial trajectories PTP, LIN, CIRC and sequences thereof.
