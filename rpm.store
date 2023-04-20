@@ -1,1 +1,1 @@
-{"base": "32bed5182", "parent": "rpm/rolling/moveit_setup_core_plugins", "previous": "ed9359f01", "trim": "", "trimbase": ""}
+{"base": "f6af5314e", "parent": "rpm/iron/moveit_setup_core_plugins", "previous": "850ad78c7", "trim": "", "trimbase": ""}
