@@ -1,0 +1,12 @@
+Source: ros-iron-moveit-setup-assistant
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), qtbase5-dev, ros-iron-ament-clang-format <!nocheck>, ros-iron-ament-cmake, ros-iron-ament-cmake-gtest <!nocheck>, ros-iron-ament-cmake-lint-cmake <!nocheck>, ros-iron-ament-cmake-xmllint <!nocheck>, ros-iron-ament-index-cpp, ros-iron-ament-lint-auto <!nocheck>, ros-iron-moveit-resources-panda-moveit-config <!nocheck>, ros-iron-moveit-setup-framework, ros-iron-moveit-setup-srdf-plugins, ros-iron-pluginlib, ros-iron-rclcpp, ros-iron-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-iron-moveit-setup-assistant
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, qtbase5-dev, ros-iron-ament-index-cpp, ros-iron-moveit-setup-app-plugins, ros-iron-moveit-setup-controllers, ros-iron-moveit-setup-core-plugins, ros-iron-moveit-setup-framework, ros-iron-moveit-setup-srdf-plugins, ros-iron-pluginlib, ros-iron-rclcpp, ros-iron-ros-workspace
+Description: Generates a configuration package that makes it easy to use MoveIt
