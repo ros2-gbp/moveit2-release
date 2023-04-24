@@ -1,0 +1,12 @@
+Source: ros-iron-moveit-ros-occupancy-map-monitor
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libdynamicedt3d-dev, libeigen3-dev, libgeometric-shapes-dev, liboctomap-dev, libtf2-ros-dev, pluginlib-dev (>= 1.11.2), python3-tf2-ros, ros-iron-ament-cmake, ros-iron-ament-cmake-gmock <!nocheck>, ros-iron-ament-lint-auto <!nocheck>, ros-iron-ament-lint-common <!nocheck>, ros-iron-eigen3-cmake-module, ros-iron-moveit-common, ros-iron-moveit-core, ros-iron-moveit-msgs, ros-iron-rclcpp, ros-iron-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-iron-moveit-ros-occupancy-map-monitor
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libdynamicedt3d-dev, libeigen3-dev, libgeometric-shapes-dev, liboctomap-dev, libtf2-ros-dev, pluginlib-dev (>= 1.11.2), python3-tf2-ros, ros-iron-eigen3-cmake-module, ros-iron-moveit-common, ros-iron-moveit-core, ros-iron-moveit-msgs, ros-iron-rclcpp, ros-iron-ros-workspace
+Description: Components of MoveIt connecting to occupancy map
