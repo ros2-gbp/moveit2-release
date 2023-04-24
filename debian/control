@@ -1,0 +1,12 @@
+Source: ros-iron-moveit-hybrid-planning
+Section: misc
+Priority: optional
+Maintainer: MoveIt Release Team <moveit_releasers@googlegroups.com>
+Build-Depends: debhelper (>= 9.0.0), libstd-msgs-dev, libstd-srvs-dev, libtf2-ros-dev, libtrajectory-msgs-dev, pluginlib-dev, python3-std-msgs, python3-std-srvs, python3-tf2-ros, python3-trajectory-msgs, ros-iron-ament-cmake, ros-iron-ament-cmake-gtest <!nocheck>, ros-iron-ament-index-cpp, ros-iron-ament-lint-auto <!nocheck>, ros-iron-ament-lint-common <!nocheck>, ros-iron-moveit-common, ros-iron-moveit-core, ros-iron-moveit-msgs, ros-iron-moveit-planners-ompl <!nocheck>, ros-iron-moveit-ros-planning, ros-iron-moveit-ros-planning-interface, ros-iron-rclcpp, ros-iron-rclcpp-action, ros-iron-rclcpp-components, ros-iron-ros-testing <!nocheck>, ros-std-msgs, ros-std-srvs, ros-trajectory-msgs, ros-iron-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-iron-moveit-hybrid-planning
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, librobot-state-publisher-dev, libstd-msgs-dev, libstd-srvs-dev, libtf2-ros-dev, libtrajectory-msgs-dev, pluginlib-dev, python3-std-msgs, python3-std-srvs, python3-tf2-ros, python3-trajectory-msgs, ros-iron-ament-index-cpp, ros-iron-controller-manager, ros-iron-moveit-common, ros-iron-moveit-core, ros-iron-moveit-msgs, ros-iron-moveit-resources-panda-moveit-config, ros-iron-moveit-ros-planning, ros-iron-moveit-ros-planning-interface, ros-iron-position-controllers, ros-iron-rclcpp, ros-iron-rclcpp-action, ros-iron-rclcpp-components, ros-iron-rviz2, ros-robot-state-publisher, ros-std-msgs, ros-std-srvs, ros-trajectory-msgs, ros-iron-ros-workspace
+Description: Hybrid planning components of MoveIt 2
