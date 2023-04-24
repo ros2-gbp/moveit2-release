@@ -1,0 +1,12 @@
+Source: ros-rolling-moveit-ros-perception
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), freeglut3-dev, image-transport-tools, libcv-bridge-dev, libeigen3-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libimage-transport-dev, libmessage-filters-dev, libomp-dev, libsensor-msgs-dev, libtf2-dev, libtf2-eigen-dev, libtf2-geometry-msgs-dev, libtf2-ros-dev, liburdf-dev, pluginlib-dev (>= 1.11.2), python3-cv-bridge, python3-message-filters, python3-sensor-msgs, python3-tf2, python3-tf2-geometry-msgs, python3-tf2-ros, ros-rolling-ament-cmake, ros-rolling-ament-lint-auto <!nocheck>, ros-rolling-ament-lint-common <!nocheck>, ros-rolling-moveit-common, ros-rolling-moveit-core, ros-rolling-moveit-msgs, ros-rolling-moveit-ros-occupancy-map-monitor, ros-rolling-moveit-ros-planning, ros-rolling-object-recognition-msgs, ros-rolling-rclcpp, ros-sensor-msgs, ros-rolling-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-rolling-moveit-ros-perception
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, freeglut3-dev, image-transport-tools, libcv-bridge-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libimage-transport-dev, libmessage-filters-dev, libomp-dev, libsensor-msgs-dev, libtf2-dev, libtf2-eigen-dev, libtf2-geometry-msgs-dev, libtf2-ros-dev, liburdf-dev, pluginlib-dev (>= 1.11.2), python3-cv-bridge, python3-message-filters, python3-sensor-msgs, python3-tf2, python3-tf2-geometry-msgs, python3-tf2-ros, ros-rolling-moveit-common, ros-rolling-moveit-core, ros-rolling-moveit-msgs, ros-rolling-moveit-ros-occupancy-map-monitor, ros-rolling-moveit-ros-planning, ros-rolling-object-recognition-msgs, ros-rolling-rclcpp, ros-sensor-msgs, ros-rolling-ros-workspace
+Description: Components of MoveIt connecting to perception
