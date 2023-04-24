@@ -1,3 +1,65 @@
+## moveit (iron) - 2.7.3-1
+
+The packages in the `moveit` repository were released into the `iron` distro by running `/home/tyler/.local/bin/bloom-release --rosdistro iron moveit -n` on `Mon, 24 Apr 2023 19:49:11 -0000`
+
+These packages were released:
+- `chomp_motion_planner`
+- `moveit`
+- `moveit_chomp_optimizer_adapter`
+- `moveit_common`
+- `moveit_configs_utils`
+- `moveit_core`
+- `moveit_hybrid_planning`
+- `moveit_kinematics`
+- `moveit_planners`
+- `moveit_planners_chomp`
+- `moveit_planners_ompl`
+- `moveit_plugins`
+- `moveit_py`
+- `moveit_resources_prbt_ikfast_manipulator_plugin`
+- `moveit_resources_prbt_moveit_config`
+- `moveit_resources_prbt_pg70_support`
+- `moveit_resources_prbt_support`
+- `moveit_ros`
+- `moveit_ros_benchmarks`
+- `moveit_ros_control_interface`
+- `moveit_ros_move_group`
+- `moveit_ros_occupancy_map_monitor`
+- `moveit_ros_perception`
+- `moveit_ros_planning`
+- `moveit_ros_planning_interface`
+- `moveit_ros_robot_interaction`
+- `moveit_ros_visualization`
+- `moveit_ros_warehouse`
+- `moveit_runtime`
+- `moveit_servo`
+- `moveit_setup_app_plugins`
+- `moveit_setup_assistant`
+- `moveit_setup_controllers`
+- `moveit_setup_core_plugins`
+- `moveit_setup_framework`
+- `moveit_setup_srdf_plugins`
+- `moveit_simple_controller_manager`
+- `pilz_industrial_motion_planner`
+- `pilz_industrial_motion_planner_testutils`
+
+Version of package(s) in repository `moveit`:
+
+- upstream repository: https://github.com/ros-planning/moveit2.git
+- release repository: https://github.com/ros2-gbp/moveit2-release.git
+- rosdistro version: `2.7.2-2`
+- old version: `2.7.2-2`
+- new version: `2.7.3-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `0.4.24`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## moveit (rolling) - 2.7.3-1
 
 The packages in the `moveit` repository were released into the `rolling` distro by running `/home/tyler/.local/bin/bloom-release --rosdistro rolling moveit -n` on `Mon, 24 Apr 2023 19:36:00 -0000`
