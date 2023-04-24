@@ -1,0 +1,12 @@
+Source: ros-iron-moveit-ros-visualization
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libclass-loader-dev, libeigen3-dev, libgeometric-shapes-dev, libinteractive-markers-dev, libqt5opengl5-dev, libtf2-eigen-dev, pkg-config, pluginlib-dev (>= 1.11.2), python3-interactive-markers, qtbase5-dev, ros-iron-ament-cmake, ros-iron-ament-lint-auto <!nocheck>, ros-iron-ament-lint-common <!nocheck>, ros-iron-moveit-common, ros-iron-moveit-ros-planning-interface, ros-iron-moveit-ros-robot-interaction, ros-iron-moveit-ros-warehouse, ros-iron-object-recognition-msgs, ros-iron-rclcpp, ros-iron-rclpy, ros-iron-rviz2, ros-iron-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-iron-moveit-ros-visualization
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libgeometric-shapes-dev, libinteractive-markers-dev, libtf2-eigen-dev, pluginlib-dev (>= 1.11.2), python3-interactive-markers, ros-iron-moveit-common, ros-iron-moveit-ros-planning-interface, ros-iron-moveit-ros-robot-interaction, ros-iron-moveit-ros-warehouse, ros-iron-object-recognition-msgs, ros-iron-rclcpp, ros-iron-rclpy, ros-iron-rviz2, ros-iron-ros-workspace
+Description: Components of MoveIt that offer visualization
