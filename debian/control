@@ -1,0 +1,12 @@
+Source: ros-iron-moveit-ros-perception
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), freeglut3-dev, libeigen3-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libomp-dev, ros-iron-ament-cmake, ros-iron-ament-lint-auto <!nocheck>, ros-iron-ament-lint-common <!nocheck>, ros-iron-cv-bridge, ros-iron-image-transport, ros-iron-message-filters, ros-iron-moveit-common, ros-iron-moveit-core, ros-iron-moveit-msgs, ros-iron-moveit-ros-occupancy-map-monitor, ros-iron-moveit-ros-planning, ros-iron-object-recognition-msgs, ros-iron-pluginlib (>= 1.11.2), ros-iron-rclcpp, ros-iron-sensor-msgs, ros-iron-tf2, ros-iron-tf2-eigen, ros-iron-tf2-geometry-msgs, ros-iron-tf2-ros, ros-iron-urdf, ros-iron-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-iron-moveit-ros-perception
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, freeglut3-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libomp-dev, ros-iron-cv-bridge, ros-iron-image-transport, ros-iron-message-filters, ros-iron-moveit-common, ros-iron-moveit-core, ros-iron-moveit-msgs, ros-iron-moveit-ros-occupancy-map-monitor, ros-iron-moveit-ros-planning, ros-iron-object-recognition-msgs, ros-iron-pluginlib (>= 1.11.2), ros-iron-rclcpp, ros-iron-sensor-msgs, ros-iron-tf2, ros-iron-tf2-eigen, ros-iron-tf2-geometry-msgs, ros-iron-tf2-ros, ros-iron-urdf, ros-iron-ros-workspace
+Description: Components of MoveIt connecting to perception
