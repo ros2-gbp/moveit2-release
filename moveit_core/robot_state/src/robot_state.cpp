@@ -1461,7 +1461,7 @@ bool RobotState::integrateVariableVelocity(const JointModelGroup* jmg, const Eig
 bool RobotState::setFromIK(const JointModelGroup* jmg, const geometry_msgs::msg::Pose& pose, double timeout,
                            const GroupStateValidityCallbackFn& constraint,
                            const kinematics::KinematicsQueryOptions& options,
-                           kinematics::KinematicsBase::IKCostFn cost_function)
+                           const kinematics::KinematicsBase::IKCostFn& cost_function)
 {
   const kinematics::KinematicsBaseConstPtr& solver = jmg->getSolverInstance();
   if (!solver)
@@ -1475,7 +1475,7 @@ bool RobotState::setFromIK(const JointModelGroup* jmg, const geometry_msgs::msg:
 bool RobotState::setFromIK(const JointModelGroup* jmg, const geometry_msgs::msg::Pose& pose, const std::string& tip,
                            double timeout, const GroupStateValidityCallbackFn& constraint,
                            const kinematics::KinematicsQueryOptions& options,
-                           kinematics::KinematicsBase::IKCostFn cost_function)
+                           const kinematics::KinematicsBase::IKCostFn& cost_function)
 {
   Eigen::Isometry3d mat;
   tf2::fromMsg(pose, mat);
@@ -1486,7 +1486,7 @@ bool RobotState::setFromIK(const JointModelGroup* jmg, const geometry_msgs::msg:
 bool RobotState::setFromIK(const JointModelGroup* jmg, const Eigen::Isometry3d& pose, double timeout,
                            const GroupStateValidityCallbackFn& constraint,
                            const kinematics::KinematicsQueryOptions& options,
-                           kinematics::KinematicsBase::IKCostFn cost_function)
+                           const kinematics::KinematicsBase::IKCostFn& cost_function)
 {
   const kinematics::KinematicsBaseConstPtr& solver = jmg->getSolverInstance();
   if (!solver)
@@ -1501,7 +1501,7 @@ bool RobotState::setFromIK(const JointModelGroup* jmg, const Eigen::Isometry3d& 
 bool RobotState::setFromIK(const JointModelGroup* jmg, const Eigen::Isometry3d& pose_in, const std::string& tip_in,
                            double timeout, const GroupStateValidityCallbackFn& constraint,
                            const kinematics::KinematicsQueryOptions& options,
-                           kinematics::KinematicsBase::IKCostFn cost_function)
+                           const kinematics::KinematicsBase::IKCostFn& cost_function)
 {
   static std::vector<double> consistency_limits;
   return setFromIK(jmg, pose_in, tip_in, consistency_limits, timeout, constraint, options, cost_function);
@@ -1551,7 +1551,7 @@ bool RobotState::setFromIK(const JointModelGroup* jmg, const Eigen::Isometry3d& 
                            const std::vector<double>& consistency_limits_in, double timeout,
                            const GroupStateValidityCallbackFn& constraint,
                            const kinematics::KinematicsQueryOptions& options,
-                           kinematics::KinematicsBase::IKCostFn cost_function)
+                           const kinematics::KinematicsBase::IKCostFn& cost_function)
 {
   // Convert from single pose and tip to vectors
   EigenSTL::vector_Isometry3d poses;
@@ -1570,7 +1570,7 @@ bool RobotState::setFromIK(const JointModelGroup* jmg, const EigenSTL::vector_Is
                            const std::vector<std::string>& tips_in, double timeout,
                            const GroupStateValidityCallbackFn& constraint,
                            const kinematics::KinematicsQueryOptions& options,
-                           kinematics::KinematicsBase::IKCostFn cost_function)
+                           const kinematics::KinematicsBase::IKCostFn& cost_function)
 {
   const std::vector<std::vector<double> > consistency_limits;
   return setFromIK(jmg, poses_in, tips_in, consistency_limits, timeout, constraint, options, cost_function);
@@ -1581,7 +1581,7 @@ bool RobotState::setFromIK(const JointModelGroup* jmg, const EigenSTL::vector_Is
                            const std::vector<std::vector<double> >& consistency_limit_sets, double timeout,
                            const GroupStateValidityCallbackFn& constraint,
                            const kinematics::KinematicsQueryOptions& options,
-                           kinematics::KinematicsBase::IKCostFn cost_function)
+                           const kinematics::KinematicsBase::IKCostFn& cost_function)
 {
   // Error check
   if (poses_in.size() != tips_in.size())
@@ -1605,8 +1605,9 @@ bool RobotState::setFromIK(const JointModelGroup* jmg, const EigenSTL::vector_Is
     std::string error_msg;
     if (!solver->supportsGroup(jmg, &error_msg))
     {
-      RCLCPP_ERROR(LOGGER, "Kinematics solver %s does not support joint group %s.  Error: %s", typeid(*solver).name(),
-                   jmg->getName().c_str(), error_msg.c_str());
+      const kinematics::KinematicsBase& solver_ref = *solver;
+      RCLCPP_ERROR(LOGGER, "Kinematics solver %s does not support joint group %s.  Error: %s",
+                   typeid(solver_ref).name(), jmg->getName().c_str(), error_msg.c_str());
       valid_solver = false;
     }
   }
