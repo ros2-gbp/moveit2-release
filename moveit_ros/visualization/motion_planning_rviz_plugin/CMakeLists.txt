@@ -28,10 +28,12 @@ set(SOURCE_FILES
   src/icons/icons.qrc
 )
 
-add_library(moveit_motion_planning_rviz_plugin_core SHARED ${SOURCE_FILES} ${HEADERS} ${UIC_FILES})
-set_target_properties(moveit_motion_planning_rviz_plugin_core PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
-target_link_libraries(moveit_motion_planning_rviz_plugin_core moveit_rviz_plugin_render_tools moveit_planning_scene_rviz_plugin)
-ament_target_dependencies(moveit_motion_planning_rviz_plugin_core
+set(MOVEIT_LIB_NAME moveit_motion_planning_rviz_plugin)
+add_library(${MOVEIT_LIB_NAME}_core SHARED ${SOURCE_FILES} ${HEADERS} ${UIC_FILES})
+set_target_properties(${MOVEIT_LIB_NAME}_core PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
+target_link_libraries(${MOVEIT_LIB_NAME}_core moveit_rviz_plugin_render_tools moveit_planning_scene_rviz_plugin)
+ament_target_dependencies(${MOVEIT_LIB_NAME}_core
+  Boost
   moveit_ros_robot_interaction
   moveit_ros_planning_interface
   moveit_ros_warehouse
@@ -39,18 +41,20 @@ ament_target_dependencies(moveit_motion_planning_rviz_plugin_core
   rviz_ogre_vendor
   Qt5
   pluginlib
+  rviz_ogre_vendor
 )
-target_include_directories(moveit_motion_planning_rviz_plugin_core PRIVATE "${OGRE_PREFIX_DIR}/include")
+target_include_directories(${MOVEIT_LIB_NAME}_core PRIVATE "${OGRE_PREFIX_DIR}/include")
 
-add_library(moveit_motion_planning_rviz_plugin SHARED src/plugin_init.cpp)
-set_target_properties(moveit_motion_planning_rviz_plugin PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
-target_link_libraries(moveit_motion_planning_rviz_plugin moveit_motion_planning_rviz_plugin_core)
-ament_target_dependencies(moveit_motion_planning_rviz_plugin
+add_library(${MOVEIT_LIB_NAME} SHARED src/plugin_init.cpp)
+set_target_properties(${MOVEIT_LIB_NAME} PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
+target_link_libraries(${MOVEIT_LIB_NAME} ${MOVEIT_LIB_NAME}_core)
+ament_target_dependencies(${MOVEIT_LIB_NAME}
+  Boost
   moveit_ros_robot_interaction
   moveit_ros_warehouse
   pluginlib
   rviz_ogre_vendor
 )
-target_include_directories(moveit_motion_planning_rviz_plugin PRIVATE "${OGRE_PREFIX_DIR}/include")
+target_include_directories(${MOVEIT_LIB_NAME} PRIVATE "${OGRE_PREFIX_DIR}/include")
 
-install(DIRECTORY include/ DESTINATION include/moveit_ros_visualization)
+install(DIRECTORY include/ DESTINATION include)

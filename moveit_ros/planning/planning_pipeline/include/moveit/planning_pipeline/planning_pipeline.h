@@ -36,8 +36,6 @@
 
 #pragma once
 
-#include <atomic>
-
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/planning_request_adapter/planning_request_adapter.h>
 #include <pluginlib/class_loader.hpp>
@@ -136,6 +134,18 @@ public:
                     const planning_interface::MotionPlanRequest& req,
                     planning_interface::MotionPlanResponse& res) const;
 
+  /** \brief Call the motion planner plugin and the sequence of planning request adapters (if any).
+      \param planning_scene The planning scene where motion planning is to be done
+      \param req The request for motion planning
+      \param res The motion planning response
+      \param adapter_added_state_index Sometimes planning request adapters may add states on the solution path (e.g.,
+     add the current state of the robot as prefix, when the robot started to plan only from near that state, as the
+     current state itself appears to touch obstacles). This is helpful because the added states should not be considered
+     invalid in all situations. */
+  bool generatePlan(const planning_scene::PlanningSceneConstPtr& planning_scene,
+                    const planning_interface::MotionPlanRequest& req, planning_interface::MotionPlanResponse& res,
+                    std::vector<std::size_t>& adapter_added_state_index) const;
+
   /** \brief Request termination, if a generatePlan() function is currently computing plans */
   void terminate() const;
 
@@ -163,17 +173,8 @@ public:
     return robot_model_;
   }
 
-  /** \brief Get current status of the planning pipeline */
-  [[nodiscard]] bool isActive() const
-  {
-    return active_;
-  }
-
 private:
   void configure();
-
-  // Flag that indicates whether or not the planning pipeline is currently solving a planning problem
-  mutable std::atomic<bool> active_;
 
   std::shared_ptr<rclcpp::Node> node_;
   std::string parameter_namespace_;

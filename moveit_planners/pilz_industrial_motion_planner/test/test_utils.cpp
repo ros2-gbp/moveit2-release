@@ -188,7 +188,7 @@ bool testutils::isGoalReached(const moveit::core::RobotModelConstPtr& robot_mode
   auto rot_diff{ actual_rotation - expected_rotation };
   if (rot_diff.norm() > orientation_tolerance)
   {
-    std::cout << "\nOrientation difference = " << rot_diff.norm() << " (eps=" << orientation_tolerance << ')'
+    std::cout << "\nOrientation difference = " << rot_diff.norm() << " (eps=" << orientation_tolerance << ")"
               << "\n### Expected goal orientation: ### \n"
               << expected_rotation << '\n'
               << "### Actual goal orientation ### \n"
@@ -201,7 +201,7 @@ bool testutils::isGoalReached(const moveit::core::RobotModelConstPtr& robot_mode
   auto pos_diff{ actual_position - expected_position };
   if (pos_diff.norm() > pos_tolerance)
   {
-    std::cout << "\nPosition difference = " << pos_diff.norm() << " (eps=" << pos_tolerance << ')'
+    std::cout << "\nPosition difference = " << pos_diff.norm() << " (eps=" << pos_tolerance << ")"
               << "\n### Expected goal position: ### \n"
               << expected_position << '\n'
               << "### Actual goal position ### \n"
@@ -494,7 +494,7 @@ bool testutils::checkJointTrajectory(const trajectory_msgs::msg::JointTrajectory
       return ::testing::AssertionFailure()
              << "Waypoint " << (i) << " has " << trajectory->getWayPointDurationFromPrevious(i)
              << " time between itself and its predecessor."
-             << " Total points in trajectory: " << trajectory->getWayPointCount() << '.';
+             << " Total points in trajectory: " << trajectory->getWayPointCount() << ".";
     }
   }
 
@@ -787,9 +787,9 @@ bool testutils::checkBlendingCartSpaceContinuity(const pilz_industrial_motion_pl
   }
 
   // limits
-  double max_trans_velo = planner_limits.getCartesianLimits().max_trans_vel;
-  double max_trans_acc = planner_limits.getCartesianLimits().max_trans_acc;
-  double max_rot_velo = planner_limits.getCartesianLimits().max_rot_vel;
+  double max_trans_velo = planner_limits.getCartesianLimits().getMaxTranslationalVelocity();
+  double max_trans_acc = planner_limits.getCartesianLimits().getMaxTranslationalAcceleration();
+  double max_rot_velo = planner_limits.getCartesianLimits().getMaxRotationalVelocity();
   double max_rot_acc = max_trans_acc / max_trans_velo * max_rot_velo;
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

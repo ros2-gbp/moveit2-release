@@ -57,13 +57,9 @@ JMGItemModel::JMGItemModel(const moveit::core::RobotState& robot_state, const st
 int JMGItemModel::rowCount(const QModelIndex& /*parent*/) const
 {
   if (!jmg_)
-  {
     return robot_state_.getVariableCount();
-  }
   else
-  {
     return jmg_->getVariableCount();
-  }
 }
 
 int JMGItemModel::columnCount(const QModelIndex& /*parent*/) const
@@ -274,13 +270,9 @@ void MotionPlanningFrameJointsWidget::setActiveModel(JMGItemModel* model)
 void MotionPlanningFrameJointsWidget::triggerUpdate(JMGItemModel* model)
 {
   if (model == start_state_model_.get())
-  {
     planning_display_->setQueryStartState(model->getRobotState());
-  }
   else
-  {
     planning_display_->setQueryGoalState(model->getRobotState());
-  }
 }
 
 // Find matching key vector in columns of haystack and return the best-aligned column index.
@@ -503,7 +495,7 @@ ProgressBarEditor::ProgressBarEditor(QWidget* parent, float min, float max, int 
 {
   // if left mouse button is pressed, grab all future mouse events until button(s) released
   if (QApplication::mouseButtons() & Qt::LeftButton)
-    grabMouse();
+    this->grabMouse();
 }
 
 void ProgressBarEditor::paintEvent(QPaintEvent* /*event*/)
@@ -512,7 +504,7 @@ void ProgressBarEditor::paintEvent(QPaintEvent* /*event*/)
 
   QStyleOptionProgressBar opt;
   opt.rect = rect();
-  opt.palette = palette();
+  opt.palette = this->palette();
   opt.minimum = 0;
   opt.maximum = 1000;
   opt.progress = 1000. * (value_ - min_) / (max_ - min_);

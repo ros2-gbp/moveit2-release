@@ -39,7 +39,6 @@
 // ROS2
 #include <rclcpp/rclcpp.hpp>
 #include <random_numbers/random_numbers.h>
-#include <lma_kinematics_parameters.hpp>
 
 // ROS msgs
 #include <geometry_msgs/msg/pose.hpp>
@@ -156,7 +155,13 @@ private:
   std::vector<std::string> joint_names_;
   rclcpp::Node::SharedPtr node_;
 
-  std::shared_ptr<lma_kinematics::ParamListener> param_listener_;
-  lma_kinematics::Params params_;
+  int max_solver_iterations_;
+  double epsilon_;
+  /** weight of orientation error vs position error
+   *
+   * < 1.0: orientation has less importance than position
+   * > 1.0: orientation has more importance than position
+   * = 0.0: perform position-only IK */
+  double orientation_vs_position_weight_;
 };
 }  // namespace lma_kinematics_plugin

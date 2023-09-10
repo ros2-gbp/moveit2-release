@@ -164,12 +164,12 @@ protected:
 TEST_F(TrajectoryGeneratorPTPTest, TestExceptionErrorCodeMapping)
 {
   {
-    auto pvpsf_ex = std::make_shared<PtpVelocityProfileSyncFailed>("");
+    std::shared_ptr<PtpVelocityProfileSyncFailed> pvpsf_ex{ new PtpVelocityProfileSyncFailed("") };
     EXPECT_EQ(pvpsf_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::FAILURE);
   }
 
   {
-    auto pnisfgp_ex = std::make_shared<PtpNoIkSolutionForGoalPose>("");
+    std::shared_ptr<PtpNoIkSolutionForGoalPose> pnisfgp_ex{ new PtpNoIkSolutionForGoalPose("") };
     EXPECT_EQ(pnisfgp_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::NO_IK_SOLUTION);
   }
 }
@@ -185,14 +185,14 @@ TEST_F(TrajectoryGeneratorPTPTest, noLimits)
 }
 
 /**
- * @brief Send an empty request, define res.trajectory
+ * @brief Send an empty request, define res.trajectory_
  *
  *  - Test Sequence:
  *    1. Create request, define a trajectory in the result
  *    2. assign at least one joint limit will all required limits
  *
  *  - Expected Results:
- *    1. the res.trajectory should be cleared (contain no waypoints)
+ *    1. the res.trajectory_ should be cleared (contain no waypoints)
  */
 TEST_F(TrajectoryGeneratorPTPTest, emptyRequest)
 {
@@ -203,13 +203,13 @@ TEST_F(TrajectoryGeneratorPTPTest, emptyRequest)
       new robot_trajectory::RobotTrajectory(this->robot_model_, planning_group_));
   moveit::core::RobotState state(this->robot_model_);
   trajectory->addPrefixWayPoint(state, 0);
-  res.trajectory = trajectory;
+  res.trajectory_ = trajectory;
 
-  EXPECT_FALSE(res.trajectory->empty());
+  EXPECT_FALSE(res.trajectory_->empty());
 
   EXPECT_FALSE(ptp_->generate(planning_scene_, req, res));
 
-  EXPECT_TRUE(res.trajectory->empty());
+  EXPECT_TRUE(res.trajectory_->empty());
 }
 
 /**
@@ -300,8 +300,8 @@ TEST_F(TrajectoryGeneratorPTPTest, testInsufficientLimit)
 
   EXPECT_THROW(
       {
-        auto ptp_error =
-            std::make_unique<TrajectoryGeneratorPTP>(robot_model_, insufficient_planner_limits, planning_group_);
+        std::unique_ptr<TrajectoryGeneratorPTP> ptp_error(
+            new TrajectoryGeneratorPTP(robot_model_, insufficient_planner_limits, planning_group_));
       },
       TrajectoryGeneratorInvalidLimitsException);
 
@@ -339,8 +339,8 @@ TEST_F(TrajectoryGeneratorPTPTest, testInsufficientLimit)
   sufficient_planner_limits.setJointLimits(sufficient_joint_limits);
 
   EXPECT_NO_THROW({
-    auto ptp_no_error =
-        std::make_unique<TrajectoryGeneratorPTP>(robot_model_, sufficient_planner_limits, planning_group_);
+    std::unique_ptr<TrajectoryGeneratorPTP> ptp_no_error(
+        new TrajectoryGeneratorPTP(robot_model_, sufficient_planner_limits, planning_group_));
   });
 }
 
@@ -375,7 +375,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testCartesianGoal)
   //*** test robot model without gripper ***
   //****************************************
   ASSERT_TRUE(ptp_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
 
   moveit_msgs::msg::MotionPlanResponse res_msg;
   res.getMessage(res_msg);
@@ -423,12 +423,12 @@ TEST_F(TrajectoryGeneratorPTPTest, testCartesianGoalMissingLinkNameConstraints)
   planning_interface::MotionPlanRequest req_no_position_constaint_link_name = req;
   req_no_position_constaint_link_name.goal_constraints.front().position_constraints.front().link_name = "";
   ASSERT_FALSE(ptp_->generate(planning_scene_, req_no_position_constaint_link_name, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_GOAL_CONSTRAINTS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_GOAL_CONSTRAINTS);
 
   planning_interface::MotionPlanRequest req_no_orientation_constaint_link_name = req;
   req_no_orientation_constaint_link_name.goal_constraints.front().orientation_constraints.front().link_name = "";
   ASSERT_FALSE(ptp_->generate(planning_scene_, req_no_orientation_constaint_link_name, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_GOAL_CONSTRAINTS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_GOAL_CONSTRAINTS);
 }
 
 /**
@@ -455,8 +455,8 @@ TEST_F(TrajectoryGeneratorPTPTest, testInvalidCartesianGoal)
   req.goal_constraints.push_back(pose_goal);
 
   ASSERT_FALSE(ptp_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::NO_IK_SOLUTION);
-  EXPECT_EQ(res.trajectory, nullptr);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::NO_IK_SOLUTION);
+  EXPECT_EQ(res.trajectory_, nullptr);
 }
 
 /**
@@ -481,7 +481,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalAlreadyReached)
 
   // TODO lin and circ has different settings
   ASSERT_TRUE(ptp_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
 
   moveit_msgs::msg::MotionPlanResponse res_msg;
   res.getMessage(res_msg);
@@ -553,19 +553,19 @@ TEST_F(TrajectoryGeneratorPTPTest, testScalingFactor)
   req.max_acceleration_scaling_factor = 1.0 / 3.0;
 
   ASSERT_TRUE(ptp_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
 
   moveit_msgs::msg::MotionPlanResponse res_msg;
   res.getMessage(res_msg);
   EXPECT_TRUE(checkTrajectory(res_msg.trajectory.joint_trajectory, req, planner_limits_.getJointLimitContainer()));
 
   // trajectory duration
-  EXPECT_NEAR(4.5, res.trajectory->getWayPointDurationFromStart(res.trajectory->getWayPointCount()),
+  EXPECT_NEAR(4.5, res.trajectory_->getWayPointDurationFromStart(res.trajectory_->getWayPointCount()),
               joint_acceleration_tolerance_);
 
   // way point at 1s
   int index;
-  index = testutils::getWayPointIndex(res.trajectory, 1.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 1.0);
   // joint_1
   EXPECT_NEAR(0.125, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.25, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -586,7 +586,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testScalingFactor)
   EXPECT_NEAR(0.0, res_msg.trajectory.joint_trajectory.points[index].accelerations[4], joint_acceleration_tolerance_);
 
   // way point at 2s
-  index = testutils::getWayPointIndex(res.trajectory, 2.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 2.0);
   // joint_1
   EXPECT_NEAR(0.5, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.5, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -603,7 +603,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testScalingFactor)
   EXPECT_NEAR(0.0, res_msg.trajectory.joint_trajectory.points[index].accelerations[1], joint_acceleration_tolerance_);
 
   // way point at 3s
-  index = testutils::getWayPointIndex(res.trajectory, 3.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 3.0);
   // joint_1
   EXPECT_NEAR(1, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.5, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -623,7 +623,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testScalingFactor)
   EXPECT_NEAR(0.0, res_msg.trajectory.joint_trajectory.points[index].accelerations[3], joint_acceleration_tolerance_);
 
   // way point at 4s
-  index = testutils::getWayPointIndex(res.trajectory, 4.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 4.0);
   // joint_1
   EXPECT_NEAR(2.875 / 2.0, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.25, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -640,7 +640,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testScalingFactor)
   EXPECT_NEAR(-1.0, res_msg.trajectory.joint_trajectory.points[index].accelerations[5], joint_acceleration_tolerance_);
 
   // way point at 4.5s
-  index = testutils::getWayPointIndex(res.trajectory, 4.5);
+  index = testutils::getWayPointIndex(res.trajectory_, 4.5);
   // joint_1
   EXPECT_NEAR(1.5, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.0, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -680,19 +680,19 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalAndAlmostZeroStartVelocity)
   req.goal_constraints.push_back(gc);
 
   ASSERT_TRUE(ptp_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
 
   moveit_msgs::msg::MotionPlanResponse res_msg;
   res.getMessage(res_msg);
   EXPECT_TRUE(checkTrajectory(res_msg.trajectory.joint_trajectory, req, planner_limits_.getJointLimitContainer()));
 
   // trajectory duration
-  EXPECT_NEAR(4.5, res.trajectory->getWayPointDurationFromStart(res.trajectory->getWayPointCount()),
+  EXPECT_NEAR(4.5, res.trajectory_->getWayPointDurationFromStart(res.trajectory_->getWayPointCount()),
               joint_acceleration_tolerance_);
 
   // way point at 1s
   int index;
-  index = testutils::getWayPointIndex(res.trajectory, 1.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 1.0);
   // joint_1
   EXPECT_NEAR(0.125, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.25, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -713,7 +713,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalAndAlmostZeroStartVelocity)
   EXPECT_NEAR(0.0, res_msg.trajectory.joint_trajectory.points[index].accelerations[4], joint_acceleration_tolerance_);
 
   // way point at 2s
-  index = testutils::getWayPointIndex(res.trajectory, 2.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 2.0);
   // joint_1
   EXPECT_NEAR(0.5, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.5, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -730,7 +730,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalAndAlmostZeroStartVelocity)
   EXPECT_NEAR(0.0, res_msg.trajectory.joint_trajectory.points[index].accelerations[1], joint_acceleration_tolerance_);
 
   // way point at 3s
-  index = testutils::getWayPointIndex(res.trajectory, 3.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 3.0);
   // joint_1
   EXPECT_NEAR(1, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.5, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -750,7 +750,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalAndAlmostZeroStartVelocity)
   EXPECT_NEAR(0.0, res_msg.trajectory.joint_trajectory.points[index].accelerations[3], joint_acceleration_tolerance_);
 
   // way point at 4s
-  index = testutils::getWayPointIndex(res.trajectory, 4.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 4.0);
   // joint_1
   EXPECT_NEAR(2.875 / 2.0, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.25, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -767,7 +767,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalAndAlmostZeroStartVelocity)
   EXPECT_NEAR(-1.0, res_msg.trajectory.joint_trajectory.points[index].accelerations[5], joint_acceleration_tolerance_);
 
   // way point at 4.5s
-  index = testutils::getWayPointIndex(res.trajectory, 4.5);
+  index = testutils::getWayPointIndex(res.trajectory_, 4.5);
   // joint_1
   EXPECT_NEAR(1.5, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.0, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -822,14 +822,14 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalNoStartVel)
   req.goal_constraints.push_back(gc);
 
   ASSERT_TRUE(ptp_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
 
   moveit_msgs::msg::MotionPlanResponse res_msg;
   res.getMessage(res_msg);
   EXPECT_TRUE(checkTrajectory(res_msg.trajectory.joint_trajectory, req, planner_limits_.getJointLimitContainer()));
 
   // trajectory duration
-  EXPECT_NEAR(4.5, res.trajectory->getWayPointDurationFromStart(res.trajectory->getWayPointCount()),
+  EXPECT_NEAR(4.5, res.trajectory_->getWayPointDurationFromStart(res.trajectory_->getWayPointCount()),
               joint_position_tolerance_);
 
   // way point at 0s
@@ -851,7 +851,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalNoStartVel)
 
   // way point at 1s
   int index;
-  index = testutils::getWayPointIndex(res.trajectory, 1.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 1.0);
   // joint_1
   EXPECT_NEAR(0.125, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.25, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -877,7 +877,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalNoStartVel)
   EXPECT_NEAR(0.5, res_msg.trajectory.joint_trajectory.points[index].accelerations[5], joint_acceleration_tolerance_);
 
   // way point at 2s
-  index = testutils::getWayPointIndex(res.trajectory, 2.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 2.0);
   // joint_1
   EXPECT_NEAR(0.5, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.5, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -896,7 +896,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalNoStartVel)
   EXPECT_NEAR(1.0, res_msg.trajectory.joint_trajectory.points[index].velocities[5], joint_velocity_tolerance_);
 
   // way point at 3s
-  index = testutils::getWayPointIndex(res.trajectory, 3.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 3.0);
   // joint_1
   EXPECT_NEAR(1, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.5, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -920,7 +920,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalNoStartVel)
   EXPECT_NEAR(0.0, res_msg.trajectory.joint_trajectory.points[index].accelerations[5], joint_acceleration_tolerance_);
 
   // way point at 4s
-  index = testutils::getWayPointIndex(res.trajectory, 4.0);
+  index = testutils::getWayPointIndex(res.trajectory_, 4.0);
   // joint_1
   EXPECT_NEAR(2.875 / 2.0, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.25, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);
@@ -946,7 +946,7 @@ TEST_F(TrajectoryGeneratorPTPTest, testJointGoalNoStartVel)
   EXPECT_NEAR(-1.0, res_msg.trajectory.joint_trajectory.points[index].accelerations[5], joint_acceleration_tolerance_);
 
   // way point at 4.5s
-  index = testutils::getWayPointIndex(res.trajectory, 4.5);
+  index = testutils::getWayPointIndex(res.trajectory_, 4.5);
   // joint_1
   EXPECT_NEAR(1.5, res_msg.trajectory.joint_trajectory.points[index].positions[0], joint_position_tolerance_);
   EXPECT_NEAR(0.0, res_msg.trajectory.joint_trajectory.points[index].velocities[0], joint_velocity_tolerance_);

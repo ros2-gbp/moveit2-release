@@ -71,7 +71,7 @@ void checkFCLCapabilities(const DistanceRequest& req)
                           FCL_MAJOR_VERSION, FCL_MINOR_VERSION, FCL_PATCH_VERSION);
   }
 #else
-  static_cast<void>(req);  // silent -Wunused-parameter
+  (void)(req);  // silent -Wunused-parameter
 #endif
 }
 }  // namespace
@@ -85,8 +85,7 @@ CollisionEnvFCL::CollisionEnvFCL(const moveit::core::RobotModelConstPtr& model, 
   robot_fcl_objs_.resize(robot_model_->getLinkGeometryCount());
   // we keep the same order of objects as what RobotState *::getLinkState() returns
   for (auto link : links)
-  {
-    for (std::size_t j{ 0 }; j < link->getShapes().size(); ++j)
+    for (std::size_t j = 0; j < link->getShapes().size(); ++j)
     {
       FCLGeometryConstPtr link_geometry = createCollisionGeometry(link->getShapes()[j], getLinkScale(link->getName()),
                                                                   getLinkPadding(link->getName()), link, j);
@@ -105,7 +104,6 @@ CollisionEnvFCL::CollisionEnvFCL(const moveit::core::RobotModelConstPtr& model, 
       else
         RCLCPP_ERROR(LOGGER, "Unable to construct collision geometry for link '%s'", link->getName().c_str());
     }
-  }
 
   manager_ = std::make_unique<fcl::DynamicAABBTreeCollisionManagerd>();
 
@@ -124,8 +122,7 @@ CollisionEnvFCL::CollisionEnvFCL(const moveit::core::RobotModelConstPtr& model, 
   robot_fcl_objs_.resize(robot_model_->getLinkGeometryCount());
   // we keep the same order of objects as what RobotState *::getLinkState() returns
   for (auto link : links)
-  {
-    for (std::size_t j{ 0 }; j < link->getShapes().size(); ++j)
+    for (std::size_t j = 0; j < link->getShapes().size(); ++j)
     {
       FCLGeometryConstPtr g = createCollisionGeometry(link->getShapes()[j], getLinkScale(link->getName()),
                                                       getLinkPadding(link->getName()), link, j);
@@ -143,7 +140,6 @@ CollisionEnvFCL::CollisionEnvFCL(const moveit::core::RobotModelConstPtr& model, 
       else
         RCLCPP_ERROR(LOGGER, "Unable to construct collision geometry for link '%s'", link->getName().c_str());
     }
-  }
 
   manager_ = std::make_unique<fcl::DynamicAABBTreeCollisionManagerd>();
 
@@ -179,7 +175,7 @@ void CollisionEnvFCL::getAttachedBodyObjects(const moveit::core::AttachedBody* a
                                              std::vector<FCLGeometryConstPtr>& geoms) const
 {
   const std::vector<shapes::ShapeConstPtr>& shapes = ab->getShapes();
-  const size_t num_shapes{ shapes.size() };
+  const size_t num_shapes = shapes.size();
   geoms.reserve(num_shapes);
   for (std::size_t i = 0; i < num_shapes; ++i)
   {
@@ -192,7 +188,7 @@ void CollisionEnvFCL::getAttachedBodyObjects(const moveit::core::AttachedBody* a
 
 void CollisionEnvFCL::constructFCLObjectWorld(const World::Object* obj, FCLObject& fcl_obj) const
 {
-  for (std::size_t i{ 0 }; i < obj->shapes_.size(); ++i)
+  for (std::size_t i = 0; i < obj->shapes_.size(); ++i)
   {
     FCLGeometryConstPtr g = createCollisionGeometry(obj->shapes_[i], obj);
     if (g)
@@ -209,8 +205,7 @@ void CollisionEnvFCL::constructFCLObjectRobot(const moveit::core::RobotState& st
   fcl_obj.collision_objects_.reserve(robot_geoms_.size());
   fcl::Transform3d fcl_tf;
 
-  for (std::size_t i{ 0 }; i < robot_geoms_.size(); ++i)
-  {
+  for (std::size_t i = 0; i < robot_geoms_.size(); ++i)
     if (robot_geoms_[i] && robot_geoms_[i]->collision_geometry_)
     {
       transform2fcl(state.getCollisionBodyTransform(robot_geoms_[i]->collision_geometry_data_->ptr.link,
@@ -221,7 +216,6 @@ void CollisionEnvFCL::constructFCLObjectRobot(const moveit::core::RobotState& st
       coll_obj->computeAABB();
       fcl_obj.collision_objects_.push_back(FCLCollisionObjectPtr(coll_obj));
     }
-  }
 
   // TODO: Implement a method for caching fcl::CollisionObject's for moveit::core::AttachedBody's
   std::vector<const moveit::core::AttachedBody*> ab;
@@ -232,7 +226,6 @@ void CollisionEnvFCL::constructFCLObjectRobot(const moveit::core::RobotState& st
     getAttachedBodyObjects(body, objs);
     const EigenSTL::vector_Isometry3d& ab_t = body->getGlobalCollisionBodyTransforms();
     for (std::size_t k = 0; k < objs.size(); ++k)
-    {
       if (objs[k]->collision_geometry_)
       {
         transform2fcl(ab_t[k], fcl_tf);
@@ -242,7 +235,6 @@ void CollisionEnvFCL::constructFCLObjectRobot(const moveit::core::RobotState& st
         // and would be destroyed when objs goes out of scope.
         fcl_obj.collision_geometry_.push_back(objs[k]);
       }
-    }
   }
 }
 
@@ -453,7 +445,7 @@ void CollisionEnvFCL::updatedPaddingOrScaling(const std::vector<std::string>& li
     const moveit::core::LinkModel* lmodel = robot_model_->getLinkModel(link);
     if (lmodel)
     {
-      for (std::size_t j{ 0 }; j < lmodel->getShapes().size(); ++j)
+      for (std::size_t j = 0; j < lmodel->getShapes().size(); ++j)
       {
         FCLGeometryConstPtr g = createCollisionGeometry(lmodel->getShapes()[j], getLinkScale(lmodel->getName()),
                                                         getLinkPadding(lmodel->getName()), lmodel, j);

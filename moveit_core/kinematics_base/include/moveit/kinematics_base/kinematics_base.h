@@ -434,10 +434,8 @@ public:
   virtual const std::string& getTipFrame() const
   {
     if (tip_frames_.size() > 1)
-    {
       RCLCPP_ERROR(LOGGER, "This kinematic solver has more than one tip frame, "
                            "do not call getTipFrame()");
-    }
 
     return tip_frames_[0];
   }
@@ -606,8 +604,8 @@ protected:
    * as the predominant configuration but also allows groupwise specifications.
    */
   template <typename T>
-  [[deprecated("Use generate_parameter_library instead")]] inline bool
-  lookupParam(const rclcpp::Node::SharedPtr& node, const std::string& param, T& val, const T& default_val) const
+  inline bool lookupParam(const rclcpp::Node::SharedPtr& node, const std::string& param, T& val,
+                          const T& default_val) const
   {
     if (node->has_parameter({ group_name_ + "." + param }))
     {

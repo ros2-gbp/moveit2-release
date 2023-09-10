@@ -74,10 +74,8 @@ bool LMAKinematicsPlugin::checkConsistency(const Eigen::VectorXd& seed_state,
                                            const Eigen::VectorXd& solution) const
 {
   for (std::size_t i = 0; i < dimension_; ++i)
-  {
     if (fabs(seed_state(i) - solution(i)) > consistency_limits[i])
       return false;
-  }
   return true;
 }
 
@@ -86,12 +84,6 @@ bool LMAKinematicsPlugin::initialize(const rclcpp::Node::SharedPtr& node, const 
                                      const std::vector<std::string>& tip_frames, double search_discretization)
 {
   node_ = node;
-
-  // Get Solver Parameters
-  std::string kinematics_param_prefix = "robot_description_kinematics." + group_name;
-  param_listener_ = std::make_shared<lma_kinematics::ParamListener>(node, kinematics_param_prefix);
-  params_ = param_listener_->get_params();
-
   storeValues(robot_model, group_name, base_frame, tip_frames, search_discretization);
   joint_model_group_ = robot_model_->getJointModelGroup(group_name);
   if (!joint_model_group_)
@@ -130,6 +122,18 @@ bool LMAKinematicsPlugin::initialize(const rclcpp::Node::SharedPtr& node, const 
     }
   }
   dimension_ = joints_.size();
+
+  // Get Solver Parameters
+  lookupParam(node_, "max_solver_iterations", max_solver_iterations_, 500);
+  lookupParam(node_, "epsilon", epsilon_, 1e-5);
+  lookupParam(node_, "orientation_vs_position", orientation_vs_position_weight_, 0.01);
+
+  bool position_ik;
+  lookupParam(node_, "position_only_ik", position_ik, false);
+  if (position_ik)  // position_only_ik overrules orientation_vs_position
+    orientation_vs_position_weight_ = 0.0;
+  if (orientation_vs_position_weight_ == 0.0)
+    RCLCPP_INFO(LOGGER, "Using position only ik");
 
   // Setup the joint state groups that we need
   state_ = std::make_shared<moveit::core::RobotState>(robot_model_);
@@ -202,10 +206,8 @@ bool LMAKinematicsPlugin::obeysLimits(const Eigen::VectorXd& values) const
 {
   size_t i = 0;
   for (const auto& jm : joints_)
-  {
     if (!jm->satisfiesPositionBounds(&values[i++]))
       return false;
-  }
   return true;
 }
 
@@ -239,17 +241,13 @@ bool LMAKinematicsPlugin::searchPositionIK(const geometry_msgs::msg::Pose& ik_po
     return false;
   }
 
-  const auto orientation_vs_position_weight = params_.position_only_ik ? 0.0 : params_.orientation_vs_position;
-  if (orientation_vs_position_weight == 0.0)
-    RCLCPP_INFO(LOGGER, "Using position only ik");
-
   Eigen::Matrix<double, 6, 1> cartesian_weights;
   cartesian_weights(0) = 1;
   cartesian_weights(1) = 1;
   cartesian_weights(2) = 1;
-  cartesian_weights(3) = orientation_vs_position_weight;
-  cartesian_weights(4) = orientation_vs_position_weight;
-  cartesian_weights(5) = orientation_vs_position_weight;
+  cartesian_weights(3) = orientation_vs_position_weight_;
+  cartesian_weights(4) = orientation_vs_position_weight_;
+  cartesian_weights(5) = orientation_vs_position_weight_;
 
   KDL::JntArray jnt_seed_state(dimension_);
   KDL::JntArray jnt_pos_in(dimension_);
@@ -257,16 +255,16 @@ bool LMAKinematicsPlugin::searchPositionIK(const geometry_msgs::msg::Pose& ik_po
   jnt_seed_state.data = Eigen::Map<const Eigen::VectorXd>(ik_seed_state.data(), ik_seed_state.size());
   jnt_pos_in = jnt_seed_state;
 
-  KDL::ChainIkSolverPos_LMA ik_solver_pos(kdl_chain_, cartesian_weights, params_.epsilon, params_.max_solver_iterations);
+  KDL::ChainIkSolverPos_LMA ik_solver_pos(kdl_chain_, cartesian_weights, epsilon_, max_solver_iterations_);
   solution.resize(dimension_);
 
   KDL::Frame pose_desired;
   tf2::fromMsg(ik_pose, pose_desired);
 
   RCLCPP_DEBUG_STREAM(LOGGER, "searchPositionIK2: Position request pose is "
-                                  << ik_pose.position.x << ' ' << ik_pose.position.y << ' ' << ik_pose.position.z << ' '
-                                  << ik_pose.orientation.x << ' ' << ik_pose.orientation.y << ' '
-                                  << ik_pose.orientation.z << ' ' << ik_pose.orientation.w);
+                                  << ik_pose.position.x << " " << ik_pose.position.y << " " << ik_pose.position.z << " "
+                                  << ik_pose.orientation.x << " " << ik_pose.orientation.y << " "
+                                  << ik_pose.orientation.z << " " << ik_pose.orientation.w);
   unsigned int attempt = 0;
   do
   {
@@ -274,13 +272,9 @@ bool LMAKinematicsPlugin::searchPositionIK(const geometry_msgs::msg::Pose& ik_po
     if (attempt > 1)  // randomly re-seed after first attempt
     {
       if (!consistency_limits.empty())
-      {
         getRandomConfiguration(jnt_seed_state.data, consistency_limits, jnt_pos_in.data);
-      }
       else
-      {
         getRandomConfiguration(jnt_pos_in.data);
-      }
       RCLCPP_DEBUG_STREAM(LOGGER, "New random configuration (" << attempt << "): " << jnt_pos_in);
     }
 

@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.22)
-project(moveit_planners_trajopt LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.1.3)
+project(moveit_planners_trajopt)
 
 find_package(catkin REQUIRED
     COMPONENTS
@@ -10,13 +10,13 @@ find_package(catkin REQUIRED
       pluginlib
       roscpp
       rosparam_shortcuts
+      trajopt
 )
-find_package(trajopt REQUIRED)
 
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES
-      moveit_planners_trajopt
+      ${PROJECT_NAME}
     INCLUDE_DIRS
     CATKIN_DEPENDS
       roscpp
@@ -37,7 +37,7 @@ include_directories(
 )
 
 add_library(
-  moveit_planners_trajopt
+  ${PROJECT_NAME}
   src/trajopt_interface.cpp
   src/problem_description.cpp
   src/kinematic_terms.cpp
@@ -45,23 +45,22 @@ add_library(
 )
 
 target_link_libraries(
-  moveit_planners_trajopt
+  ${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
-  trajopt::trajopt
 )
 
 set_target_properties(
-  moveit_planners_trajopt
+  ${PROJECT_NAME}
   PROPERTIES
   VERSION
-  "${moveit_planners_trajopt_VERSION}"
+  "${${PROJECT_NAME}_VERSION}"
 )
 
 # TrajOpt planning plugin
 add_library(moveit_trajopt_planner_plugin src/trajopt_planner_manager.cpp)
-set_target_properties(moveit_trajopt_planner_plugin PROPERTIES VERSION "${moveit_planners_trajopt_VERSION}")
-target_link_libraries(moveit_trajopt_planner_plugin moveit_planners_trajopt ${catkin_LIBRARIES})
+set_target_properties(moveit_trajopt_planner_plugin PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
+target_link_libraries(moveit_trajopt_planner_plugin ${PROJECT_NAME} ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -102,7 +101,7 @@ if(CATKIN_ENABLE_TESTING)
     trajectory_test
     ${LIBRARY_NAME}
     ${catkin_LIBRARIES}
-    moveit_planners_trajopt
+    ${PROJECT_NAME}
   )
 
 endif()

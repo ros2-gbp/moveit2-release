@@ -1236,13 +1236,9 @@ public:
   {
     const JointModelGroup* jmg = getJointModelGroup(group_name);
     if (jmg)
-    {
       return setToDefaultValues(jmg, state_name);
-    }
     else
-    {
       return false;
-    }
   }
 
   /** \brief Set all joints to random values.  Values will be within default bounds. */
@@ -1534,10 +1530,8 @@ public:
   void harmonizePosition(const JointModel* joint)
   {
     if (joint->harmonizePosition(position_ + joint->getFirstVariableIndex()))
-    {
       // no need to mark transforms dirty, as the transform hasn't changed
       updateMimicJoint(joint);
-    }
   }
 
   void enforceVelocityBounds(const JointModel* joint)

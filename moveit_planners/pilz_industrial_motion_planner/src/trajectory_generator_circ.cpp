@@ -58,7 +58,11 @@ TrajectoryGeneratorCIRC::TrajectoryGeneratorCIRC(const moveit::core::RobotModelC
                                                  const std::string& /*group_name*/)
   : TrajectoryGenerator::TrajectoryGenerator(robot_model, planner_limits)
 {
-  planner_limits_.printCartesianLimits();
+  if (!planner_limits_.hasFullCartesianLimits())
+  {
+    throw TrajectoryGeneratorInvalidLimitsException(
+        "Cartesian limits are not fully set for CIRC trajectory generator.");
+  }
 }
 
 void TrajectoryGeneratorCIRC::cmdSpecificRequestValidation(const planning_interface::MotionPlanRequest& req) const
@@ -229,8 +233,8 @@ std::unique_ptr<KDL::Path> TrajectoryGeneratorCIRC::setPathCIRC(const MotionPlan
   // The KDL::Path implementation chooses the motion with the longer duration
   // (translation vs. rotation)
   // and uses eqradius as scaling factor between the distances.
-  double eqradius =
-      planner_limits_.getCartesianLimits().max_trans_vel / planner_limits_.getCartesianLimits().max_rot_vel;
+  double eqradius = planner_limits_.getCartesianLimits().getMaxTranslationalVelocity() /
+                    planner_limits_.getCartesianLimits().getMaxRotationalVelocity();
 
   try
   {

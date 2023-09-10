@@ -37,6 +37,8 @@
 #include <moveit/ompl_interface/ompl_interface.h>
 #include <moveit/robot_state/conversions.h>
 #include <moveit/kinematic_constraints/utils.h>
+#include <moveit/ompl_interface/detail/constrained_valid_state_sampler.h>
+
 #include <moveit/utils/lexical_casts.h>
 #include <fstream>
 
@@ -181,25 +183,17 @@ void OMPLInterface::loadPlannerConfigurations()
         {
           RCLCPP_ERROR_STREAM(LOGGER, "Invalid type for parameter '" << name << "' expected ["
                                                                      << rclcpp::to_string(type) << "] got ["
-                                                                     << rclcpp::to_string(parameter.get_type()) << ']');
+                                                                     << rclcpp::to_string(parameter.get_type()) << "]");
           continue;
         }
         if (parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING)
-        {
           specific_group_params[name] = parameter.as_string();
-        }
         else if (parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
-        {
           specific_group_params[name] = moveit::core::toString(parameter.as_double());
-        }
         else if (parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
-        {
           specific_group_params[name] = std::to_string(parameter.as_int());
-        }
         else if (parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
-        {
           specific_group_params[name] = std::to_string(parameter.as_bool());
-        }
       }
     }
 

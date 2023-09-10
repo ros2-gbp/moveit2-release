@@ -156,13 +156,11 @@ bool TrajectoryFunctionsTestBase::tfNear(const Eigen::Isometry3d& pose1, const E
                                          const double& epsilon)
 {
   for (std::size_t i = 0; i < 3; ++i)
-  {
     for (std::size_t j = 0; j < 4; ++j)
     {
       if (fabs(pose1(i, j) - pose2(i, j)) > fabs(epsilon))
         return false;
     }
-  }
   return true;
 }
 
@@ -222,10 +220,6 @@ TEST_F(TrajectoryFunctionsTestFlangeAndGripper, testIKSolver)
   const moveit::core::JointModelGroup* jmg = robot_model_->getJointModelGroup(planning_group_);
   const kinematics::KinematicsBaseConstPtr& solver = jmg->getSolverInstance();
 
-  if (!solver)
-  {
-    throw("No IK solver configured for group '" + planning_group_ + "'");
-  }
   // robot state
   moveit::core::RobotState rstate(robot_model_);
 
@@ -244,13 +238,9 @@ TEST_F(TrajectoryFunctionsTestFlangeAndGripper, testIKSolver)
     {
       ik_expect.push_back(rstate.getVariablePosition(joint_name));
       if (rstate.getVariablePosition(joint_name) > 0)
-      {
         ik_seed.push_back(rstate.getVariablePosition(joint_name) - IK_SEED_OFFSET);
-      }
       else
-      {
         ik_seed.push_back(rstate.getVariablePosition(joint_name) + IK_SEED_OFFSET);
-      }
     }
 
     std::vector<std::vector<double>> ik_solutions;
@@ -298,13 +288,9 @@ TEST_F(TrajectoryFunctionsTestFlangeAndGripper, testIKRobotState)
     {
       ik_expect[joint_name] = rstate.getVariablePosition(joint_name);
       if (rstate.getVariablePosition(joint_name) > 0)
-      {
         ik_seed[joint_name] = rstate.getVariablePosition(joint_name) - IK_SEED_OFFSET;
-      }
       else
-      {
         ik_seed[joint_name] = rstate.getVariablePosition(joint_name) + IK_SEED_OFFSET;
-      }
     }
 
     rstate.setVariablePositions(ik_seed);

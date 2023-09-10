@@ -106,17 +106,16 @@ protected:
     pilz_industrial_motion_planner::JointLimitsContainer joint_limits =
         pilz_industrial_motion_planner::JointLimitsAggregator::getAggregatedLimits(
             node_, PARAM_NAMESPACE_LIMITS, robot_model_->getActiveJointModels());
-
+    CartesianLimit cart_limits;
     // Cartesian limits are chose as such values to ease the manually compute the
     // trajectory
-    cartesian_limits::Params cartesian_limit;
-    cartesian_limit.max_trans_vel = 1.0 * M_PI;
-    cartesian_limit.max_trans_acc = 1.0 * M_PI;
-    cartesian_limit.max_trans_dec = 1.0 * M_PI;
-    cartesian_limit.max_rot_vel = 1.0 * M_PI;
 
+    cart_limits.setMaxRotationalVelocity(1 * M_PI);
+    cart_limits.setMaxTranslationalAcceleration(1 * M_PI);
+    cart_limits.setMaxTranslationalDeceleration(1 * M_PI);
+    cart_limits.setMaxTranslationalVelocity(1 * M_PI);
     planner_limits_.setJointLimits(joint_limits);
-    planner_limits_.setCartesianLimits(cartesian_limit);
+    planner_limits_.setCartesianLimits(cart_limits);
 
     // initialize the LIN trajectory generator
     circ_ = std::make_unique<TrajectoryGeneratorCIRC>(robot_model_, planner_limits_, planning_group_);
@@ -128,7 +127,7 @@ protected:
   {
     moveit_msgs::msg::MotionPlanResponse res_msg;
     res.getMessage(res_msg);
-    EXPECT_TRUE(testutils::isGoalReached(res.trajectory->getFirstWayPointPtr()->getRobotModel(),
+    EXPECT_TRUE(testutils::isGoalReached(res.trajectory_->getFirstWayPointPtr()->getRobotModel(),
                                          res_msg.trajectory.joint_trajectory, req, other_tolerance_));
 
     EXPECT_TRUE(
@@ -141,23 +140,23 @@ protected:
     Eigen::Vector3d circ_center;
     getCircCenter(req, res, circ_center);
 
-    for (std::size_t i = 0; i < res.trajectory->getWayPointCount(); ++i)
+    for (std::size_t i = 0; i < res.trajectory_->getWayPointCount(); ++i)
     {
-      Eigen::Affine3d waypoint_pose = res.trajectory->getWayPointPtr(i)->getFrameTransform(target_link_);
+      Eigen::Affine3d waypoint_pose = res.trajectory_->getWayPointPtr(i)->getFrameTransform(target_link_);
       EXPECT_NEAR(
-          (res.trajectory->getFirstWayPointPtr()->getFrameTransform(target_link_).translation() - circ_center).norm(),
+          (res.trajectory_->getFirstWayPointPtr()->getFrameTransform(target_link_).translation() - circ_center).norm(),
           (circ_center - waypoint_pose.translation()).norm(), cartesian_position_tolerance_);
     }
 
     // check translational and rotational paths
-    ASSERT_TRUE(testutils::checkCartesianTranslationalPath(res.trajectory, target_link_, acceleration_tolerance_));
-    ASSERT_TRUE(testutils::checkCartesianRotationalPath(res.trajectory, target_link_, angular_acc_tolerance_,
+    ASSERT_TRUE(testutils::checkCartesianTranslationalPath(res.trajectory_, target_link_, acceleration_tolerance_));
+    ASSERT_TRUE(testutils::checkCartesianRotationalPath(res.trajectory_, target_link_, angular_acc_tolerance_,
                                                         rot_axis_norm_tolerance_));
 
-    for (size_t idx = 0; idx < res.trajectory->getLastWayPointPtr()->getVariableCount(); ++idx)
+    for (size_t idx = 0; idx < res.trajectory_->getLastWayPointPtr()->getVariableCount(); ++idx)
     {
-      EXPECT_NEAR(0.0, res.trajectory->getLastWayPointPtr()->getVariableVelocity(idx), other_tolerance_);
-      EXPECT_NEAR(0.0, res.trajectory->getLastWayPointPtr()->getVariableAcceleration(idx), other_tolerance_);
+      EXPECT_NEAR(0.0, res.trajectory_->getLastWayPointPtr()->getVariableVelocity(idx), other_tolerance_);
+      EXPECT_NEAR(0.0, res.trajectory_->getLastWayPointPtr()->getVariableAcceleration(idx), other_tolerance_);
     }
   }
 
@@ -179,8 +178,8 @@ protected:
       Eigen::Vector3d interim;
       tf2::fromMsg(req.path_constraints.position_constraints.at(0).constraint_region.primitive_poses.at(0).position,
                    interim);
-      Eigen::Vector3d start = res.trajectory->getFirstWayPointPtr()->getFrameTransform(target_link_).translation();
-      Eigen::Vector3d goal = res.trajectory->getLastWayPointPtr()->getFrameTransform(target_link_).translation();
+      Eigen::Vector3d start = res.trajectory_->getFirstWayPointPtr()->getFrameTransform(target_link_).translation();
+      Eigen::Vector3d goal = res.trajectory_->getLastWayPointPtr()->getFrameTransform(target_link_).translation();
 
       const Eigen::Vector3d t = interim - start;
       const Eigen::Vector3d u = goal - start;
@@ -220,59 +219,69 @@ protected:
 TEST_F(TrajectoryGeneratorCIRCTest, TestExceptionErrorCodeMapping)
 {
   {
-    auto cnp_ex = std::make_shared<CircleNoPlane>("");
+    std::shared_ptr<CircleNoPlane> cnp_ex{ new CircleNoPlane("") };
     EXPECT_EQ(cnp_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
   }
 
   {
-    auto cts_ex = std::make_shared<CircleToSmall>("");
+    std::shared_ptr<CircleToSmall> cts_ex{ new CircleToSmall("") };
     EXPECT_EQ(cts_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
   }
 
   {
-    auto cpdr_ex = std::make_shared<CenterPointDifferentRadius>("");
+    std::shared_ptr<CenterPointDifferentRadius> cpdr_ex{ new CenterPointDifferentRadius("") };
     EXPECT_EQ(cpdr_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
   }
 
   {
-    auto ctcf_ex = std::make_shared<CircTrajectoryConversionFailure>("");
+    std::shared_ptr<CircTrajectoryConversionFailure> ctcf_ex{ new CircTrajectoryConversionFailure("") };
     EXPECT_EQ(ctcf_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
   }
 
   {
-    auto upcn_ex = std::make_shared<UnknownPathConstraintName>("");
+    std::shared_ptr<UnknownPathConstraintName> upcn_ex{ new UnknownPathConstraintName("") };
     EXPECT_EQ(upcn_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
   }
 
   {
-    auto npc_ex = std::make_shared<NoPositionConstraints>("");
+    std::shared_ptr<NoPositionConstraints> npc_ex{ new NoPositionConstraints("") };
     EXPECT_EQ(npc_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
   }
 
   {
-    auto npp_ex = std::make_shared<NoPrimitivePose>("");
+    std::shared_ptr<NoPrimitivePose> npp_ex{ new NoPrimitivePose("") };
     EXPECT_EQ(npp_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
   }
 
   {
-    auto ulnoap_ex = std::make_shared<UnknownLinkNameOfAuxiliaryPoint>("");
+    std::shared_ptr<UnknownLinkNameOfAuxiliaryPoint> ulnoap_ex{ new UnknownLinkNameOfAuxiliaryPoint("") };
     EXPECT_EQ(ulnoap_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::INVALID_LINK_NAME);
   }
 
   {
-    auto nocm_ex = std::make_shared<NumberOfConstraintsMismatch>("");
+    std::shared_ptr<NumberOfConstraintsMismatch> nocm_ex{ new NumberOfConstraintsMismatch("") };
     EXPECT_EQ(nocm_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::INVALID_GOAL_CONSTRAINTS);
   }
 
   {
-    auto cjmiss_ex = std::make_shared<CircJointMissingInStartState>("");
+    std::shared_ptr<CircJointMissingInStartState> cjmiss_ex{ new CircJointMissingInStartState("") };
     EXPECT_EQ(cjmiss_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::INVALID_ROBOT_STATE);
   }
 
   {
-    auto cifgi_ex = std::make_shared<CircInverseForGoalIncalculable>("");
+    std::shared_ptr<CircInverseForGoalIncalculable> cifgi_ex{ new CircInverseForGoalIncalculable("") };
     EXPECT_EQ(cifgi_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::NO_IK_SOLUTION);
   }
+}
+
+/**
+ * @brief Construct a TrajectoryGeneratorCirc with no limits given
+ */
+TEST_F(TrajectoryGeneratorCIRCTest, noLimits)
+{
+  LimitsContainer planner_limits;
+  EXPECT_THROW(TrajectoryGeneratorCIRC(this->robot_model_, planner_limits, planning_group_),
+               TrajectoryGeneratorInvalidLimitsException);
 }
 
 /**
@@ -290,7 +299,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, incompleteStartState)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_ROBOT_STATE);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_ROBOT_STATE);
 }
 
 /**
@@ -304,7 +313,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, nonZeroStartVelocity)
   req.start_state.joint_state.velocity.push_back(1.0);
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_ROBOT_STATE);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_ROBOT_STATE);
   req.start_state.joint_state.velocity.clear();
 }
 
@@ -314,7 +323,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, ValidCommand)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_TRUE(circ_->generate(planning_scene_, circ.toRequest(), res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
 }
 
 /**
@@ -327,7 +336,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, velScaleToHigh)
   circ.setVelocityScale(1.0);
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, circ.toRequest(), res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::PLANNING_FAILED);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::PLANNING_FAILED);
 }
 
 /**
@@ -340,7 +349,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, accScaleToHigh)
   circ.setAccelerationScale(1.0);
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, circ.toRequest(), res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::PLANNING_FAILED);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::PLANNING_FAILED);
 }
 
 /**
@@ -362,7 +371,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, samePointsWithCenter)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, circ.toRequest(), res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
 }
 
 /**
@@ -385,7 +394,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, samePointsWithInterim)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, circ.toRequest(), res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
 }
 
 /**
@@ -401,7 +410,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, emptyAux)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
 }
 
 /**
@@ -417,7 +426,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, invalidAuxName)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
 }
 
 /**
@@ -434,7 +443,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, invalidAuxLinkName)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_LINK_NAME);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_LINK_NAME);
 }
 
 /**
@@ -448,7 +457,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, invalidCenter)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, circ.toRequest(), res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
 }
 
 /**
@@ -468,7 +477,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, colinearCenter)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, circ.toRequest(), res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
 }
 
 /**
@@ -489,7 +498,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, colinearInterim)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, circ.toRequest(), res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
 }
 
 /**
@@ -507,7 +516,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, colinearCenterDueToInterim)
 
   planning_interface::MotionPlanResponse res;
   ASSERT_TRUE(circ_->generate(planning_scene_, circ.toRequest(), res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
 }
 
 /**
@@ -540,7 +549,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, colinearCenterAndInterim)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_TRUE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
   checkCircResult(req, res);
 }
 
@@ -574,7 +583,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, interimLarger180Degree)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_TRUE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
   checkCircResult(req, res);
 }
 
@@ -588,7 +597,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, centerPointJointGoal)
 
   planning_interface::MotionPlanResponse res;
   ASSERT_TRUE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
   checkCircResult(req, res);
 }
 
@@ -615,7 +624,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, InvalidAdditionalPrimitivePose)
 
   planning_interface::MotionPlanResponse res;
   ASSERT_FALSE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN);
 }
 
 /**
@@ -637,7 +646,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, InvalidExtraJointConstraint)
 
   planning_interface::MotionPlanResponse res;
   EXPECT_FALSE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_GOAL_CONSTRAINTS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::INVALID_GOAL_CONSTRAINTS);
 }
 
 /**
@@ -651,12 +660,12 @@ TEST_F(TrajectoryGeneratorCIRCTest, CenterPointPoseGoal)
 
   planning_interface::MotionPlanResponse res;
   ASSERT_TRUE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
   checkCircResult(req, res);
 }
 
 /**
- * @brief Set a frame id only on the position constraints
+ * @brief Set a frame id only on the position constrainst
  */
 TEST_F(TrajectoryGeneratorCIRCTest, CenterPointPoseGoalFrameIdPositionConstraints)
 {
@@ -668,12 +677,12 @@ TEST_F(TrajectoryGeneratorCIRCTest, CenterPointPoseGoalFrameIdPositionConstraint
 
   planning_interface::MotionPlanResponse res;
   ASSERT_TRUE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
   checkCircResult(req, res);
 }
 
 /**
- * @brief Set a frame id only on the orientation constraints
+ * @brief Set a frame id only on the orientation constrainst
  */
 TEST_F(TrajectoryGeneratorCIRCTest, CenterPointPoseGoalFrameIdOrientationConstraints)
 {
@@ -684,7 +693,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, CenterPointPoseGoalFrameIdOrientationConstra
 
   planning_interface::MotionPlanResponse res;
   ASSERT_TRUE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
   checkCircResult(req, res);
 }
 
@@ -703,7 +712,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, CenterPointPoseGoalFrameIdBothConstraints)
 
   planning_interface::MotionPlanResponse res;
   ASSERT_TRUE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
   checkCircResult(req, res);
 }
 
@@ -718,7 +727,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, InterimPointJointGoal)
 
   planning_interface::MotionPlanResponse res;
   ASSERT_TRUE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
   checkCircResult(req, res);
 }
 
@@ -739,7 +748,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, InterimPointJointGoalStartVelNearZero)
 
   planning_interface::MotionPlanResponse res;
   ASSERT_TRUE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
   checkCircResult(req, res);
 }
 
@@ -753,7 +762,7 @@ TEST_F(TrajectoryGeneratorCIRCTest, InterimPointPoseGoal)
 
   planning_interface::MotionPlanResponse res;
   ASSERT_TRUE(circ_->generate(planning_scene_, req, res));
-  EXPECT_EQ(res.error_code.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
+  EXPECT_EQ(res.error_code_.val, moveit_msgs::msg::MoveItErrorCodes::SUCCESS);
   checkCircResult(req, res);
 }
 

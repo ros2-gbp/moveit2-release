@@ -89,12 +89,12 @@ void GetSolverTipFrameTest::SetUp()
 TEST_F(GetSolverTipFrameTest, TestExceptionErrorCodeMapping)
 {
   {
-    auto nse_ex = std::make_shared<NoSolverException>("");
+    std::shared_ptr<NoSolverException> nse_ex{ new NoSolverException("") };
     EXPECT_EQ(nse_ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::FAILURE);
   }
 
   {
-    auto ex = std::make_shared<MoreThanOneTipFrameException>("");
+    std::shared_ptr<MoreThanOneTipFrameException> ex{ new MoreThanOneTipFrameException("") };
     EXPECT_EQ(ex->getErrorCode(), moveit_msgs::msg::MoveItErrorCodes::FAILURE);
   }
 }

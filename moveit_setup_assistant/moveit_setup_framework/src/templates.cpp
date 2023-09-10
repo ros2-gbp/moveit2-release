@@ -40,7 +40,7 @@
 
 namespace moveit_setup
 {
-std::vector<TemplateVariable> TemplatedGeneratedFile::variables;
+std::vector<TemplateVariable> TemplatedGeneratedFile::variables_;
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_setup.templates");
 
 bool TemplatedGeneratedFile::write()
@@ -71,7 +71,7 @@ bool TemplatedGeneratedFile::write()
   template_stream.close();
 
   // Replace keywords in string ------------------------------------------------------------
-  for (const auto& variable : variables)
+  for (const auto& variable : variables_)
   {
     std::string key_with_brackets = "[" + variable.key + "]";
     boost::replace_all(template_string, key_with_brackets, variable.value);

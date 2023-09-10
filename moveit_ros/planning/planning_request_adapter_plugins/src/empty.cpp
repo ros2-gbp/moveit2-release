@@ -32,16 +32,13 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Ioan Sucan
- * Desc: Empty adapter that just calls the planner
- */
+/* Author: Ioan Sucan */
 
 #include <moveit/planning_request_adapter/planning_request_adapter.h>
 #include <class_loader/class_loader.hpp>
 
 namespace default_planner_request_adapters
 {
-/** @brief Empty adapter that just calls the planner. */
 class Empty : public planning_request_adapter::PlanningRequestAdapter
 {
 public:
@@ -51,8 +48,8 @@ public:
   }
 
   bool adaptAndPlan(const PlannerFn& planner, const planning_scene::PlanningSceneConstPtr& planning_scene,
-                    const planning_interface::MotionPlanRequest& req,
-                    planning_interface::MotionPlanResponse& res) const override
+                    const planning_interface::MotionPlanRequest& req, planning_interface::MotionPlanResponse& res,
+                    std::vector<std::size_t>& /*added_path_index*/) const override
   {
     return planner(planning_scene, req, res);
   }

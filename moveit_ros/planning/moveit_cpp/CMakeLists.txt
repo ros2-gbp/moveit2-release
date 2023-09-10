@@ -1,19 +1,20 @@
-add_library(moveit_cpp SHARED
+set(MOVEIT_LIB_NAME moveit_cpp)
+
+add_library(${MOVEIT_LIB_NAME} SHARED
   src/moveit_cpp.cpp
   src/planning_component.cpp
 )
-set_target_properties(moveit_cpp PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
-ament_target_dependencies(moveit_cpp
+set_target_properties(${MOVEIT_LIB_NAME} PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
+ament_target_dependencies(${MOVEIT_LIB_NAME}
   rclcpp
   moveit_core
 )
-target_link_libraries(moveit_cpp
+target_link_libraries(${MOVEIT_LIB_NAME}
   moveit_planning_scene_monitor
   moveit_planning_pipeline
-  moveit_planning_pipeline_interfaces
   moveit_trajectory_execution_manager)
 
-install(DIRECTORY include/ DESTINATION include/moveit_ros_planning)
+install(DIRECTORY include/ DESTINATION include)
 
 # TODO: Port MoveItCpp test
 #if (BUILD_TESTING)

@@ -58,7 +58,7 @@ Bounds::Bounds(const std::vector<double>& lower, const std::vector<double>& uppe
 
 Eigen::VectorXd Bounds::penalty(const Eigen::Ref<const Eigen::VectorXd>& x) const
 {
-  assert(static_cast<long>(lower_.size()) == x.size());
+  assert((long)lower_.size() == x.size());
   Eigen::VectorXd penalty(x.size());
 
   for (unsigned int i = 0; i < x.size(); ++i)
@@ -81,7 +81,7 @@ Eigen::VectorXd Bounds::penalty(const Eigen::Ref<const Eigen::VectorXd>& x) cons
 
 Eigen::VectorXd Bounds::derivative(const Eigen::Ref<const Eigen::VectorXd>& x) const
 {
-  assert(static_cast<long>(lower_.size()) == x.size());
+  assert((long)lower_.size() == x.size());
   Eigen::VectorXd derivative(x.size());
 
   for (unsigned int i = 0; i < x.size(); ++i)
@@ -345,8 +345,8 @@ Bounds positionConstraintMsgToBoundVector(const moveit_msgs::msg::PositionConstr
 
 Bounds orientationConstraintMsgToBoundVector(const moveit_msgs::msg::OrientationConstraint& ori_con)
 {
-  std::vector<double> dims = { ori_con.absolute_x_axis_tolerance * 2.0, ori_con.absolute_y_axis_tolerance * 2.0,
-                               ori_con.absolute_z_axis_tolerance * 2.0 };
+  std::vector<double> dims = { ori_con.absolute_x_axis_tolerance, ori_con.absolute_y_axis_tolerance,
+                               ori_con.absolute_z_axis_tolerance };
 
   // dimension of -1 signifies unconstrained parameter, so set to infinity
   for (auto& dim : dims)

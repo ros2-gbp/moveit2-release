@@ -68,7 +68,7 @@ bool pilz_industrial_motion_planner::computePoseIK(const planning_scene::Plannin
   if (frame_id != robot_model->getModelFrame())
   {
     RCLCPP_ERROR_STREAM(LOGGER, "Given frame (" << frame_id << ") is unequal to model frame("
-                                                << robot_model->getModelFrame() << ')');
+                                                << robot_model->getModelFrame() << ")");
     return false;
   }
 
@@ -169,7 +169,8 @@ bool pilz_industrial_motion_planner::verifySampleJointLimits(
     // acceleration case
     if (fabs(velocity_last.at(pos.first)) <= fabs(velocity_current))
     {
-      if (!joint_limits.verifyAccelerationLimit(pos.first, acceleration_current))
+      if (joint_limits.getLimit(pos.first).has_acceleration_limits &&
+          fabs(acceleration_current) > fabs(joint_limits.getLimit(pos.first).max_acceleration))
       {
         RCLCPP_ERROR_STREAM(LOGGER, "Joint acceleration limit of "
                                         << pos.first << " violated. Set the acceleration scaling factor lower!"
@@ -182,7 +183,8 @@ bool pilz_industrial_motion_planner::verifySampleJointLimits(
     // deceleration case
     else
     {
-      if (!joint_limits.verifyDecelerationLimit(pos.first, acceleration_current))
+      if (joint_limits.getLimit(pos.first).has_deceleration_limits &&
+          fabs(acceleration_current) > fabs(joint_limits.getLimit(pos.first).max_deceleration))
       {
         RCLCPP_ERROR_STREAM(LOGGER, "Joint deceleration limit of "
                                         << pos.first << " violated. Set the acceleration scaling factor lower!"

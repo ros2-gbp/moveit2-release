@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>moveit_core</name>
-  <version>2.8.0</version>
+  <version>2.5.5</version>
   <description>Core libraries used by MoveIt</description>
 
   <maintainer email="henningkayser@picknik.ai">Henning Kayser</maintainer>
@@ -10,7 +10,7 @@
   <maintainer email="me@v4hn.de">Michael Görner</maintainer>
   <maintainer email="moveit_releasers@googlegroups.com">MoveIt Release Team</maintainer>
 
-  <license>BSD-3-Clause</license>
+  <license>BSD</license>
 
   <url type="website">http://moveit.ros.org</url>
   <url type="bugtracker">https://github.com/ros-planning/moveit2/issues</url>
@@ -25,7 +25,6 @@
   <buildtool_depend>pkg-config</buildtool_depend>
   <buildtool_depend>eigen3_cmake_module</buildtool_depend>
   <buildtool_export_depend>eigen3_cmake_module</buildtool_export_depend>
-
   <depend>angles</depend>
   <depend>assimp</depend>
   <depend>boost</depend>
@@ -36,7 +35,6 @@
   <depend>generate_parameter_library</depend>
   <depend>geometric_shapes</depend>
   <depend>geometry_msgs</depend>
-  <depend>google_benchmark_vendor</depend>
   <depend>kdl_parser</depend>
   <depend>libfcl-dev</depend>
   <depend>moveit_common</depend>
@@ -68,7 +66,6 @@
   <test_depend>moveit_resources_pr2_description</test_depend>
   <test_depend>angles</test_depend>
   <test_depend>orocos_kdl_vendor</test_depend>
-  <test_depend>ament_cmake_google_benchmark</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_cmake_gmock</test_depend>
   <test_depend>ament_index_cpp</test_depend>

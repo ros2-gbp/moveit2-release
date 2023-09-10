@@ -107,12 +107,11 @@ protected:
 
     pilz_industrial_motion_planner::JointLimitsContainer joint_limits =
         testutils::createFakeLimits(robot_model_->getVariableNames());
-
-    cartesian_limits::Params cartesian_limit;
-    cartesian_limit.max_trans_vel = 1.0 * M_PI;
-    cartesian_limit.max_trans_acc = 1.0 * M_PI;
-    cartesian_limit.max_trans_dec = 1.0 * M_PI;
-    cartesian_limit.max_rot_vel = 1.0 * M_PI;
+    pilz_industrial_motion_planner::CartesianLimit cartesian_limit;
+    cartesian_limit.setMaxRotationalVelocity(1.0 * M_PI);
+    cartesian_limit.setMaxTranslationalAcceleration(1.0 * M_PI);
+    cartesian_limit.setMaxTranslationalDeceleration(1.0 * M_PI);
+    cartesian_limit.setMaxTranslationalVelocity(1.0 * M_PI);
 
     pilz_industrial_motion_planner::LimitsContainer limits;
     limits.setJointLimits(joint_limits);
@@ -210,7 +209,7 @@ TYPED_TEST(PlanningContextTest, NoRequest)
   bool result = this->planning_context_->solve(res);
 
   EXPECT_FALSE(result) << testutils::demangle(typeid(TypeParam).name());
-  EXPECT_EQ(moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN, res.error_code.val)
+  EXPECT_EQ(moveit_msgs::msg::MoveItErrorCodes::INVALID_MOTION_PLAN, res.error_code_.val)
       << testutils::demangle(typeid(TypeParam).name());
 }
 
@@ -228,14 +227,14 @@ TYPED_TEST(PlanningContextTest, SolveValidRequest)
   bool result = this->planning_context_->solve(res);
 
   EXPECT_TRUE(result) << testutils::demangle(typeid(TypeParam).name());
-  EXPECT_EQ(moveit_msgs::msg::MoveItErrorCodes::SUCCESS, res.error_code.val)
+  EXPECT_EQ(moveit_msgs::msg::MoveItErrorCodes::SUCCESS, res.error_code_.val)
       << testutils::demangle(typeid(TypeParam).name());
 
   planning_interface::MotionPlanDetailedResponse res_detailed;
   bool result_detailed = this->planning_context_->solve(res_detailed);
 
   EXPECT_TRUE(result_detailed) << testutils::demangle(typeid(TypeParam).name());
-  EXPECT_EQ(moveit_msgs::msg::MoveItErrorCodes::SUCCESS, res.error_code.val)
+  EXPECT_EQ(moveit_msgs::msg::MoveItErrorCodes::SUCCESS, res.error_code_.val)
       << testutils::demangle(typeid(TypeParam).name());
 }
 
@@ -251,7 +250,7 @@ TYPED_TEST(PlanningContextTest, SolveValidRequestDetailedResponse)
   bool result = this->planning_context_->solve(res);
 
   EXPECT_TRUE(result) << testutils::demangle(typeid(TypeParam).name());
-  EXPECT_EQ(moveit_msgs::msg::MoveItErrorCodes::SUCCESS, res.error_code.val)
+  EXPECT_EQ(moveit_msgs::msg::MoveItErrorCodes::SUCCESS, res.error_code_.val)
       << testutils::demangle(typeid(TypeParam).name());
 }
 
@@ -271,7 +270,7 @@ TYPED_TEST(PlanningContextTest, SolveOnTerminated)
   bool result = this->planning_context_->solve(res);
   EXPECT_FALSE(result) << testutils::demangle(typeid(TypeParam).name());
 
-  EXPECT_EQ(moveit_msgs::msg::MoveItErrorCodes::PLANNING_FAILED, res.error_code.val)
+  EXPECT_EQ(moveit_msgs::msg::MoveItErrorCodes::PLANNING_FAILED, res.error_code_.val)
       << testutils::demangle(typeid(TypeParam).name());
 }
 

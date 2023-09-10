@@ -1,22 +1,20 @@
-add_library(moveit_constraint_samplers SHARED
+set(MOVEIT_LIB_NAME moveit_constraint_samplers)
+
+add_library(${MOVEIT_LIB_NAME} SHARED
   src/constraint_sampler.cpp
   src/constraint_sampler_manager.cpp
   src/constraint_sampler_tools.cpp
   src/default_constraint_samplers.cpp
   src/union_constraint_sampler.cpp
 )
-target_include_directories(moveit_constraint_samplers PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include/moveit_core>
-)
-set_target_properties(moveit_constraint_samplers PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
-ament_target_dependencies(moveit_constraint_samplers
+set_target_properties(${MOVEIT_LIB_NAME} PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
+ament_target_dependencies(${MOVEIT_LIB_NAME}
   urdf
   urdfdom
   urdfdom_headers
   visualization_msgs
 )
-target_link_libraries(moveit_constraint_samplers
+target_link_libraries(${MOVEIT_LIB_NAME}
   moveit_robot_trajectory
   moveit_robot_state
   moveit_kinematic_constraints
@@ -24,7 +22,7 @@ target_link_libraries(moveit_constraint_samplers
   moveit_planning_scene
 )
 
-install(DIRECTORY include/ DESTINATION include/moveit_core)
+install(DIRECTORY include/ DESTINATION include)
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gmock REQUIRED)
@@ -51,6 +49,6 @@ if(BUILD_TESTING)
   target_link_libraries(test_constraint_samplers
     moveit_test_utils
     moveit_utils
-    moveit_constraint_samplers
+    ${MOVEIT_LIB_NAME}
   )
 endif()

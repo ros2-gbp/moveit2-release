@@ -11,7 +11,6 @@ Checks:          '-*,
                   modernize-make-unique,
                   modernize-avoid-bind,
                   misc-unused-parameters,
-		              readability-braces-around-statements,
                   readability-named-parameter,
                   readability-redundant-smartptr-get,
                   readability-redundant-string-cstr,
@@ -43,15 +42,15 @@ CheckOptions:
   # variable names
   - key:             readability-identifier-naming.VariableCase
     value:           lower_case
-  - key:             readability-identifier-naming.ProtectedMemberSuffix
-    value:           '_'
-  - key:             readability-identifier-naming.PrivateMemberSuffix
+  - key:             readability-identifier-naming.ClassMemberSuffix
     value:           '_'
   # const static or global variables are UPPER_CASE
   - key:             readability-identifier-naming.EnumConstantCase
     value:           UPPER_CASE
   - key:             readability-identifier-naming.StaticConstantCase
     value:           UPPER_CASE
-  - key:             readability-identifier-naming.GlobalConstantCase
+  - key:             readability-identifier-naming.ClassConstantCase
+    value:           UPPER_CASE
+  - key:             readability-identifier-naming.GlobalVariableCase
     value:           UPPER_CASE
 ...

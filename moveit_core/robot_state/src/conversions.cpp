@@ -86,7 +86,6 @@ static bool _multiDOFJointsToRobotState(const sensor_msgs::msg::MultiDOFJointSta
   if (nj > 0 && !Transforms::sameFrame(mjs.header.frame_id, state.getRobotModel()->getModelFrame()))
   {
     if (tf)
-    {
       try
       {
         // find the transform that takes the given frame_id to the desired fixed frame
@@ -101,19 +100,14 @@ static bool _multiDOFJointsToRobotState(const sensor_msgs::msg::MultiDOFJointSta
         RCLCPP_ERROR(LOGGER, "Caught %s", ex.what());
         error = true;
       }
-    }
     else
-    {
       error = true;
-    }
 
     if (error)
-    {
       RCLCPP_WARN(LOGGER,
                   "The transform for multi-dof joints was specified in frame '%s' "
                   "but it was not possible to transform that to frame '%s'",
                   mjs.header.frame_id.c_str(), state.getRobotModel()->getModelFrame().c_str());
-    }
   }
 
   for (std::size_t i = 0; i < nj; ++i)
@@ -316,9 +310,7 @@ static void _msgToAttachedBody(const Transforms* tf, const moveit_msgs::msg::Att
           if (!frame_found)
           {
             if (tf && tf->canTransform(aco.object.header.frame_id))
-            {
               world_to_header_frame = tf->getTransform(aco.object.header.frame_id);
-            }
             else
             {
               world_to_header_frame.setIdentity();
@@ -339,12 +331,10 @@ static void _msgToAttachedBody(const Transforms* tf, const moveit_msgs::msg::Att
         else
         {
           if (state.clearAttachedBody(aco.object.id))
-          {
             RCLCPP_DEBUG(LOGGER,
                          "The robot state already had an object named '%s' attached to link '%s'. "
                          "The object was replaced.",
                          aco.object.id.c_str(), aco.link_name.c_str());
-          }
           state.attachBody(aco.object.id, object_pose, shapes, shape_poses, aco.touch_links, aco.link_name,
                            aco.detach_posture, subframe_poses);
           RCLCPP_DEBUG(LOGGER, "Attached object '%s' to link '%s'", aco.object.id.c_str(), aco.link_name.c_str());

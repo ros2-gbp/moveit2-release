@@ -52,9 +52,7 @@ ompl_interface::PoseModelStateSpace::PoseModelStateSpace(const ModelBasedStateSp
   jump_factor_ = 3;  // \todo make this a param
 
   if (spec.joint_model_group_->getGroupKinematics().first)
-  {
     poses_.emplace_back(spec.joint_model_group_, spec.joint_model_group_->getGroupKinematics().first);
-  }
   else if (!spec.joint_model_group_->getGroupKinematics().second.empty())
   {
     const moveit::core::JointModelGroup::KinematicsSolverMap& m = spec.joint_model_group_->getGroupKinematics().second;
@@ -62,14 +60,10 @@ ompl_interface::PoseModelStateSpace::PoseModelStateSpace(const ModelBasedStateSp
       poses_.emplace_back(it.first, it.second);
   }
   if (poses_.empty())
-  {
     RCLCPP_ERROR(LOGGER, "No kinematics solvers specified. Unable to construct a "
                          "PoseModelStateSpace");
-  }
   else
-  {
     std::sort(poses_.begin(), poses_.end());
-  }
   setName(getName() + "_" + PARAMETERIZATION_TYPE);
 }
 
@@ -141,10 +135,8 @@ void ompl_interface::PoseModelStateSpace::interpolate(const ompl::base::State* f
 
   // interpolate SE3 components
   for (std::size_t i = 0; i < poses_.size(); ++i)
-  {
     poses_[i].state_space_->interpolate(from->as<StateType>()->poses[i], to->as<StateType>()->poses[i], t,
                                         state->as<StateType>()->poses[i]);
-  }
 
   // the call above may reset all flags for state; but we know the pose we want flag should be set
   state->as<StateType>()->setPoseComputed(true);
@@ -269,13 +261,11 @@ bool ompl_interface::PoseModelStateSpace::computeStateFK(ompl::base::State* stat
   if (state->as<StateType>()->poseComputed())
     return true;
   for (std::size_t i = 0; i < poses_.size(); ++i)
-  {
     if (!poses_[i].computeStateFK(state->as<StateType>(), i))
     {
       state->as<StateType>()->markInvalid();
       return false;
     }
-  }
   state->as<StateType>()->setPoseComputed(true);
   return true;
 }
@@ -285,13 +275,11 @@ bool ompl_interface::PoseModelStateSpace::computeStateIK(ompl::base::State* stat
   if (state->as<StateType>()->jointsComputed())
     return true;
   for (std::size_t i = 0; i < poses_.size(); ++i)
-  {
     if (!poses_[i].computeStateIK(state->as<StateType>(), i))
     {
       state->as<StateType>()->markInvalid();
       return false;
     }
-  }
   state->as<StateType>()->setJointsComputed(true);
   return true;
 }

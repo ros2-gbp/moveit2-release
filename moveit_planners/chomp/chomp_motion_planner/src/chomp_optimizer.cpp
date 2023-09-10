@@ -51,6 +51,13 @@ namespace chomp
 {
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("chomp_optimizer");
 
+double getRandomDouble()
+{
+  std::default_random_engine seed;
+  std::uniform_real_distribution<> uniform(0.0, 1.0);
+  return uniform(seed);
+}
+
 ChompOptimizer::ChompOptimizer(ChompTrajectory* trajectory, const planning_scene::PlanningSceneConstPtr& planning_scene,
                                const std::string& planning_group, const ChompParameters* parameters,
                                const moveit::core::RobotState& start_state)
@@ -311,7 +318,7 @@ bool ChompOptimizer::optimize()
     double s_cost = getSmoothnessCost();
     double cost = c_cost + s_cost;
 
-    RCLCPP_DEBUG(LOGGER, "Collision cost %f, smoothness cost: %f", c_cost, s_cost);
+    RCLCPP_INFO(LOGGER, "Collision cost %f, smoothness cost: %f", c_cost, s_cost);
 
     /// TODO: HMC BASED COMMENTED CODE BELOW, Need to uncomment and perform extensive testing by varying the HMC
     /// parameters values in the chomp_planning.yaml file so that CHOMP can find optimal paths
@@ -328,7 +335,7 @@ bool ChompOptimizer::optimize()
     //       averageCostVelocity += (costs.at(i) - costs.at(i - 1));
     //     }
 
-    //     averageCostVelocity /= static_cast<double>(costWindow);
+    //     averageCostVelocity /= (double)(costWindow);
     //     currentCostIter = -1;
     //   }
     // }
@@ -371,7 +378,7 @@ bool ChompOptimizer::optimize()
 
     if (iteration_ % 10 == 0)
     {
-      RCLCPP_DEBUG(LOGGER, "iteration: %d", iteration_);
+      RCLCPP_INFO(LOGGER, "iteration: %d", iteration_);
       if (isCurrentTrajectoryMeshToMeshCollisionFree())
       {
         num_collision_free_iterations_ = 0;
@@ -418,7 +425,7 @@ bool ChompOptimizer::optimize()
       }
       else
       {
-        RCLCPP_DEBUG(LOGGER, "cCost %f over threshold %f", c_cost, parameters_->collision_threshold_);
+        RCLCPP_INFO(LOGGER, "cCost %f over threshold %f", c_cost, parameters_->collision_threshold_);
       }
     }
 
@@ -603,7 +610,7 @@ void ChompOptimizer::calculateCollisionIncrements()
   // This is faster and guaranteed to converge, but it may take more iterations in the worst case.
   if (parameters_->use_stochastic_descent_)
   {
-    start_point = static_cast<int>(rsl::uniform_real(0., 1.) * (free_vars_end_ - free_vars_start_) + free_vars_start_);
+    start_point = static_cast<int>(getRandomDouble() * (free_vars_end_ - free_vars_start_) + free_vars_start_);
     if (start_point < free_vars_start_)
       start_point = free_vars_start_;
     if (start_point > free_vars_end_)
@@ -1062,9 +1069,9 @@ void ChompOptimizer::perturbTrajectory()
 //     int j = 0;
 //     for(map<string, pair<double, double> >::iterator it = bounds.begin(); it != bounds.end(); ++it)
 //     {
-//       double randVal = jointState->getJointStateValues()[j] + (rsl::uniform_real(0., 1.)
+//       double randVal = jointState->getJointStateValues()[j] + (getRandomDouble()
 //                                                                * (parameters_->getRandomJumpAmount()) -
-//                                                                rsl::uniform_real(0., 1.) *
+//                                                                getRandomDouble() *
 //                                                                (parameters_->getRandomJumpAmount()));
 
 //       if(!continuous)
