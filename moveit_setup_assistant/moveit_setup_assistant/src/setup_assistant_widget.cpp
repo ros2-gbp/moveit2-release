@@ -35,7 +35,7 @@
 /* Author: Dave Coleman */
 
 // SA
-#include "moveit_setup_assistant/setup_assistant_widget.hpp"
+#include <moveit_setup_assistant/setup_assistant_widget.hpp>
 
 // Qt
 #include <QApplication>
@@ -55,7 +55,7 @@ namespace assistant
 // ******************************************************************************************
 // Outer User Interface for MoveIt Configuration Assistant
 // ******************************************************************************************
-SetupAssistantWidget::SetupAssistantWidget(rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr node,
+SetupAssistantWidget::SetupAssistantWidget(const rviz_common::ros_integration::RosNodeAbstractionIface::WeakPtr& node,
                                            QWidget* parent, const boost::program_options::variables_map& args)
   : QWidget(parent)
   , node_abstraction_(node)
