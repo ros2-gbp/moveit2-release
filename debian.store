@@ -1,1 +1,1 @@
-{"base": "3b4f81ce5", "parent": "debian/rolling/moveit_ros_occupancy_map_monitor", "previous": "c27ed6351", "trim": "", "trimbase": ""}
+{"base": "a0beca69a", "parent": "debian/rolling/moveit_ros_occupancy_map_monitor", "previous": "50deb78a0", "trim": "", "trimbase": ""}
