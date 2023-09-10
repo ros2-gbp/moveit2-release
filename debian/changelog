@@ -1,0 +1,23 @@
+ros-rolling-moveit-planners-stomp (2.8.0-2bullseye) bullseye; urgency=high
+
+  * Remove added path index from planner adapter function signature (#2285 <https://github.com/ros-planning/moveit2/issues/2285>)
+  * Always set response planner id and warn if it is not set (#2236 <https://github.com/ros-planning/moveit2/issues/2236>)
+  * Contributors: Sebastian Jahr
+
+ -- Henning Kayser <henningkayser@picknik.ai>  Sat, 09 Sep 2023 22:00:00 -0000
+
+ros-rolling-moveit-planners-stomp (2.7.4-2bullseye) bullseye; urgency=high
+
+  * Migrate STOMP from ros-planning/stomp_moveit (#2158 <https://github.com/ros-planning/moveit2/issues/2158>)
+  * Fix clang-tidy warnings
+  * Improve Documentation and Readability
+  * Remove MVT example
+  * Migrate stomp_moveit into moveit_planners
+    * Move package into moveit_planners subdirectory
+    * Rename stomp_moveit package to moveit_planners_stomp
+    * List moveit_planners_stomp as package dependency
+  * Contributors: Henning Kayser
+
+ -- Henning Kayser <henningkayser@picknik.ai>  Wed, 17 May 2023 22:00:00 -0000
+
+
