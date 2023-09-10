@@ -31,6 +31,7 @@ find_package(tf2_eigen REQUIRED)
 find_package(tf2_kdl REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(eigen_stl_containers REQUIRED)
+find_package(generate_parameter_library REQUIRED)
 find_package(geometric_shapes REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(kdl_parser REQUIRED)
@@ -84,37 +85,10 @@ set(THIS_PACKAGE_INCLUDE_DIRS
     utils/include
 )
 
-set(THIS_PACKAGE_LIBRARIES
-    moveit_butterworth_filter
-    moveit_collision_distance_field
-    moveit_collision_detection
-    moveit_collision_detection_fcl
-    moveit_collision_detection_bullet
-    moveit_dynamics_solver
-    moveit_constraint_samplers
-    moveit_distance_field
-    moveit_exceptions
-    moveit_kinematics_base
-    moveit_kinematic_constraints
-    moveit_kinematics_metrics
-    moveit_planning_interface
-    moveit_planning_scene
-    moveit_planning_request_adapter
-    # TODO: Port python bindings
-    # moveit_python_tools
-    moveit_robot_model
-    moveit_robot_state
-    moveit_robot_trajectory
-    moveit_smoothing_base
-    moveit_test_utils
-    moveit_trajectory_processing
-    moveit_transforms
-    moveit_utils
-)
-
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   angles
   eigen_stl_containers
+  generate_parameter_library
   geometric_shapes
   geometry_msgs
   kdl_parser
@@ -209,7 +183,34 @@ add_subdirectory(collision_detection_fcl)
 
 
 install(
-  TARGETS ${THIS_PACKAGE_LIBRARIES}
+  TARGETS
+    collision_detector_bullet_plugin
+    moveit_butterworth_filter
+    moveit_butterworth_parameters
+    moveit_collision_distance_field
+    moveit_collision_detection
+    moveit_collision_detection_fcl
+    moveit_collision_detection_bullet
+    moveit_dynamics_solver
+    moveit_constraint_samplers
+    moveit_distance_field
+    moveit_exceptions
+    moveit_kinematics_base
+    moveit_kinematic_constraints
+    moveit_kinematics_metrics
+    moveit_planning_interface
+    moveit_planning_scene
+    moveit_planning_request_adapter
+    # TODO: Port python bindings
+    # moveit_python_tools
+    moveit_robot_model
+    moveit_robot_state
+    moveit_robot_trajectory
+    moveit_smoothing_base
+    moveit_test_utils
+    moveit_trajectory_processing
+    moveit_transforms
+    moveit_utils
   EXPORT export_${PROJECT_NAME}
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
