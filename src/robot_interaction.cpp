@@ -35,7 +35,7 @@
 
 /* Author: Ioan Sucan, Adam Leeper */
 
-#include "moveit/robot_interaction/robot_interaction.h"
+#include <moveit/robot_interaction/robot_interaction.h>
 #include <moveit/robot_interaction/interaction_handler.h>
 #include <moveit/robot_interaction/interactive_marker_helpers.h>
 #include <moveit/robot_interaction/kinematic_options_map.h>
@@ -571,11 +571,11 @@ void RobotInteraction::toggleMoveInteractiveMarkerTopic(bool enable)
         std::string topic_name = int_marker_move_topics_[i];
         std::string marker_name = int_marker_names_[i];
         std::function<void(const geometry_msgs::msg::PoseStamped::SharedPtr)> subscription_callback =
-            [this, marker_name](const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
+            [this, marker_name](const geometry_msgs::msg::PoseStamped::SharedPtr& msg) {
               moveInteractiveMarker(marker_name, *msg);
             };
-        auto subscription =
-            node_->create_subscription<geometry_msgs::msg::PoseStamped>(topic_name, 1, subscription_callback);
+        auto subscription = node_->create_subscription<geometry_msgs::msg::PoseStamped>(
+            topic_name, rclcpp::SystemDefaultsQoS(), subscription_callback);
         int_marker_move_subscribers_.push_back(subscription);
       }
     }
