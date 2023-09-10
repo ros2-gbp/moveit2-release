@@ -137,7 +137,7 @@ private:
   bool satisfiesPoseTolerance(const Eigen::Vector3d& positional_tolerance, const double angular_tolerance);
 
   /** \brief Subscribe to the target pose on this topic */
-  void targetPoseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr msg);
+  void targetPoseCallback(const geometry_msgs::msg::PoseStamped::ConstSharedPtr& msg);
 
   /** \brief Update PID controller target positions & orientations */
   void updateControllerSetpoints();
@@ -159,7 +159,7 @@ private:
   // Joint group used for controlling the motions
   std::string move_group_name_;
 
-  rclcpp::Rate loop_rate_;
+  rclcpp::WallRate loop_rate_;
 
   // ROS interface to Servo
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_stamped_pub_;

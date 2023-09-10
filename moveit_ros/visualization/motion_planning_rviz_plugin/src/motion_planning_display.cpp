@@ -284,8 +284,8 @@ void MotionPlanningDisplay::toggleSelectPlanningGroupSubscription(bool enable)
   if (enable)
   {
     planning_group_sub_ = node_->create_subscription<std_msgs::msg::String>(
-        "/rviz/moveit/select_planning_group", 1,
-        [this](const std_msgs::msg::String::ConstSharedPtr msg) { return selectPlanningGroupCallback(msg); });
+        "/rviz/moveit/select_planning_group", rclcpp::SystemDefaultsQoS(),
+        [this](const std_msgs::msg::String::ConstSharedPtr& msg) { return selectPlanningGroupCallback(msg); });
   }
   else
   {
@@ -293,7 +293,7 @@ void MotionPlanningDisplay::toggleSelectPlanningGroupSubscription(bool enable)
   }
 }
 
-void MotionPlanningDisplay::selectPlanningGroupCallback(const std_msgs::msg::String::ConstSharedPtr msg)
+void MotionPlanningDisplay::selectPlanningGroupCallback(const std_msgs::msg::String::ConstSharedPtr& msg)
 {
   // synchronize ROS callback with main loop
   addMainLoopJob([this, group = msg->data] { changePlanningGroup(group); });
