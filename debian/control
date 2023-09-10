@@ -1,0 +1,12 @@
+Source: ros-iron-moveit-planners
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ros-iron-ament-cmake, ros-iron-ament-lint-auto <!nocheck>, ros-iron-ament-lint-common <!nocheck>, ros-iron-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-iron-moveit-planners
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-iron-moveit-planners-ompl, ros-iron-moveit-planners-stomp, ros-iron-pilz-industrial-motion-planner, ros-iron-ros-workspace
+Description: Meta package that installs all available planners for MoveIt
