@@ -58,7 +58,6 @@
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <std_msgs/msg/int8.hpp>
 #include <std_srvs/srv/empty.hpp>
-#include <tf2_eigen/tf2_eigen.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 
 // moveit_core
@@ -80,7 +79,8 @@ enum class ServoType
 class ServoCalcs
 {
 public:
-  ServoCalcs(rclcpp::Node::SharedPtr node, const std::shared_ptr<const moveit_servo::ServoParameters>& parameters,
+  ServoCalcs(const rclcpp::Node::SharedPtr& node,
+             const std::shared_ptr<const moveit_servo::ServoParameters>& parameters,
              const planning_scene_monitor::PlanningSceneMonitorPtr& planning_scene_monitor);
 
   ~ServoCalcs();
@@ -172,13 +172,6 @@ protected:
    */
   std::vector<const moveit::core::JointModel*> enforcePositionLimits(sensor_msgs::msg::JointState& joint_state) const;
 
-  /** \brief Possibly calculate a velocity scaling factor, due to proximity of
-   * singularity and direction of motion
-   */
-  double velocityScalingFactorForSingularity(const Eigen::VectorXd& commanded_velocity,
-                                             const Eigen::JacobiSVD<Eigen::MatrixXd>& svd,
-                                             const Eigen::MatrixXd& pseudo_inverse);
-
   /** \brief Compose the outgoing JointTrajectory message */
   void composeJointTrajMessage(const sensor_msgs::msg::JointState& joint_state,
                                trajectory_msgs::msg::JointTrajectory& joint_trajectory);
@@ -237,9 +230,9 @@ protected:
   void jointStateCB(const sensor_msgs::msg::JointState::SharedPtr msg);
 
   /* \brief Command callbacks */
-  void twistStampedCB(const geometry_msgs::msg::TwistStamped::SharedPtr msg);
-  void jointCmdCB(const control_msgs::msg::JointJog::SharedPtr msg);
-  void collisionVelocityScaleCB(const std_msgs::msg::Float64::SharedPtr msg);
+  void twistStampedCB(const geometry_msgs::msg::TwistStamped::ConstSharedPtr& msg);
+  void jointCmdCB(const control_msgs::msg::JointJog::ConstSharedPtr& msg);
+  void collisionVelocityScaleCB(const std_msgs::msg::Float64::ConstSharedPtr& msg);
 
   /**
    * Allow drift in certain dimensions. For example, may allow the wrist to rotate freely.
@@ -249,17 +242,17 @@ protected:
    * @param response the service response
    * @return true if the adjustment was made
    */
-  void changeDriftDimensions(const std::shared_ptr<moveit_msgs::srv::ChangeDriftDimensions::Request> req,
-                             std::shared_ptr<moveit_msgs::srv::ChangeDriftDimensions::Response> res);
+  void changeDriftDimensions(const std::shared_ptr<moveit_msgs::srv::ChangeDriftDimensions::Request>& req,
+                             const std::shared_ptr<moveit_msgs::srv::ChangeDriftDimensions::Response>& res);
 
   /** \brief Start the main calculation timer */
   // Service callback for changing servoing dimensions
-  void changeControlDimensions(const std::shared_ptr<moveit_msgs::srv::ChangeControlDimensions::Request> req,
-                               std::shared_ptr<moveit_msgs::srv::ChangeControlDimensions::Response> res);
+  void changeControlDimensions(const std::shared_ptr<moveit_msgs::srv::ChangeControlDimensions::Request>& req,
+                               const std::shared_ptr<moveit_msgs::srv::ChangeControlDimensions::Response>& res);
 
   /** \brief Service callback to reset Servo status, e.g. so the arm can move again after a collision */
-  bool resetServoStatus(const std::shared_ptr<std_srvs::srv::Empty::Request> req,
-                        std::shared_ptr<std_srvs::srv::Empty::Response> res);
+  bool resetServoStatus(const std::shared_ptr<std_srvs::srv::Empty::Request>& req,
+                        const std::shared_ptr<std_srvs::srv::Empty::Response>& res);
 
   // Pointer to the ROS node
   std::shared_ptr<rclcpp::Node> node_;
@@ -313,7 +306,6 @@ protected:
   rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr status_pub_;
   rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr trajectory_outgoing_cmd_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr multiarray_outgoing_cmd_pub_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr condition_pub_;
   rclcpp::Service<moveit_msgs::srv::ChangeControlDimensions>::SharedPtr control_dimensions_server_;
   rclcpp::Service<moveit_msgs::srv::ChangeDriftDimensions>::SharedPtr drift_dimensions_server_;
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reset_servo_status_;

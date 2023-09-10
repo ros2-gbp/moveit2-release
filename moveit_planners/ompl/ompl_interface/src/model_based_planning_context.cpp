@@ -60,11 +60,11 @@
 #include <ompl/base/terminationconditions/IterationTerminationCondition.h>
 #include <ompl/base/terminationconditions/CostConvergenceTerminationCondition.h>
 
-#include "ompl/base/objectives/PathLengthOptimizationObjective.h"
-#include "ompl/base/objectives/MechanicalWorkOptimizationObjective.h"
-#include "ompl/base/objectives/MinimaxObjective.h"
-#include "ompl/base/objectives/StateCostIntegralObjective.h"
-#include "ompl/base/objectives/MaximizeMinClearanceObjective.h"
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+#include <ompl/base/objectives/MechanicalWorkOptimizationObjective.h>
+#include <ompl/base/objectives/MinimaxObjective.h>
+#include <ompl/base/objectives/StateCostIntegralObjective.h>
+#include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
 #include <ompl/geometric/planners/prm/LazyPRM.h>
 
 namespace ompl_interface
@@ -968,7 +968,7 @@ void ompl_interface::ModelBasedPlanningContext::unregisterTerminationCondition()
   ptc_ = nullptr;
 }
 
-int32_t ompl_interface::ModelBasedPlanningContext::logPlannerStatus(og::SimpleSetupPtr ompl_simple_setup)
+int32_t ompl_interface::ModelBasedPlanningContext::logPlannerStatus(const og::SimpleSetupPtr& ompl_simple_setup)
 {
   auto result = moveit_msgs::msg::MoveItErrorCodes::PLANNING_FAILED;
   ompl::base::PlannerStatus ompl_status = ompl_simple_setup->getLastPlannerStatus();
