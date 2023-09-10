@@ -55,9 +55,9 @@
 #include <functional>
 #include <thread>
 #include <variant>
-#include "rclcpp/rclcpp.hpp"
+#include <rclcpp/rclcpp.hpp>
 
-#include "moveit_planning_scene_export.h"
+#include <moveit_planning_scene_export.h>
 
 /** \brief This namespace includes the central class for representing planning contexts */
 namespace planning_scene
@@ -255,7 +255,7 @@ public:
     return world_const_;
   }
 
-  // brief Get the representation of the world
+  /** \brief Get the representation of the world */
   const collision_detection::WorldPtr& getWorldNonConst()
   {
     // we always have a world representation
