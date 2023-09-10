@@ -1,0 +1,12 @@
+Source: ros-iron-run-move-group
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ros-iron-ament-cmake, ros-iron-ament-lint-auto <!nocheck>, ros-iron-ament-lint-common <!nocheck>, ros-iron-moveit-common, ros-iron-moveit-ros-planning-interface, ros-iron-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-iron-run-move-group
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-iron-controller-manager, ros-iron-moveit-resources-panda-moveit-config, ros-iron-moveit-ros-move-group, ros-iron-moveit-ros-planning-interface, ros-iron-robot-state-publisher, ros-iron-rviz2, ros-iron-tf2-ros, ros-iron-warehouse-ros-mongo, ros-iron-ros-workspace
+Description: Demo launch file for running a MoveGroup setup
