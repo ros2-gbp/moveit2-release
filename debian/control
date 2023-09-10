@@ -1,0 +1,12 @@
+Source: ros-iron-moveit-setup-framework
+Section: misc
+Priority: optional
+Maintainer: David V. Lu!! <davidvlu@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libfmt-dev, ros-iron-ament-clang-format <!nocheck>, ros-iron-ament-cmake, ros-iron-ament-cmake-lint-cmake <!nocheck>, ros-iron-ament-cmake-xmllint <!nocheck>, ros-iron-ament-index-cpp, ros-iron-ament-lint-auto <!nocheck>, ros-iron-moveit-common, ros-iron-moveit-core, ros-iron-moveit-ros-planning, ros-iron-moveit-ros-visualization, ros-iron-pluginlib, ros-iron-rclcpp, ros-iron-rviz-common, ros-iron-rviz-rendering, ros-iron-srdfdom, ros-iron-urdf, ros-iron-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-iron-moveit-setup-framework
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libfmt-dev, ros-iron-ament-index-cpp, ros-iron-moveit-common, ros-iron-moveit-core, ros-iron-moveit-ros-planning, ros-iron-moveit-ros-visualization, ros-iron-pluginlib, ros-iron-rclcpp, ros-iron-rviz-common, ros-iron-rviz-rendering, ros-iron-srdfdom, ros-iron-urdf, ros-iron-ros-workspace
+Description: C++ Interface for defining setup steps for MoveIt Setup Assistant
