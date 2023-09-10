@@ -36,7 +36,7 @@
 
 // Modified by Pilz GmbH & Co. KG
 
-#include "pilz_industrial_motion_planner/move_group_sequence_action.h"
+#include <pilz_industrial_motion_planner/move_group_sequence_action.h>
 
 #include <time.h>
 
@@ -48,15 +48,17 @@
 #include <moveit/utils/message_checks.h>
 #include <moveit/moveit_cpp/moveit_cpp.h>
 
-#include "pilz_industrial_motion_planner/command_list_manager.h"
-#include "pilz_industrial_motion_planner/trajectory_generation_exceptions.h"
+#include <pilz_industrial_motion_planner/command_list_manager.h>
+#include <pilz_industrial_motion_planner/trajectory_generation_exceptions.h>
 
 namespace pilz_industrial_motion_planner
 {
 static const rclcpp::Logger LOGGER =
     rclcpp::get_logger("moveit.pilz_industrial_motion_planner.move_group_sequence_action");
 
-MoveGroupSequenceAction::MoveGroupSequenceAction() : MoveGroupCapability("SequenceAction")
+MoveGroupSequenceAction::MoveGroupSequenceAction()
+  : MoveGroupCapability("SequenceAction")
+  , move_feedback_(std::make_shared<moveit_msgs::action::MoveGroupSequence::Feedback>())
 {
 }
 
@@ -69,16 +71,16 @@ void MoveGroupSequenceAction::initialize()
   move_action_server_ = rclcpp_action::create_server<moveit_msgs::action::MoveGroupSequence>(
       context_->moveit_cpp_->getNode(), "sequence_move_group",
       [](const rclcpp_action::GoalUUID& /* unused */,
-         std::shared_ptr<const moveit_msgs::action::MoveGroupSequence::Goal> /* unused */) {
+         const std::shared_ptr<const moveit_msgs::action::MoveGroupSequence::Goal>& /* unused */) {
         RCLCPP_DEBUG(LOGGER, "Received action goal");
         return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
       },
-      [this](const std::shared_ptr<MoveGroupSequenceGoalHandle> /* unused goal_handle */) {
+      [this](const std::shared_ptr<MoveGroupSequenceGoalHandle>& /* unused goal_handle */) {
         RCLCPP_DEBUG(LOGGER, "Canceling action goal");
         preemptMoveCallback();
         return rclcpp_action::CancelResponse::ACCEPT;
       },
-      [this](const std::shared_ptr<MoveGroupSequenceGoalHandle> goal_handle) {
+      [this](const std::shared_ptr<MoveGroupSequenceGoalHandle>& goal_handle) {
         RCLCPP_DEBUG(LOGGER, "Accepting new action goal");
         executeSequenceCallback(goal_handle);
       },
@@ -88,12 +90,11 @@ void MoveGroupSequenceAction::initialize()
       context_->moveit_cpp_->getNode(), context_->planning_scene_monitor_->getRobotModel());
 }
 
-void MoveGroupSequenceAction::executeSequenceCallback(const std::shared_ptr<MoveGroupSequenceGoalHandle> goal_handle)
+void MoveGroupSequenceAction::executeSequenceCallback(const std::shared_ptr<MoveGroupSequenceGoalHandle>& goal_handle)
 {
   // Notify that goal is being executed
   goal_handle_ = goal_handle;
   const auto goal = goal_handle->get_goal();
-  goal_handle->execute();
 
   setMoveState(move_group::PLANNING);
 
@@ -162,7 +163,7 @@ void MoveGroupSequenceAction::executeSequenceCallbackPlanAndExecute(
   opt.replan_delay_ = goal->planning_options.replan_delay;
   opt.before_execution_callback_ = [this] { startMoveExecutionCallback(); };
 
-  [this, &request = goal->request](plan_execution::ExecutableMotionPlan& plan) {
+  opt.plan_callback_ = [this, &request = goal->request](plan_execution::ExecutableMotionPlan& plan) {
     return planUsingSequenceManager(request, plan);
   };
 
