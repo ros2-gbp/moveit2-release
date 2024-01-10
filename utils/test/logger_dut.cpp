@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2013, Willow Garage, Inc.
+ *  Copyright (c) 2023, PickNik Robotics Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,25 +32,23 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Acorn Pooley, Ioan Sucan */
+/* Author: Tyler Weaver */
 
-#include <moveit/exceptions/exceptions.h>
-#include <rclcpp/logger.hpp>
-#include <rclcpp/logging.hpp>
+#include <chrono>
+#include <rclcpp/rclcpp.hpp>
 #include <moveit/utils/logger.hpp>
 
-// Logger
-namespace moveit
+int main(int argc, char** argv)
 {
+  rclcpp::init(argc, argv);
+  rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("dut_node");
 
-ConstructException::ConstructException(const std::string& what_arg) : std::runtime_error(what_arg)
-{
-  RCLCPP_ERROR(getLogger("moveit_exception"), "Error during construction of object: %s\nException thrown.",
-               what_arg.c_str());
-}
+  // Set the moveit logger to be from node
+  moveit::setNodeLoggerName(node->get_name());
 
-Exception::Exception(const std::string& what_arg) : std::runtime_error(what_arg)
-{
-  RCLCPP_ERROR(getLogger("moveit_exception"), "%s\nException thrown.", what_arg.c_str());
+  // A node logger, should be in the file output and rosout
+  auto wall_timer = node->create_wall_timer(std::chrono::milliseconds(100),
+                                            [&] { RCLCPP_INFO(moveit::getLogger("child"), "hello from node!"); });
+
+  rclcpp::spin(node);
 }
-}  // namespace moveit
