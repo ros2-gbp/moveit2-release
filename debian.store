@@ -1,1 +1,1 @@
-{"base": "996e1a56a", "parent": "debian/rolling/moveit_simple_controller_manager", "previous": "49aecab4b", "trim": "", "trimbase": ""}
+{"base": "743aa47d2", "parent": "debian/rolling/moveit_simple_controller_manager", "previous": "d756baafc", "trim": "", "trimbase": ""}
