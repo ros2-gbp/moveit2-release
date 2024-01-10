@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2023, PickNik Robotics.
+ *  Copyright (c) 2023, PickNik Robotics Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the Willow Garage nor the names of its
+ *   * Neither the name of PickNik Robotics Inc. nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,49 +32,24 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Mario Prats */
+/* Author: Tyler Weaver */
 
-// To run this benchmark, 'cd' to the build/moveit_core/robot_state directory and directly run the binary.
+#pragma once
 
-#include <benchmark/benchmark.h>
-#include <moveit/robot_model/robot_model.h>
-#include <moveit/robot_state/robot_state.h>
-#include <moveit/utils/robot_model_test_utils.h>
-#include <random_numbers/random_numbers.h>
+#include <rclcpp/logger.hpp>
+#include <string>
 
-// Robot and planning group for which the Jacobian will be benchmarked.
-constexpr char TEST_ROBOT[] = "panda";
-constexpr char TEST_GROUP[] = "panda_arm";
-
-static void BM_MoveItJacobian(benchmark::State& st)
+namespace moveit
 {
-  // Load a test robot model.
-  const moveit::core::RobotModelPtr& robot_model = moveit::core::loadTestingRobotModel(TEST_ROBOT);
 
-  // Make sure the group exists, otherwise exit early with an error.
-  if (!robot_model->hasJointModelGroup(TEST_GROUP))
-  {
-    st.SkipWithError("The planning group doesn't exist.");
-    return;
-  }
+/// @brief Call once after creating a node to initialize logging namespaces.
+/// @code{C++}
+/// rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("move_group");
+/// moveit::setNodeLoggerName(node->get_name());
+/// @endcode
+void setNodeLoggerName(const std::string& name);
 
-  // Robot state.
-  moveit::core::RobotState kinematic_state(robot_model);
-  const moveit::core::JointModelGroup* jmg = kinematic_state.getJointModelGroup(TEST_GROUP);
+/// @brief Creates a namespaced logger.
+rclcpp::Logger getLogger(const std::string& name);
 
-  // Provide our own random number generator to setToRandomPositions to get a deterministic sequence of joint
-  // configurations.
-  random_numbers::RandomNumberGenerator rng(0);
-
-  for (auto _ : st)
-  {
-    // Time only the jacobian computation, not the forward kinematics.
-    st.PauseTiming();
-    kinematic_state.setToRandomPositions(jmg, rng);
-    kinematic_state.updateLinkTransforms();
-    st.ResumeTiming();
-    kinematic_state.getJacobian(jmg);
-  }
-}
-
-BENCHMARK(BM_MoveItJacobian);
+}  // namespace moveit
