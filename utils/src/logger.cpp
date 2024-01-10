@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2013, Willow Garage, Inc.
+ *  Copyright (c) 2023, PickNik Robotics Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,25 +32,53 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Acorn Pooley, Ioan Sucan */
+/* Author: Tyler Weaver */
 
-#include <moveit/exceptions/exceptions.h>
-#include <rclcpp/logger.hpp>
-#include <rclcpp/logging.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <moveit/utils/logger.hpp>
+#include <string>
+#include <rsl/random.hpp>
+#include <fmt/format.h>
 
-// Logger
 namespace moveit
 {
 
-ConstructException::ConstructException(const std::string& what_arg) : std::runtime_error(what_arg)
+// This is the function that stores the global logger used by moveit.
+// As it returns a reference to the static logger it can be changed through the
+// `setNodeLoggerName` function.
+rclcpp::Logger& getGlobalRootLogger()
 {
-  RCLCPP_ERROR(getLogger("moveit_exception"), "Error during construction of object: %s\nException thrown.",
-               what_arg.c_str());
+  static rclcpp::Logger logger = [&] {
+    // A random number is appended to the name used for the node to make it unique.
+    // This unique node and logger name is only used if a user does not set a logger
+    // through the `setNodeLoggerName` method to their node's logger.
+    auto name = fmt::format("moveit_{}", rsl::rng()());
+    try
+    {
+      static auto* moveit_node = new rclcpp::Node(name);
+      return moveit_node->get_logger();
+    }
+    catch (const std::exception& ex)
+    {
+      // rclcpp::init was not called so rcl context is null, return non-node logger
+      auto logger = rclcpp::get_logger(name);
+      RCLCPP_WARN_STREAM(logger, "exception thrown while creating node for logging: " << ex.what());
+      RCLCPP_WARN(logger, "if rclcpp::init was not called, messages from this logger may be missing from /rosout");
+      return logger;
+    }
+  }();
+  return logger;
 }
 
-Exception::Exception(const std::string& what_arg) : std::runtime_error(what_arg)
+void setNodeLoggerName(const std::string& name)
 {
-  RCLCPP_ERROR(getLogger("moveit_exception"), "%s\nException thrown.", what_arg.c_str());
+  static auto node = std::make_shared<rclcpp::Node>("moveit", name);
+  getGlobalRootLogger() = node->get_logger();
 }
+
+rclcpp::Logger getLogger(const std::string& name)
+{
+  return getGlobalRootLogger().get_child(name);
+}
+
 }  // namespace moveit
