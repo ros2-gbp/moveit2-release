@@ -46,7 +46,6 @@
 
 #include <rcl/error_handling.h>
 #include <rcl/time.h>
-#include <rclcpp/clock.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/time.hpp>
 #include <rclcpp/utilities.hpp>
@@ -156,14 +155,16 @@ public:
    */
   double getWayPointDurationFromStart(std::size_t index) const;
 
-  [[deprecated]] double getWaypointDurationFromStart(std::size_t index) const;
-
   double getWayPointDurationFromPrevious(std::size_t index) const
   {
     if (duration_from_previous_.size() > index)
+    {
       return duration_from_previous_[index];
+    }
     else
+    {
       return 0.0;
+    }
   }
 
   RobotTrajectory& setWayPointDurationFromPrevious(std::size_t index, double value)
@@ -289,6 +290,8 @@ public:
   RobotTrajectory& reverse();
 
   RobotTrajectory& unwind();
+
+  /** @brief Unwind, starting from an initial state **/
   RobotTrajectory& unwind(const moveit::core::RobotState& state);
 
   /** @brief Finds the waypoint indices before and after a duration from start.
@@ -297,7 +300,7 @@ public:
    *  @param The waypoint index after (or equal to) the supplied duration.
    *  @param The progress (0 to 1) between the two waypoints, based on time (not based on joint distances).
    */
-  void findWayPointIndicesForDurationAfterStart(const double& duration, int& before, int& after, double& blend) const;
+  void findWayPointIndicesForDurationAfterStart(double duration, int& before, int& after, double& blend) const;
 
   // TODO support visitor function for interpolation, or at least different types.
   /** @brief Gets a robot state corresponding to a supplied duration from start for the trajectory, using linear time
@@ -382,7 +385,6 @@ private:
   const moveit::core::JointModelGroup* group_;
   std::deque<moveit::core::RobotStatePtr> waypoints_;
   std::deque<double> duration_from_previous_;
-  rclcpp::Clock clock_ros_;
 };
 
 /** @brief Operator overload for printing trajectory to a stream */
@@ -394,18 +396,18 @@ std::ostream& operator<<(std::ostream& out, const RobotTrajectory& trajectory);
 /// active joint distances between the two states (L1 norm).
 /// \param[in] trajectory Given robot trajectory
 /// \return Length of the robot trajectory [rad]
-[[nodiscard]] double path_length(RobotTrajectory const& trajectory);
+[[nodiscard]] double pathLength(const RobotTrajectory& trajectory);
 
 /// \brief Calculate the smoothness of a given trajectory
 /// \param[in] trajectory Given robot trajectory
 /// \return Smoothness of the given trajectory
 /// or nullopt if it is not possible to calculate the smoothness
-[[nodiscard]] std::optional<double> smoothness(RobotTrajectory const& trajectory);
+[[nodiscard]] std::optional<double> smoothness(const RobotTrajectory& trajectory);
 
 /// \brief Calculate the waypoint density of a trajectory
 /// \param[in] trajectory Given robot trajectory
 /// \return Waypoint density of the given trajectory
 /// or nullopt if it is not possible to calculate the density
-[[nodiscard]] std::optional<double> waypoint_density(RobotTrajectory const& trajectory);
+[[nodiscard]] std::optional<double> waypointDensity(const RobotTrajectory& trajectory);
 
 }  // namespace robot_trajectory

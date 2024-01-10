@@ -41,8 +41,8 @@
 #include <moveit/trajectory_execution_manager/trajectory_execution_manager.h>
 #include <moveit/planning_scene_monitor/planning_scene_monitor.h>
 #include <moveit/planning_scene_monitor/trajectory_monitor.h>
-#include <moveit/sensor_manager/sensor_manager.h>
 #include <pluginlib/class_loader.hpp>
+#include <rclcpp/logger.hpp>
 
 #include <atomic>
 
@@ -56,22 +56,22 @@ class PlanExecution
 public:
   struct Options
   {
-    Options() : replan_(false), replan_attempts_(0), replan_delay_(0.0)
+    Options() : replan(false), replan_attemps(0), replan_delay(0.0)
     {
     }
 
     /// Flag indicating whether replanning is allowed
-    bool replan_;
+    bool replan;
 
     /// If replanning is allowed, this variable specifies how many replanning attempts there can be, at most, before
     /// failure
-    unsigned int replan_attempts_;
+    unsigned int replan_attemps;
 
     /// The amount of time to wait in between replanning attempts (in seconds)
-    double replan_delay_;
+    double replan_delay;
 
     /// Callback for computing motion plans. This callback must always be specified.
-    ExecutableMotionPlanComputationFn plan_callback_;
+    ExecutableMotionPlanComputationFn plan_callback;
 
     /// Callback for repairing motion plans. This is optional. A new plan is re-computed if repairing routines are not
     /// specified.
@@ -108,9 +108,13 @@ public:
   double getTrajectoryStateRecordingFrequency() const
   {
     if (trajectory_monitor_)
+    {
       return trajectory_monitor_->getSamplingFrequency();
+    }
     else
+    {
       return 0.0;
+    }
   }
 
   void setTrajectoryStateRecordingFrequency(double freq)
@@ -140,8 +144,6 @@ public:
 
   void stop();
 
-  std::string getErrorCodeString(const moveit_msgs::msg::MoveItErrorCodes& error_code);
-
 private:
   void planAndExecuteHelper(ExecutableMotionPlan& plan, const Options& opt);
   bool isRemainingPathValid(const ExecutableMotionPlan& plan, const std::pair<int, int>& path_segment);
@@ -160,7 +162,7 @@ private:
   class
   {
   private:
-    std::atomic<bool> preemption_requested{ false };
+    std::atomic<bool> preemption_requested_{ false };
 
   public:
     /** \brief check *and clear* the preemption flag
@@ -168,11 +170,11 @@ private:
         A true return value has to trigger full execution stop, as it consumes the request */
     inline bool checkAndClear()
     {
-      return preemption_requested.exchange(false);
+      return preemption_requested_.exchange(false);
     }
     inline void request()
     {
-      preemption_requested.store(true);
+      preemption_requested_.store(true);
     }
   } preempt_;
 
@@ -180,6 +182,8 @@ private:
 
   bool execution_complete_;
   bool path_became_invalid_;
+
+  rclcpp::Logger logger_;
 
   // class DynamicReconfigureImpl;
   // DynamicReconfigureImpl* reconfigure_impl_;

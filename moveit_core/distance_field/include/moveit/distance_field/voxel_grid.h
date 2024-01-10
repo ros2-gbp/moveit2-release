@@ -202,9 +202,6 @@ public:
    */
   double getResolution() const;
 
-  /** \brief deprecated.  Use the version with no arguments. */
-  double getResolution(Dimension dim) const;
-
   /**
    * \brief Gets the origin (minimum point) of the indicated dimension
    *
@@ -441,12 +438,6 @@ inline double VoxelGrid<T>::getResolution() const
 }
 
 template <typename T>
-inline double VoxelGrid<T>::getResolution(Dimension /*dim*/) const
-{
-  return resolution_;
-}
-
-template <typename T>
 inline double VoxelGrid<T>::getOrigin(Dimension dim) const
 {
   return origin_[dim];
@@ -472,7 +463,7 @@ inline const T& VoxelGrid<T>::operator()(double x, double y, double z) const
 template <typename T>
 inline const T& VoxelGrid<T>::operator()(const Eigen::Vector3d& pos) const
 {
-  return this->operator()(pos.x(), pos.y(), pos.z());
+  return operator()(pos.x(), pos.y(), pos.z());
 }
 
 template <typename T>

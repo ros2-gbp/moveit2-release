@@ -1,3 +1,5 @@
+import os
+
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
@@ -237,7 +239,7 @@ def generate_move_group_launch(moveit_config):
         parameters=move_group_params,
         extra_debug_args=["--debug"],
         # Set the display variable, in case OpenGL code is used internally
-        additional_env={"DISPLAY": ":0"},
+        additional_env={"DISPLAY": os.environ["DISPLAY"]},
     )
     return ld
 
@@ -325,8 +327,10 @@ def generate_demo_launch(moveit_config):
             package="controller_manager",
             executable="ros2_control_node",
             parameters=[
-                moveit_config.robot_description,
                 str(moveit_config.package_path / "config/ros2_controllers.yaml"),
+            ],
+            remappings=[
+                ("/controller_manager/robot_description", "/robot_description"),
             ],
         )
     )
