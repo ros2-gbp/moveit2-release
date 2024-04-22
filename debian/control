@@ -1,0 +1,12 @@
+Source: ros-jazzy-pilz-industrial-motion-planner
+Section: misc
+Priority: optional
+Maintainer: Christian Henkel <c.henkel@pilz.de>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake, ament-cmake-copyright <!nocheck>, ament-cmake-cppcheck <!nocheck>, ament-cmake-cpplint <!nocheck>, ament-cmake-flake8 <!nocheck>, ament-cmake-googletest <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-pep257 <!nocheck>, ament-cmake-uncrustify <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, libboost-all-dev <!nocheck>, libgeometry-msgs-dev, liborocos-kdl-dev, libtf2-dev, libtf2-eigen-dev, libtf2-geometry-msgs-dev, libtf2-kdl-dev, libtf2-ros-dev, pluginlib-dev, python3-geometry-msgs, python3-tf2, python3-tf2-geometry-msgs, python3-tf2-kdl, python3-tf2-ros, ros-geometry-msgs, ros-jazzy-eigen3-cmake-module, ros-jazzy-generate-parameter-library, ros-jazzy-launch-param-builder <!nocheck>, ros-jazzy-moveit-common, ros-jazzy-moveit-configs-utils <!nocheck>, ros-jazzy-moveit-core, ros-jazzy-moveit-msgs, ros-jazzy-moveit-resources-panda-moveit-config <!nocheck>, ros-jazzy-moveit-resources-prbt-moveit-config <!nocheck>, ros-jazzy-moveit-resources-prbt-pg70-support <!nocheck>, ros-jazzy-moveit-resources-prbt-support <!nocheck>, ros-jazzy-moveit-ros-move-group, ros-jazzy-moveit-ros-planning, ros-jazzy-moveit-ros-planning-interface, ros-jazzy-pilz-industrial-motion-planner-testutils <!nocheck>, ros-jazzy-rclcpp, ros-jazzy-ros-testing <!nocheck>, ros-jazzy-tf2-eigen-kdl, ros-jazzy-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-pilz-industrial-motion-planner
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libgeometry-msgs-dev, liborocos-kdl-dev, libtf2-dev, libtf2-eigen-dev, libtf2-geometry-msgs-dev, libtf2-kdl-dev, libtf2-ros-dev, pluginlib-dev, python3-geometry-msgs, python3-tf2, python3-tf2-geometry-msgs, python3-tf2-kdl, python3-tf2-ros, ros-geometry-msgs, ros-jazzy-eigen3-cmake-module, ros-jazzy-generate-parameter-library, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-moveit-msgs, ros-jazzy-moveit-ros-move-group, ros-jazzy-moveit-ros-planning, ros-jazzy-moveit-ros-planning-interface, ros-jazzy-rclcpp, ros-jazzy-tf2-eigen-kdl, ros-jazzy-ros-workspace
+Description: MoveIt plugin to generate industrial trajectories PTP, LIN, CIRC and sequences thereof.
