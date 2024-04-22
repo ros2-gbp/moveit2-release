@@ -1,0 +1,12 @@
+Source: ros-jazzy-moveit-setup-app-plugins
+Section: misc
+Priority: optional
+Maintainer: David V. Lu!! <davidvlu@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake, ament-cmake-googletest <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, libament-index-cpp-dev, pluginlib-dev, ros-jazzy-ament-clang-format <!nocheck>, ros-jazzy-moveit-configs-utils, ros-jazzy-moveit-ros-visualization, ros-jazzy-moveit-setup-framework, ros-jazzy-rclcpp, ros-jazzy-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-moveit-setup-app-plugins
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libament-index-cpp-dev, pluginlib-dev, ros-jazzy-moveit-configs-utils, ros-jazzy-moveit-ros-visualization, ros-jazzy-moveit-setup-framework, ros-jazzy-rclcpp, ros-jazzy-ros-workspace
+Description: Various specialty plugins for MoveIt Setup Assistant
