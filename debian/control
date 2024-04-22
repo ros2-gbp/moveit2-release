@@ -1,0 +1,14 @@
+Source: ros-jazzy-moveit-ros-planning
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake, ament-cmake-copyright <!nocheck>, ament-cmake-cppcheck <!nocheck>, ament-cmake-cpplint <!nocheck>, ament-cmake-flake8 <!nocheck>, ament-cmake-googletest <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-pep257 <!nocheck>, ament-cmake-uncrustify <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, libament-index-cpp-dev, libeigen3-dev, libfmt-dev, libmessage-filters-dev, libtf2-dev, libtf2-eigen-dev, libtf2-geometry-msgs-dev, libtf2-msgs-dev, libtf2-ros-dev, liburdf-dev, pluginlib-dev (>= 1.11.2), python3-message-filters, python3-tf2, python3-tf2-geometry-msgs, python3-tf2-msgs, python3-tf2-ros, ros-jazzy-eigen3-cmake-module, ros-jazzy-generate-parameter-library, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-moveit-msgs, ros-jazzy-moveit-resources-panda-moveit-config <!nocheck>, ros-jazzy-moveit-ros-occupancy-map-monitor, ros-jazzy-rclcpp, ros-jazzy-rclcpp-action, ros-jazzy-ros-testing <!nocheck>, ros-jazzy-srdfdom, ros-tf2-msgs, ros-jazzy-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-moveit-ros-planning
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libament-index-cpp-dev, libeigen3-dev, libfmt-dev, libmessage-filters-dev, libtf2-dev, libtf2-eigen-dev, libtf2-geometry-msgs-dev, libtf2-msgs-dev, libtf2-ros-dev, liburdf-dev, pluginlib-dev (>= 1.11.2), python3-message-filters, python3-tf2, python3-tf2-geometry-msgs, python3-tf2-msgs, python3-tf2-ros, ros-jazzy-eigen3-cmake-module, ros-jazzy-generate-parameter-library, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-moveit-msgs, ros-jazzy-moveit-ros-occupancy-map-monitor, ros-jazzy-rclcpp, ros-jazzy-rclcpp-action, ros-jazzy-srdfdom, ros-tf2-msgs, ros-jazzy-ros-workspace
+Conflicts: ros-jazzy-moveit-ros-planning-interface (<< 2.1.5)
+Replaces: ros-jazzy-moveit-ros-planning-interface (<< 2.1.5)
+Description: Planning components of MoveIt that use ROS
