@@ -1,0 +1,12 @@
+Source: ros-jazzy-moveit-planners-stomp
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake, ament-cmake-copyright <!nocheck>, ament-cmake-cppcheck <!nocheck>, ament-cmake-cpplint <!nocheck>, ament-cmake-flake8 <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-pep257 <!nocheck>, ament-cmake-uncrustify <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, libstd-msgs-dev, libtf2-eigen-dev, libvisualization-msgs-dev, python3-std-msgs, python3-visualization-msgs, ros-jazzy-generate-parameter-library, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-rsl, ros-jazzy-stomp, ros-std-msgs, ros-visualization-msgs, ros-jazzy-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-moveit-planners-stomp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libstd-msgs-dev, libtf2-eigen-dev, libvisualization-msgs-dev, python3-std-msgs, python3-visualization-msgs, ros-jazzy-generate-parameter-library, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-rsl, ros-jazzy-stomp, ros-std-msgs, ros-visualization-msgs, ros-jazzy-ros-workspace
+Description: STOMP Motion Planner for MoveIt
