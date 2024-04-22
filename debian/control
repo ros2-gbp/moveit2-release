@@ -1,0 +1,12 @@
+Source: ros-jazzy-moveit-ros-visualization
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake, ament-cmake-copyright <!nocheck>, ament-cmake-cppcheck <!nocheck>, ament-cmake-cpplint <!nocheck>, ament-cmake-flake8 <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-pep257 <!nocheck>, ament-cmake-uncrustify <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, libclass-loader-dev, libeigen3-dev, libgeometric-shapes-dev, libinteractive-markers-dev, libqt5opengl5-dev, libtf2-eigen-dev, pkg-config, pluginlib-dev (>= 1.11.2), python3-interactive-markers, qtbase5-dev, ros-jazzy-moveit-common, ros-jazzy-moveit-ros-planning-interface, ros-jazzy-moveit-ros-robot-interaction, ros-jazzy-moveit-ros-warehouse, ros-jazzy-object-recognition-msgs, ros-jazzy-rclcpp, ros-jazzy-rclpy, ros-jazzy-rviz2, ros-jazzy-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-moveit-ros-visualization
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libgeometric-shapes-dev, libinteractive-markers-dev, libtf2-eigen-dev, pluginlib-dev (>= 1.11.2), python3-interactive-markers, ros-jazzy-moveit-common, ros-jazzy-moveit-ros-planning-interface, ros-jazzy-moveit-ros-robot-interaction, ros-jazzy-moveit-ros-warehouse, ros-jazzy-object-recognition-msgs, ros-jazzy-rclcpp, ros-jazzy-rclpy, ros-jazzy-rviz2, ros-jazzy-ros-workspace
+Description: Components of MoveIt that offer visualization
