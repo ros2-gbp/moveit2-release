@@ -1,0 +1,12 @@
+Source: ros-jazzy-moveit-hybrid-planning
+Section: misc
+Priority: optional
+Maintainer: MoveIt Release Team <moveit_releasers@googlegroups.com>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake, ament-cmake-copyright <!nocheck>, ament-cmake-cppcheck <!nocheck>, ament-cmake-cpplint <!nocheck>, ament-cmake-flake8 <!nocheck>, ament-cmake-googletest <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-pep257 <!nocheck>, ament-cmake-uncrustify <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, libament-index-cpp-dev, libstd-msgs-dev, libstd-srvs-dev, libtf2-ros-dev, libtrajectory-msgs-dev, pluginlib-dev, python3-std-msgs, python3-std-srvs, python3-tf2-ros, python3-trajectory-msgs, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-moveit-msgs, ros-jazzy-moveit-planners-ompl <!nocheck>, ros-jazzy-moveit-ros-planning, ros-jazzy-moveit-ros-planning-interface, ros-jazzy-rclcpp, ros-jazzy-rclcpp-action, ros-jazzy-rclcpp-components, ros-jazzy-ros-testing <!nocheck>, ros-std-msgs, ros-std-srvs, ros-trajectory-msgs, ros-jazzy-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-moveit-hybrid-planning
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libament-index-cpp-dev, librobot-state-publisher-dev, libstd-msgs-dev, libstd-srvs-dev, libtf2-ros-dev, libtrajectory-msgs-dev, pluginlib-dev, python3-std-msgs, python3-std-srvs, python3-tf2-ros, python3-trajectory-msgs, ros-jazzy-controller-manager, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-moveit-msgs, ros-jazzy-moveit-resources-panda-moveit-config, ros-jazzy-moveit-ros-planning, ros-jazzy-moveit-ros-planning-interface, ros-jazzy-position-controllers, ros-jazzy-rclcpp, ros-jazzy-rclcpp-action, ros-jazzy-rclcpp-components, ros-jazzy-rviz2, ros-robot-state-publisher, ros-std-msgs, ros-std-srvs, ros-trajectory-msgs, ros-jazzy-ros-workspace
+Description: Hybrid planning components of MoveIt 2
