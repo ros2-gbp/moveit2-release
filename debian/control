@@ -1,0 +1,12 @@
+Source: ros-jazzy-moveit-ros-perception
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake, ament-cmake-copyright <!nocheck>, ament-cmake-cppcheck <!nocheck>, ament-cmake-cpplint <!nocheck>, ament-cmake-flake8 <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-pep257 <!nocheck>, ament-cmake-uncrustify <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, freeglut3-dev, image-transport-tools, libcv-bridge-dev, libeigen3-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libimage-transport-dev, libmessage-filters-dev, libomp-dev, libsensor-msgs-dev, libtf2-dev, libtf2-eigen-dev, libtf2-geometry-msgs-dev, libtf2-ros-dev, liburdf-dev, pluginlib-dev (>= 1.11.2), python3-cv-bridge, python3-message-filters, python3-sensor-msgs, python3-tf2, python3-tf2-geometry-msgs, python3-tf2-ros, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-moveit-msgs, ros-jazzy-moveit-ros-occupancy-map-monitor, ros-jazzy-moveit-ros-planning, ros-jazzy-object-recognition-msgs, ros-jazzy-rclcpp, ros-sensor-msgs, ros-jazzy-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-moveit-ros-perception
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, freeglut3-dev, image-transport-tools, libcv-bridge-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libimage-transport-dev, libmessage-filters-dev, libomp-dev, libsensor-msgs-dev, libtf2-dev, libtf2-eigen-dev, libtf2-geometry-msgs-dev, libtf2-ros-dev, liburdf-dev, pluginlib-dev (>= 1.11.2), python3-cv-bridge, python3-message-filters, python3-sensor-msgs, python3-tf2, python3-tf2-geometry-msgs, python3-tf2-ros, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-moveit-msgs, ros-jazzy-moveit-ros-occupancy-map-monitor, ros-jazzy-moveit-ros-planning, ros-jazzy-object-recognition-msgs, ros-jazzy-rclcpp, ros-sensor-msgs, ros-jazzy-ros-workspace
+Description: Components of MoveIt connecting to perception
