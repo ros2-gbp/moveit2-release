@@ -1,0 +1,12 @@
+Source: ros-jazzy-chomp-motion-planner
+Section: misc
+Priority: optional
+Maintainer: Chittaranjan Srinivas Swaminathan <chitt@live.in>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake, ament-cmake-copyright <!nocheck>, ament-cmake-cppcheck <!nocheck>, ament-cmake-cpplint <!nocheck>, ament-cmake-flake8 <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-pep257 <!nocheck>, ament-cmake-uncrustify <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, libtrajectory-msgs-dev, python3-trajectory-msgs, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-rclcpp, ros-jazzy-rsl, ros-trajectory-msgs, ros-jazzy-ros-workspace
+Homepage: http://ros.org/wiki/chomp_motion_planner
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-chomp-motion-planner
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libtrajectory-msgs-dev, python3-trajectory-msgs, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-rclcpp, ros-jazzy-rsl, ros-trajectory-msgs, ros-jazzy-ros-workspace
+Description: chomp_motion_planner
