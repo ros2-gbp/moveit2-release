@@ -1,0 +1,12 @@
+Source: ros-jazzy-moveit-kinematics
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake, ament-cmake-copyright <!nocheck>, ament-cmake-cppcheck <!nocheck>, ament-cmake-cpplint <!nocheck>, ament-cmake-flake8 <!nocheck>, ament-cmake-googletest <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-pep257 <!nocheck>, ament-cmake-uncrustify <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, libclass-loader-dev, libeigen3-dev, liborocos-kdl-dev, libtf2-dev, libtf2-kdl-dev, pluginlib-dev, python3-tf2, python3-tf2-kdl, ros-jazzy-generate-parameter-library, ros-jazzy-launch-param-builder <!nocheck>, ros-jazzy-moveit-common, ros-jazzy-moveit-configs-utils <!nocheck>, ros-jazzy-moveit-core, ros-jazzy-moveit-msgs, ros-jazzy-moveit-resources-fanuc-description <!nocheck>, ros-jazzy-moveit-resources-fanuc-moveit-config <!nocheck>, ros-jazzy-moveit-resources-panda-description <!nocheck>, ros-jazzy-moveit-resources-panda-moveit-config <!nocheck>, ros-jazzy-moveit-ros-planning, ros-jazzy-ros-testing <!nocheck>, ros-jazzy-rsl, ros-jazzy-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-moveit-kinematics
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libclass-loader-dev, libeigen3-dev, liborocos-kdl-dev, libtf2-dev, libtf2-kdl-dev, liburdfdom-dev, pluginlib-dev, python3-lxml, python3-tf2, python3-tf2-kdl, ros-jazzy-generate-parameter-library, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-moveit-msgs, ros-jazzy-moveit-ros-planning, ros-jazzy-rsl, ros-jazzy-ros-workspace
+Description: Package for all inverse kinematics solvers in MoveIt
