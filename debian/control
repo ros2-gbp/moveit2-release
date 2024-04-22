@@ -1,0 +1,12 @@
+Source: ros-jazzy-moveit-ros-control-interface
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake, ament-cmake-copyright <!nocheck>, ament-cmake-cppcheck <!nocheck>, ament-cmake-cpplint <!nocheck>, ament-cmake-flake8 <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-pep257 <!nocheck>, ament-cmake-uncrustify <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, libtrajectory-msgs-dev, pluginlib-dev (>= 1.11.2), python3-trajectory-msgs, ros-jazzy-controller-manager-msgs, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-moveit-simple-controller-manager, ros-jazzy-rclcpp-action, ros-trajectory-msgs, ros-jazzy-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-moveit-ros-control-interface
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libtrajectory-msgs-dev, pluginlib-dev (>= 1.11.2), python3-trajectory-msgs, ros-jazzy-controller-manager-msgs, ros-jazzy-moveit-common, ros-jazzy-moveit-core, ros-jazzy-moveit-simple-controller-manager, ros-jazzy-rclcpp-action, ros-trajectory-msgs, ros-jazzy-ros-workspace
+Description: ros_control controller manager interface for MoveIt
