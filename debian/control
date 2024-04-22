@@ -1,0 +1,12 @@
+Source: ros-jazzy-moveit-configs-utils
+Section: misc
+Priority: optional
+Maintainer: MoveIt Release Team <moveit_releasers@googlegroups.com>
+Build-Depends: debhelper (>= 9.0.0), ament-cmake-copyright <!nocheck>, ament-cmake-cppcheck <!nocheck>, ament-cmake-cpplint <!nocheck>, ament-cmake-flake8 <!nocheck>, ament-cmake-lint-cmake <!nocheck>, ament-cmake-pep257 <!nocheck>, ament-cmake-uncrustify <!nocheck>, ament-cmake-xmllint <!nocheck>, ament-lint <!nocheck>, ros-jazzy-ros-workspace, python3-all, python3-setuptools, dh-python
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-moveit-configs-utils
+Architecture: any
+Depends: ${python3:Depends}, ${misc:Depends}, python3-ament-index, ros-jazzy-launch, ros-jazzy-launch-param-builder, ros-jazzy-launch-ros, ros-jazzy-srdfdom, ros-jazzy-ros-workspace
+Description: Python library for loading moveit config parameters in launch files
