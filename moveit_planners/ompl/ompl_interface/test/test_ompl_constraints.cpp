@@ -65,7 +65,7 @@
 
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("test_ompl_constraints");
+  return moveit::getLogger("moveit.planners.ompl.test_constraints");
 }
 
 /** \brief Number of times to run a test that uses randomly generated input. **/
@@ -252,7 +252,7 @@ protected:
     // But these issues do not prevent us to use the ConstrainedPlanningStateSpace! :)
     // The jacobian test is expected to fail because of the discontinuous constraint derivative.
     // In addition not all samples returned from the state sampler will be valid.
-    // For more details: https://github.com/ros-planning/moveit/issues/2092#issuecomment-669911722
+    // For more details: https://github.com/moveit/moveit/issues/2092#issuecomment-669911722
     try
     {
       constrained_state_space->sanityChecks();
