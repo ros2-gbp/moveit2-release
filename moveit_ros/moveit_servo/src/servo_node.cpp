@@ -67,27 +67,18 @@ ServoNode::ServoNode(const rclcpp::NodeOptions& options)
 {
   moveit::setNodeLoggerName(node_->get_name());
 
-  if (!options.use_intra_process_comms())
+  // Configure SCHED_FIFO and priority
+  if (realtime_tools::configure_sched_fifo(servo_params_.thread_priority))
   {
-    RCLCPP_WARN_STREAM(node_->get_logger(),
-                       "Intra-process communication is disabled, consider enabling it by adding: "
-                       "\nextra_arguments=[{'use_intra_process_comms' : True}]\nto the Servo composable node "
-                       "in the launch file");
+    RCLCPP_INFO_STREAM(node_->get_logger(), "Enabled SCHED_FIFO and higher thread priority.");
+  }
+  else
+  {
+    RCLCPP_WARN_STREAM(node_->get_logger(), "Could not enable FIFO RT scheduling policy. Continuing with the default.");
   }
 
   // Check if a realtime kernel is available
-  if (realtime_tools::has_realtime_kernel())
-  {
-    if (realtime_tools::configure_sched_fifo(servo_params_.thread_priority))
-    {
-      RCLCPP_INFO_STREAM(node_->get_logger(), "Realtime kernel available, higher thread priority has been set.");
-    }
-    else
-    {
-      RCLCPP_WARN_STREAM(node_->get_logger(), "Could not enable FIFO RT scheduling policy.");
-    }
-  }
-  else
+  if (!realtime_tools::has_realtime_kernel())
   {
     RCLCPP_WARN_STREAM(node_->get_logger(), "Realtime kernel is recommended for better performance.");
   }
