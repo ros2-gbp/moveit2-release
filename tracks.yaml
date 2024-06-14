@@ -128,7 +128,7 @@ tracks:
     release_tag: :{version}
     ros_distro: jazzy
     vcs_type: git
-    vcs_uri: https://github.com/ros-planning/moveit2.git
+    vcs_uri: https://github.com/moveit/moveit2.git
     version: :{ask}
   rolling:
     actions:
