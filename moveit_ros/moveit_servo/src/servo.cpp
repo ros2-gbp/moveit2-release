@@ -58,7 +58,7 @@ namespace moveit_servo
 Servo::Servo(const rclcpp::Node::SharedPtr& node, std::shared_ptr<const servo::ParamListener> servo_param_listener,
              const planning_scene_monitor::PlanningSceneMonitorPtr& planning_scene_monitor)
   : node_(node)
-  , logger_(moveit::getLogger("servo"))
+  , logger_(moveit::getLogger("moveit.ros.servo"))
   , servo_param_listener_{ std::move(servo_param_listener) }
   , planning_scene_monitor_{ planning_scene_monitor }
 {
@@ -222,7 +222,7 @@ bool Servo::validateParams(const servo::Params& servo_params) const
     RCLCPP_ERROR_STREAM(
         logger_, "When publishing a std_msgs/Float64MultiArray, "
                  "either the parameter 'publish_joint_positions' OR the parameter 'publish_joint_velocities' must "
-                 "be set to true. But both are set to false."
+                 "be set to true. But both are set to true."
                      << check_yaml_string);
     params_valid = false;
   }
@@ -514,16 +514,6 @@ KinematicState Servo::getNextJointState(const moveit::core::RobotStatePtr& robot
     // Compute the joint velocities required to reach positions
     target_state.velocities = joint_position_delta / servo_params_.publish_period;
 
-    // Apply smoothing to the positions if a smoother was provided.
-    doSmoothing(target_state);
-
-    // Apply collision scaling to the joint position delta
-    target_state.positions =
-        current_state.positions + collision_velocity_scale_ * (target_state.positions - current_state.positions);
-
-    // Compute velocities based on smoothed joint positions
-    target_state.velocities = (target_state.positions - current_state.positions) / servo_params_.publish_period;
-
     // Scale down the velocity based on joint velocity limit or user defined scaling if applicable.
     const double joint_velocity_limit_scale = jointLimitVelocityScalingFactor(
         target_state.velocities, joint_bounds, servo_params_.override_velocity_scaling_factor);
@@ -536,6 +526,16 @@ KinematicState Servo::getNextJointState(const moveit::core::RobotStatePtr& robot
     // Adjust joint position based on scaled down velocity
     target_state.positions = current_state.positions + (target_state.velocities * servo_params_.publish_period);
 
+    // Apply smoothing to the positions if a smoother was provided.
+    doSmoothing(target_state);
+
+    // Apply collision scaling to the joint position delta
+    target_state.positions =
+        current_state.positions + collision_velocity_scale_ * (target_state.positions - current_state.positions);
+
+    // Compute velocities based on smoothed joint positions
+    target_state.velocities = (target_state.positions - current_state.positions) / servo_params_.publish_period;
+
     // Check if any joints are going past joint position limits
     const std::vector<int> joints_to_halt =
         jointsToHalt(target_state.positions, target_state.velocities, joint_bounds, servo_params_.joint_limit_margins);
@@ -547,6 +547,9 @@ KinematicState Servo::getNextJointState(const moveit::core::RobotStatePtr& robot
       target_state = haltJoints(joints_to_halt, current_state, target_state);
     }
   }
+
+  // Update internal state of filter with final calculated command.
+  resetSmoothing(target_state);
 
   return target_state;
 }
@@ -678,6 +681,7 @@ std::pair<bool, KinematicState> Servo::smoothHalt(const KinematicState& halt_sta
     }
   }
 
+  resetSmoothing(target_state);
   return std::make_pair(stopped, target_state);
 }
 
