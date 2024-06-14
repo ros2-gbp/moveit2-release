@@ -46,7 +46,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("collision_detection_world");
+  return moveit::getLogger("moveit.core.collision_detection_world");
 }
 }  // namespace
 
@@ -109,6 +109,7 @@ void World::addToObject(const std::string& object_id, const Eigen::Isometry3d& p
 std::vector<std::string> World::getObjectIds() const
 {
   std::vector<std::string> ids;
+  ids.reserve(objects_.size());
   for (const auto& object : objects_)
     ids.push_back(object.first);
   return ids;
