@@ -173,20 +173,20 @@ class MoveItConfigsBuilder(ParameterBuilder):
         if setup_assistant_file.exists():
             setup_assistant_yaml = load_yaml(setup_assistant_file)
             config = setup_assistant_yaml.get("moveit_setup_assistant_config", {})
-            urdf_config = config.get("urdf", config.get("URDF"))
-            if urdf_config and self.__urdf_package is None:
-                self.__urdf_package = Path(
-                    get_package_share_directory(urdf_config["package"])
-                )
-                self.__urdf_file_path = Path(urdf_config["relative_path"])
 
-                if (xacro_args := urdf_config.get("xacro_args")) is not None:
+            if urdf_config := config.get("urdf", config.get("URDF")):
+                if self.__urdf_package is None:
+                    self.__urdf_package = Path(
+                        get_package_share_directory(urdf_config["package"])
+                    )
+                    self.__urdf_file_path = Path(urdf_config["relative_path"])
+
+                if xacro_args := urdf_config.get("xacro_args"):
                     self.__urdf_xacro_args = dict(
                         arg.split(":=") for arg in xacro_args.split(" ") if arg
                     )
 
-            srdf_config = config.get("srdf", config.get("SRDF"))
-            if srdf_config:
+            if srdf_config := config.get("srdf", config.get("SRDF")):
                 self.__srdf_file_path = Path(srdf_config["relative_path"])
 
         if not self.__urdf_package or not self.__urdf_file_path:
@@ -414,7 +414,7 @@ class MoveItConfigsBuilder(ParameterBuilder):
         if sensors_path.exists():
             sensors_data = load_yaml(sensors_path)
             # TODO(mikeferguson): remove the second part of this check once
-            # https://github.com/ros-planning/moveit_resources/pull/141 has made through buildfarm
+            # https://github.com/moveit/moveit_resources/pull/141 has made through buildfarm
             if len(sensors_data["sensors"]) > 0 and sensors_data["sensors"][0]:
                 self.__moveit_configs.sensors_3d = sensors_data
         return self
