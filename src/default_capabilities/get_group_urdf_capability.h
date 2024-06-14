@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, SRI, Inc.
+ *  Copyright (c) 2024, PickNik Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of Willow Garage nor the names of its
+ *   * Neither the name of PickNik Inc. nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,44 +32,36 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: David Hershberger */
+/* Author: Sebastian Jahr
+   Desc: This capability creates an URDF string with joints and links of a requested joint model group */
 
-#include "clear_octomap_service_capability.h"
-#include <moveit/moveit_cpp/moveit_cpp.h>
-#include <moveit/move_group/capability_names.h>
-#include <moveit/utils/logger.hpp>
+#pragma once
 
-namespace
+#include <moveit/move_group/move_group_capability.h>
+#include <moveit_msgs/srv/get_group_urdf.hpp>
+
+namespace move_group
 {
-rclcpp::Logger getLogger()
+/**
+ * @brief Move group capability to create an URDF string for a joint model group
+ *
+ */
+class GetUrdfService : public MoveGroupCapability
 {
-  return moveit::getLogger("moveit.ros.move_group.clear_octomap_service");
-}
-}  // namespace
+public:
+  /**
+   * @brief Constructor
+   *
+   */
+  GetUrdfService();
 
-move_group::ClearOctomapService::ClearOctomapService() : MoveGroupCapability("clear_octomap_service")
-{
-}
+  /**
+   * @brief Initializes service when plugin is loaded
+   *
+   */
+  void initialize() override;
 
-void move_group::ClearOctomapService::initialize()
-{
-  service_ = context_->moveit_cpp_->getNode()->create_service<std_srvs::srv::Empty>(
-      CLEAR_OCTOMAP_SERVICE_NAME,
-      [this](const std::shared_ptr<std_srvs::srv::Empty::Request>& req,
-             const std::shared_ptr<std_srvs::srv::Empty::Response>& res) { return clearOctomap(req, res); });
-}
-
-void move_group::ClearOctomapService::clearOctomap(const std::shared_ptr<std_srvs::srv::Empty::Request>& /*req*/,
-                                                   const std::shared_ptr<std_srvs::srv::Empty::Response>& /*res*/)
-{
-  if (!context_->planning_scene_monitor_)
-    RCLCPP_ERROR(getLogger(), "Cannot clear octomap since planning scene monitor has not been initialized.");
-
-  RCLCPP_INFO(getLogger(), "Clearing octomap...");
-  context_->planning_scene_monitor_->clearOctomap();
-  RCLCPP_INFO(getLogger(), "Octomap cleared.");
-}
-
-#include <pluginlib/class_list_macros.hpp>
-
-PLUGINLIB_EXPORT_CLASS(move_group::ClearOctomapService, move_group::MoveGroupCapability)
+private:
+  rclcpp::Service<moveit_msgs::srv::GetGroupUrdf>::SharedPtr get_urdf_service_;
+};
+}  // namespace move_group
