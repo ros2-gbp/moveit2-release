@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2021, PickNik Inc.
+ *  Copyright (c) 2024, Andrew Zelenak
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,69 +33,30 @@
  *********************************************************************/
 
 /* Author: Andy Zelenak
-   Description: A first-order Butterworth low-pass filter. There is only one parameter to tune.
-   The first-order Butterworth filter has the nice property that it will not overshoot.
+Description: Applies jerk/acceleration/velocity limits to online motion commands
  */
 
 #pragma once
 
 #include <cstddef>
 
-#include <moveit_butterworth_filter_parameters.hpp>
 #include <moveit/robot_model/robot_model.h>
 #include <moveit/online_signal_smoothing/smoothing_base_class.h>
+#include <moveit_ruckig_filter_parameters.hpp>
+
+#include <ruckig/ruckig.hpp>
 
 namespace online_signal_smoothing
 {
-/**
- * Class ButterworthFilter - Implementation of a signal filter to soften jerks.
- * This is a first-order Butterworth low-pass filter. First-order was chosen for 2 reasons:
- * - It doesn't overshoot
- * - Computational efficiency
- * This filter has been parameterized so there is only one parameter to tune.
- * See "Digital Implementation of Butterworth First–Order Filter Type IIR" by
- * Horvath, Cervenanska, and Kotianova, 2019 and
- * Mienkina, M., Filter-Based Algorithm for Metering Applications,
- * https://www.nxp.com/docs/en/application-note/AN4265.pdf, 2016
- * It comes from finding the bilinear transform equivalent of the analog transfer function and
- * further applying the inverse z-transform.
- * The parameter "low_pass_filter_coeff" equals (2*pi / tan(omega_d * T))
- * where omega_d is the cutoff frequency and T is the sampling period in sec.
- */
-class ButterworthFilter
-{
-public:
-  /**
-   * Constructor.
-   * @param low_pass_filter_coeff Larger filter_coeff-> more smoothing of commands, but more lag.
-   * low_pass_filter_coeff = (2*pi / tan(omega_d * T))
-   * where omega_d is the cutoff frequency and T is the sampling period in sec.
-   */
-  ButterworthFilter(double low_pass_filter_coeff);
-  ButterworthFilter() = delete;
 
-  double filter(double new_measurement);
-
-  void reset(const double data);
-
-private:
-  static constexpr std::size_t FILTER_LENGTH = 2;
-  std::array<double, FILTER_LENGTH> previous_measurements_;
-  double previous_filtered_measurement_;
-  // Scale and feedback term are calculated from supplied filter coefficient
-  double scale_term_;
-  double feedback_term_;
-};
-
-// Plugin
-class ButterworthFilterPlugin : public SmoothingBaseClass
+class RuckigFilterPlugin : public SmoothingBaseClass
 {
 public:
   /**
    * Initialize the smoothing algorithm
    * @param node ROS node, used for parameter retrieval
-   * @param robot_model typically used to retrieve vel/accel/jerk limits
-   * @param num_joints number of actuated joints in the JointGroup Servo controls
+   * @param robot_model used to retrieve vel/accel/jerk limits
+   * @param num_joints number of actuated joints in the JointGroup
    * @return True if initialization was successful
    */
   bool initialize(rclcpp::Node::SharedPtr node, moveit::core::RobotModelConstPtr robot_model,
@@ -121,8 +82,25 @@ public:
              const Eigen::VectorXd& accelerations) override;
 
 private:
-  rclcpp::Node::SharedPtr node_;
-  std::vector<ButterworthFilter> position_filters_;
-  size_t num_joints_;
+  /**
+   * A utility to print Ruckig's internal state
+   */
+  void printRuckigState();
+
+  /**
+   * A utility to get velocity/acceleration/jerk bounds from the robot model
+   * @return true if all bounds are defined
+   */
+  bool getVelAccelJerkBounds(std::vector<double>& joint_velocity_bounds, std::vector<double>& joint_acceleration_bounds,
+                             std::vector<double>& joint_jerk_bounds);
+
+  /** \brief Parameters loaded from yaml file at runtime */
+  online_signal_smoothing::Params params_;
+  /** \brief The robot model contains the vel/accel/jerk limits that Ruckig requires */
+  moveit::core::RobotModelConstPtr robot_model_;
+  bool have_initial_ruckig_output_ = false;
+  std::optional<ruckig::Ruckig<ruckig::DynamicDOFs>> ruckig_;
+  std::optional<ruckig::InputParameter<ruckig::DynamicDOFs>> ruckig_input_;
+  std::optional<ruckig::OutputParameter<ruckig::DynamicDOFs>> ruckig_output_;
 };
 }  // namespace online_signal_smoothing
