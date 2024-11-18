@@ -45,6 +45,7 @@
 
 #include <pilz_industrial_motion_planner/cartesian_trajectory.h>
 #include <pilz_industrial_motion_planner/limits_container.h>
+#include <pilz_industrial_motion_planner/trajectory_generation_exceptions.h>
 
 namespace pilz_industrial_motion_planner
 {
@@ -74,17 +75,17 @@ bool computePoseIK(const planning_scene::PlanningSceneConstPtr& scene, const std
                    bool check_self_collision = true, const double timeout = 0.0);
 
 /**
- * @brief compute the pose of a link at give robot state
- * @param robot_model: kinematic model of the robot
+ * @brief compute the pose of a link at a given robot state
+ * @param robot_state: an arbitrary robot state (with collision objects attached)
  * @param link_name: target link name
  * @param joint_state: joint positions of this group
  * @param pose: pose of the link in base frame of robot model
  * @return true if succeed
  */
-bool computeLinkFK(const planning_scene::PlanningSceneConstPtr& scene, const std::string& link_name,
+bool computeLinkFK(moveit::core::RobotState& robot_state, const std::string& link_name,
                    const std::map<std::string, double>& joint_state, Eigen::Isometry3d& pose);
 
-bool computeLinkFK(const planning_scene::PlanningSceneConstPtr& scene, const std::string& link_name,
+bool computeLinkFK(moveit::core::RobotState& robot_state, const std::string& link_name,
                    const std::vector<std::string>& joint_names, const std::vector<double>& joint_positions,
                    Eigen::Isometry3d& pose);
 
@@ -126,7 +127,7 @@ bool verifySampleJointLimits(const std::map<std::string, double>& position_last,
 bool generateJointTrajectory(const planning_scene::PlanningSceneConstPtr& scene,
                              const JointLimitsContainer& joint_limits, const KDL::Trajectory& trajectory,
                              const std::string& group_name, const std::string& link_name,
-                             const std::map<std::string, double>& initial_joint_position, double sampling_time,
+                             const std::map<std::string, double>& initial_joint_position, const double& sampling_time,
                              trajectory_msgs::msg::JointTrajectory& joint_trajectory,
                              moveit_msgs::msg::MoveItErrorCodes& error_code, bool check_self_collision = false);
 
@@ -195,12 +196,12 @@ bool isRobotStateStationary(const moveit::core::RobotState& state, const std::st
  * smallest index of trajectroy.
  * @param index The intersection index which has to be determined.
  */
-bool linearSearchIntersectionPoint(const std::string& link_name, const Eigen::Vector3d& center_position, const double r,
-                                   const robot_trajectory::RobotTrajectoryPtr& traj, bool inverseOrder,
+bool linearSearchIntersectionPoint(const std::string& link_name, const Eigen::Vector3d& center_position,
+                                   const double& r, const robot_trajectory::RobotTrajectoryPtr& traj, bool inverseOrder,
                                    std::size_t& index);
 
 bool intersectionFound(const Eigen::Vector3d& p_center, const Eigen::Vector3d& p_current, const Eigen::Vector3d& p_next,
-                       double r);
+                       const double& r);
 
 /**
  * @brief Checks if current robot state is in self collision.
@@ -212,9 +213,8 @@ bool intersectionFound(const Eigen::Vector3d& p_center, const Eigen::Vector3d& p
  * @param ik_solution
  * @return
  */
-bool isStateColliding(const bool test_for_self_collision, const planning_scene::PlanningSceneConstPtr& scene,
-                      moveit::core::RobotState* state, const moveit::core::JointModelGroup* const group,
-                      const double* const ik_solution);
+bool isStateColliding(const planning_scene::PlanningSceneConstPtr& scene, moveit::core::RobotState* state,
+                      const moveit::core::JointModelGroup* const group, const double* const ik_solution);
 }  // namespace pilz_industrial_motion_planner
 
 void normalizeQuaternion(geometry_msgs::msg::Quaternion& quat);

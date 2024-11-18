@@ -42,19 +42,12 @@
 
 #include <kdl/velocityprofile_trap.hpp>
 #include <moveit/robot_state/conversions.h>
-#include <moveit/utils/logger.hpp>
 
 #include <pilz_industrial_motion_planner/limits_container.h>
 
 namespace pilz_industrial_motion_planner
 {
-namespace
-{
-rclcpp::Logger getLogger()
-{
-  return moveit::getLogger("moveit.planners.pilz.trajectory_generator");
-}
-}  // namespace
+static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit.pilz_industrial_motion_planner.trajectory_generator");
 
 sensor_msgs::msg::JointState TrajectoryGenerator::filterGroupValues(const sensor_msgs::msg::JointState& robot_state,
                                                                     const std::string& group) const
@@ -86,7 +79,7 @@ void TrajectoryGenerator::cmdSpecificRequestValidation(const planning_interface:
   // to provide a command specific request validation.
 }
 
-void TrajectoryGenerator::checkVelocityScaling(double scaling_factor)
+void TrajectoryGenerator::checkVelocityScaling(const double& scaling_factor)
 {
   if (!isScalingFactorValid(scaling_factor))
   {
@@ -97,7 +90,7 @@ void TrajectoryGenerator::checkVelocityScaling(double scaling_factor)
   }
 }
 
-void TrajectoryGenerator::checkAccelerationScaling(double scaling_factor)
+void TrajectoryGenerator::checkAccelerationScaling(const double& scaling_factor)
 {
   if (!isScalingFactorValid(scaling_factor))
   {
@@ -121,11 +114,6 @@ void TrajectoryGenerator::checkForValidGroupName(const std::string& group_name) 
 void TrajectoryGenerator::checkStartState(const moveit_msgs::msg::RobotState& start_state,
                                           const std::string& group) const
 {
-  if (start_state.joint_state.name.empty())
-  {
-    throw NoJointNamesInStartState("No joint names for state state given");
-  }
-
   if (start_state.joint_state.name.size() != start_state.joint_state.position.size())
   {
     throw SizeMismatchInStartState("Joint state name and position do not match in start state");
@@ -151,31 +139,23 @@ void TrajectoryGenerator::checkStartState(const moveit_msgs::msg::RobotState& st
 
   // does not allow start velocity
   if (!std::all_of(group_start_state.velocity.begin(), group_start_state.velocity.end(),
-                   [](double v) { return std::fabs(v) < VELOCITY_TOLERANCE; }))
+                   [this](double v) { return std::fabs(v) < this->VELOCITY_TOLERANCE; }))
   {
     throw NonZeroVelocityInStartState("Trajectory Generator does not allow non-zero start velocity");
   }
 }
 
 void TrajectoryGenerator::checkJointGoalConstraint(const moveit_msgs::msg::Constraints& constraint,
-                                                   const std::vector<std::string>& expected_joint_names,
                                                    const std::string& group_name) const
 {
-  for (const auto& joint_constraint : constraint.joint_constraints)
+  for (auto const& joint_constraint : constraint.joint_constraints)
   {
     const std::string& curr_joint_name{ joint_constraint.joint_name };
-    if (std::find(expected_joint_names.cbegin(), expected_joint_names.cend(), curr_joint_name) ==
-        expected_joint_names.cend())
-    {
-      std::ostringstream os;
-      os << "Cannot find joint \"" << curr_joint_name << "\" from start state in goal constraint";
-      throw StartStateGoalStateMismatch(os.str());
-    }
 
     if (!robot_model_->getJointModelGroup(group_name)->hasJointModel(curr_joint_name))
     {
       std::ostringstream os;
-      os << "Joint \"" << curr_joint_name << "\" does not belong to group \"" << group_name << '\"';
+      os << "Joint \"" << curr_joint_name << "\" does not belong to group \"" << group_name << "\"";
       throw JointConstraintDoesNotBelongToGroup(os.str());
     }
 
@@ -189,7 +169,8 @@ void TrajectoryGenerator::checkJointGoalConstraint(const moveit_msgs::msg::Const
 }
 
 void TrajectoryGenerator::checkCartesianGoalConstraint(const moveit_msgs::msg::Constraints& constraint,
-                                                       const std::string& group_name) const
+                                                       const moveit::core::RobotState& robot_state,
+                                                       const moveit::core::JointModelGroup* const jmg) const
 {
   assert(constraint.position_constraints.size() == 1);
   assert(constraint.orientation_constraints.size() == 1);
@@ -215,10 +196,11 @@ void TrajectoryGenerator::checkCartesianGoalConstraint(const moveit_msgs::msg::C
     throw PositionOrientationConstraintNameMismatch(os.str());
   }
 
-  if (!robot_model_->getJointModelGroup(group_name)->canSetStateFromIK(pos_constraint.link_name))
+  const auto& lm = robot_state.getRigidlyConnectedParentLinkModel(pos_constraint.link_name);
+  if (!lm || !jmg->canSetStateFromIK(lm->getName()))
   {
     std::ostringstream os;
-    os << "No IK solver available for link: \"" << pos_constraint.link_name << '\"';
+    os << "No IK solver available for link: \"" << pos_constraint.link_name << "\"";
     throw NoIKSolverAvailable(os.str());
   }
 
@@ -229,8 +211,8 @@ void TrajectoryGenerator::checkCartesianGoalConstraint(const moveit_msgs::msg::C
 }
 
 void TrajectoryGenerator::checkGoalConstraints(
-    const moveit_msgs::msg::MotionPlanRequest::_goal_constraints_type& goal_constraints,
-    const std::vector<std::string>& expected_joint_names, const std::string& group_name) const
+    const moveit_msgs::msg::MotionPlanRequest::_goal_constraints_type& goal_constraints, const std::string& group_name,
+    const moveit::core::RobotState& rstate) const
 {
   if (goal_constraints.size() != 1)
   {
@@ -247,21 +229,22 @@ void TrajectoryGenerator::checkGoalConstraints(
 
   if (isJointGoalGiven(goal_con))
   {
-    checkJointGoalConstraint(goal_con, expected_joint_names, group_name);
+    checkJointGoalConstraint(goal_con, group_name);
   }
   else
   {
-    checkCartesianGoalConstraint(goal_con, group_name);
+    checkCartesianGoalConstraint(goal_con, rstate, robot_model_->getJointModelGroup(group_name));
   }
 }
 
-void TrajectoryGenerator::validateRequest(const planning_interface::MotionPlanRequest& req) const
+void TrajectoryGenerator::validateRequest(const planning_interface::MotionPlanRequest& req,
+                                          const moveit::core::RobotState& rstate) const
 {
   checkVelocityScaling(req.max_velocity_scaling_factor);
   checkAccelerationScaling(req.max_acceleration_scaling_factor);
   checkForValidGroupName(req.group_name);
   checkStartState(req.start_state, req.group_name);
-  checkGoalConstraints(req.goal_constraints, req.start_state.joint_state.name, req.group_name);
+  checkGoalConstraints(req.goal_constraints, req.group_name, rstate);
 }
 
 void TrajectoryGenerator::setSuccessResponse(const moveit::core::RobotState& start_state, const std::string& group_name,
@@ -272,29 +255,29 @@ void TrajectoryGenerator::setSuccessResponse(const moveit::core::RobotState& sta
   auto rt = std::make_shared<robot_trajectory::RobotTrajectory>(robot_model_, group_name);
   rt->setRobotTrajectoryMsg(start_state, joint_trajectory);
 
-  res.trajectory = rt;
-  res.error_code.val = moveit_msgs::msg::MoveItErrorCodes::SUCCESS;
-  res.planning_time = (clock_->now() - planning_start).seconds();
+  res.trajectory_ = rt;
+  res.error_code_.val = moveit_msgs::msg::MoveItErrorCodes::SUCCESS;
+  res.planning_time_ = (clock_->now() - planning_start).seconds();
 }
 
 void TrajectoryGenerator::setFailureResponse(const rclcpp::Time& planning_start,
                                              planning_interface::MotionPlanResponse& res) const
 {
-  if (res.trajectory)
+  if (res.trajectory_)
   {
-    res.trajectory->clear();
+    res.trajectory_->clear();
   }
-  res.planning_time = (clock_->now() - planning_start).seconds();
+  res.planning_time_ = (clock_->now() - planning_start).seconds();
 }
 
 std::unique_ptr<KDL::VelocityProfile>
-TrajectoryGenerator::cartesianTrapVelocityProfile(double max_velocity_scaling_factor,
-                                                  double max_acceleration_scaling_factor,
+TrajectoryGenerator::cartesianTrapVelocityProfile(const double& max_velocity_scaling_factor,
+                                                  const double& max_acceleration_scaling_factor,
                                                   const std::unique_ptr<KDL::Path>& path) const
 {
   std::unique_ptr<KDL::VelocityProfile> vp_trans = std::make_unique<KDL::VelocityProfile_Trap>(
-      max_velocity_scaling_factor * planner_limits_.getCartesianLimits().max_trans_vel,
-      max_acceleration_scaling_factor * planner_limits_.getCartesianLimits().max_trans_acc);
+      max_velocity_scaling_factor * planner_limits_.getCartesianLimits().getMaxTranslationalVelocity(),
+      max_acceleration_scaling_factor * planner_limits_.getCartesianLimits().getMaxTranslationalAcceleration());
 
   if (path->PathLength() > std::numeric_limits<double>::epsilon())  // avoid division by zero
   {
@@ -307,24 +290,23 @@ TrajectoryGenerator::cartesianTrapVelocityProfile(double max_velocity_scaling_fa
   return vp_trans;
 }
 
-void TrajectoryGenerator::generate(const planning_scene::PlanningSceneConstPtr& scene,
+bool TrajectoryGenerator::generate(const planning_scene::PlanningSceneConstPtr& scene,
                                    const planning_interface::MotionPlanRequest& req,
                                    planning_interface::MotionPlanResponse& res, double sampling_time)
 {
-  RCLCPP_INFO_STREAM(getLogger(), "Generating " << req.planner_id << " trajectory...");
+  RCLCPP_INFO_STREAM(LOGGER, "Generating " << req.planner_id << " trajectory...");
   rclcpp::Time planning_begin = clock_->now();
 
-  res.planner_id = req.planner_id;
   try
   {
-    validateRequest(req);
+    validateRequest(req, scene->getCurrentState());
   }
   catch (const MoveItErrorCodeException& ex)
   {
-    RCLCPP_ERROR_STREAM(getLogger(), ex.what());
-    res.error_code.val = ex.getErrorCode();
+    RCLCPP_ERROR_STREAM(LOGGER, ex.what());
+    res.error_code_.val = ex.getErrorCode();
     setFailureResponse(planning_begin, res);
-    return;
+    return false;
   }
 
   try
@@ -333,41 +315,62 @@ void TrajectoryGenerator::generate(const planning_scene::PlanningSceneConstPtr& 
   }
   catch (const MoveItErrorCodeException& ex)
   {
-    RCLCPP_ERROR_STREAM(getLogger(), ex.what());
-    res.error_code.val = ex.getErrorCode();
+    RCLCPP_ERROR_STREAM(LOGGER, ex.what());
+    res.error_code_.val = ex.getErrorCode();
     setFailureResponse(planning_begin, res);
-    return;
+    return false;
   }
 
-  MotionPlanInfo plan_info;
+  MotionPlanInfo plan_info(scene, req);
   try
   {
     extractMotionPlanInfo(scene, req, plan_info);
   }
   catch (const MoveItErrorCodeException& ex)
   {
-    RCLCPP_ERROR_STREAM(getLogger(), ex.what());
-    res.error_code.val = ex.getErrorCode();
+    RCLCPP_ERROR_STREAM(LOGGER, ex.what());
+    res.error_code_.val = ex.getErrorCode();
     setFailureResponse(planning_begin, res);
-    return;
+    return false;
   }
 
   trajectory_msgs::msg::JointTrajectory joint_trajectory;
   try
   {
-    plan(scene, req, plan_info, sampling_time, joint_trajectory);
+    plan(plan_info.start_scene, req, plan_info, sampling_time, joint_trajectory);
   }
   catch (const MoveItErrorCodeException& ex)
   {
-    RCLCPP_ERROR_STREAM(getLogger(), ex.what());
-    res.error_code.val = ex.getErrorCode();
+    RCLCPP_ERROR_STREAM(LOGGER, ex.what());
+    res.error_code_.val = ex.getErrorCode();
     setFailureResponse(planning_begin, res);
-    return;
+    return false;
   }
 
-  moveit::core::RobotState start_state(scene->getCurrentState());
-  moveit::core::robotStateMsgToRobotState(req.start_state, start_state, true);
-  setSuccessResponse(start_state, req.group_name, joint_trajectory, planning_begin, res);
+  setSuccessResponse(plan_info.start_scene->getCurrentState(), req.group_name, joint_trajectory, planning_begin, res);
+  return true;
+}
+
+TrajectoryGenerator::MotionPlanInfo::MotionPlanInfo(const planning_scene::PlanningSceneConstPtr& scene,
+                                                    const planning_interface::MotionPlanRequest& req)
+{
+  auto ps = scene->diff();
+  auto& start_state = ps->getCurrentStateNonConst();
+  // update start state from req
+  moveit::core::robotStateMsgToRobotState(scene->getTransforms(), req.start_state, start_state);
+  start_state.update();
+  start_scene = std::move(ps);
+
+  // initialize info.start_joint_position with active joint values from start_state
+  const double* positions = start_state.getVariablePositions();
+  for (const auto* jm : start_state.getRobotModel()->getJointModelGroup(req.group_name)->getActiveJointModels())
+  {
+    const auto& names = jm->getVariableNames();
+    for (std::size_t i = 0, j = jm->getFirstVariableIndex(); i < jm->getVariableCount(); ++i, ++j)
+    {
+      start_joint_position[names[i]] = positions[j];
+    }
+  }
 }
 
 }  // namespace pilz_industrial_motion_planner

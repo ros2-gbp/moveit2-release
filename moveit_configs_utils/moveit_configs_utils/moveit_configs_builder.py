@@ -108,7 +108,9 @@ class MoveItConfigs:
     # A dictionary that has the sensor 3d configuration parameters.
     sensors_3d: Dict = field(default_factory=dict)
     # A dictionary containing move_group's non-default capabilities.
-    move_group_capabilities: Dict = field(default_factory=dict)
+    move_group_capabilities: Dict = field(
+        default_factory=lambda: {"capabilities": "", "disable_capabilities": ""}
+    )
     # A dictionary containing the overridden position/velocity/acceleration limits.
     joint_limits: Dict = field(default_factory=dict)
     # A dictionary containing MoveItCpp related parameters.
@@ -414,7 +416,7 @@ class MoveItConfigsBuilder(ParameterBuilder):
         if sensors_path.exists():
             sensors_data = load_yaml(sensors_path)
             # TODO(mikeferguson): remove the second part of this check once
-            # https://github.com/moveit/moveit_resources/pull/141 has made through buildfarm
+            # https://github.com/ros-planning/moveit_resources/pull/141 has made through buildfarm
             if len(sensors_data["sensors"]) > 0 and sensors_data["sensors"][0]:
                 self.__moveit_configs.sensors_3d = sensors_data
         return self

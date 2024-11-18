@@ -47,18 +47,13 @@ namespace core
 class MoveItErrorCode : public moveit_msgs::msg::MoveItErrorCodes
 {
 public:
-  MoveItErrorCode(const int code = moveit_msgs::msg::MoveItErrorCodes::UNDEFINED, const std::string& error_message = "",
-                  const std::string& error_source = "")
+  MoveItErrorCode(int code = 0)
   {
     val = code;
-    message = error_message;
-    source = error_source;
   }
   MoveItErrorCode(const moveit_msgs::msg::MoveItErrorCodes& code)
   {
     val = code.val;
-    message = code.message;
-    source = code.source;
   }
   explicit operator bool() const
   {
@@ -79,14 +74,12 @@ public:
    @param error_code Error code to be translated to a string
    @return Error code string
  */
-inline std::string errorCodeToString(const MoveItErrorCode& error_code)
+inline std::string error_code_to_string(MoveItErrorCode error_code)
 {
   switch (error_code.val)
   {
     case moveit::core::MoveItErrorCode::SUCCESS:
       return std::string("SUCCESS");
-    case moveit::core::MoveItErrorCode::UNDEFINED:
-      return std::string("UNDEFINED");
     case moveit::core::MoveItErrorCode::FAILURE:
       return std::string("FAILURE");
     case moveit::core::MoveItErrorCode::PLANNING_FAILED:

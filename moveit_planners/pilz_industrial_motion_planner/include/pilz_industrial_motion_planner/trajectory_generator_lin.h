@@ -48,7 +48,6 @@ namespace pilz_industrial_motion_planner
 CREATE_MOVEIT_ERROR_CODE_EXCEPTION(LinTrajectoryConversionFailure, moveit_msgs::msg::MoveItErrorCodes::FAILURE);
 
 CREATE_MOVEIT_ERROR_CODE_EXCEPTION(JointNumberMismatch, moveit_msgs::msg::MoveItErrorCodes::INVALID_GOAL_CONSTRAINTS);
-CREATE_MOVEIT_ERROR_CODE_EXCEPTION(LinJointMissingInStartState, moveit_msgs::msg::MoveItErrorCodes::INVALID_ROBOT_STATE);
 CREATE_MOVEIT_ERROR_CODE_EXCEPTION(LinInverseForGoalIncalculable, moveit_msgs::msg::MoveItErrorCodes::NO_IK_SOLUTION);
 
 /**
@@ -74,7 +73,7 @@ private:
                              const planning_interface::MotionPlanRequest& req, MotionPlanInfo& info) const final;
 
   void plan(const planning_scene::PlanningSceneConstPtr& scene, const planning_interface::MotionPlanRequest& req,
-            const MotionPlanInfo& plan_info, double sampling_time,
+            const MotionPlanInfo& plan_info, const double& sampling_time,
             trajectory_msgs::msg::JointTrajectory& joint_trajectory) override;
 
   /**

@@ -1,4 +1,4 @@
-# ghcr.io/moveit/moveit2:${ROS_DISTRO}-ci
+# ghcr.io/ros-planning/moveit2:${ROS_DISTRO}-ci
 # ROS base image augmented with all MoveIt dependencies to use for CI
 
 ARG ROS_DISTRO=rolling
@@ -6,6 +6,8 @@ FROM ros:${ROS_DISTRO}-ros-base
 LABEL maintainer Robert Haschke rhaschke@techfak.uni-bielefeld.de
 
 ENV TERM xterm
+# Allow non-interactive installation of ros-humble-rmw-connextdds
+ENV RTI_NC_LICENSE_ACCEPTED yes
 
 # Setup (temporary) ROS workspace
 WORKDIR /root/ws_moveit

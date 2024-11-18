@@ -37,14 +37,9 @@
 #pragma once
 
 #include <rclcpp/rclcpp.hpp>
-#include <rclcpp/version.h>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/message_filter.h>
-#if RCLCPP_VERSION_GTE(28, 3, 3)  // Rolling
-#include <message_filters/subscriber.hpp>
-#else
 #include <message_filters/subscriber.h>
-#endif
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <moveit/occupancy_map_monitor/occupancy_map_updater.h>
 #include <moveit/point_containment_filter/shape_mask.h>
@@ -57,7 +52,7 @@ class PointCloudOctomapUpdater : public OccupancyMapUpdater
 {
 public:
   PointCloudOctomapUpdater();
-  ~PointCloudOctomapUpdater() override{};
+  ~PointCloudOctomapUpdater() override;
 
   bool setParams(const std::string& name_space) override;
 
@@ -74,6 +69,7 @@ protected:
 private:
   bool getShapeTransform(ShapeHandle h, Eigen::Isometry3d& transform) const;
   void cloudMsgCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr& cloud_msg);
+  void stopHelper();
 
   // TODO: Enable private node for publishing filtered point cloud
   // ros::NodeHandle root_nh_;
@@ -101,12 +97,10 @@ private:
   tf2_ros::MessageFilter<sensor_msgs::msg::PointCloud2>* point_cloud_filter_;
 
   /* used to store all cells in the map which a given ray passes through during raycasting.
-     we cache this here because it dynamically pre-allocates a lot of memory in its constructor */
+     we cache this here because it dynamically pre-allocates a lot of memory in its contsructor */
   octomap::KeyRay key_ray_;
 
   std::unique_ptr<point_containment_filter::ShapeMask> shape_mask_;
   std::vector<int> mask_;
-
-  rclcpp::Logger logger_;
 };
 }  // namespace occupancy_map_monitor

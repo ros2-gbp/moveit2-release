@@ -57,28 +57,27 @@ public:
   /// Specification of options to use when constructing the MoveItCpp class
   struct PlanningSceneMonitorOptions
   {
-    PlanningSceneMonitorOptions()
-      : joint_state_topic(planning_scene_monitor::PlanningSceneMonitor::DEFAULT_JOINT_STATES_TOPIC)
-      , attached_collision_object_topic(
-            planning_scene_monitor::PlanningSceneMonitor::DEFAULT_ATTACHED_COLLISION_OBJECT_TOPIC)
-      , monitored_planning_scene_topic(planning_scene_monitor::PlanningSceneMonitor::MONITORED_PLANNING_SCENE_TOPIC)
-      , publish_planning_scene_topic(planning_scene_monitor::PlanningSceneMonitor::DEFAULT_PLANNING_SCENE_TOPIC)
-    {
-    }
-
     void load(const rclcpp::Node::SharedPtr& node)
     {
       const std::string ns = "planning_scene_monitor_options";
       node->get_parameter_or(ns + ".name", name, std::string("planning_scene_monitor"));
       node->get_parameter_or(ns + ".robot_description", robot_description, std::string("robot_description"));
+      node->get_parameter_or(ns + ".joint_state_topic", joint_state_topic,
+                             planning_scene_monitor::PlanningSceneMonitor::DEFAULT_JOINT_STATES_TOPIC);
+      node->get_parameter_or(ns + ".attached_collision_object_topic", attached_collision_object_topic,
+                             planning_scene_monitor::PlanningSceneMonitor::DEFAULT_ATTACHED_COLLISION_OBJECT_TOPIC);
+      node->get_parameter_or(ns + ".monitored_planning_scene_topic", monitored_planning_scene_topic,
+                             planning_scene_monitor::PlanningSceneMonitor::MONITORED_PLANNING_SCENE_TOPIC);
+      node->get_parameter_or(ns + ".publish_planning_scene_topic", publish_planning_scene_topic,
+                             planning_scene_monitor::PlanningSceneMonitor::DEFAULT_PLANNING_SCENE_TOPIC);
       node->get_parameter_or(ns + ".wait_for_initial_state_timeout", wait_for_initial_state_timeout, 0.0);
     }
     std::string name;
     std::string robot_description;
-    const std::string joint_state_topic;
-    const std::string attached_collision_object_topic;
-    const std::string monitored_planning_scene_topic;
-    const std::string publish_planning_scene_topic;
+    std::string joint_state_topic;
+    std::string attached_collision_object_topic;
+    std::string monitored_planning_scene_topic;
+    std::string publish_planning_scene_topic;
     double wait_for_initial_state_timeout;
   };
 
@@ -109,7 +108,17 @@ public:
   };
 
   /** \brief Constructor */
+  [[deprecated("Passing tf2_ros::Buffer to MoveItCpp's constructor is deprecated")]] MoveItCpp(
+      const rclcpp::Node::SharedPtr& node, const std::shared_ptr<tf2_ros::Buffer>& /* unused */)
+    : MoveItCpp(node)
+  {
+  }
   MoveItCpp(const rclcpp::Node::SharedPtr& node);
+  [[deprecated("Passing tf2_ros::Buffer to MoveItCpp's constructor is deprecated")]] MoveItCpp(
+      const rclcpp::Node::SharedPtr& node, const Options& options, const std::shared_ptr<tf2_ros::Buffer>& /* unused */)
+    : MoveItCpp(node, options)
+  {
+  }
   MoveItCpp(const rclcpp::Node::SharedPtr& node, const Options& options);
 
   /**
@@ -141,50 +150,44 @@ public:
   moveit::core::RobotStatePtr getCurrentState(double wait_seconds = 0.0);
 
   /** \brief Get all loaded planning pipeline instances mapped to their reference names */
-  const std::unordered_map<std::string, planning_pipeline::PlanningPipelinePtr>& getPlanningPipelines() const;
+  const std::map<std::string, planning_pipeline::PlanningPipelinePtr>& getPlanningPipelines() const;
+
+  /** \brief Get the names of all loaded planning pipelines. Specify group_name to filter the results by planning group
+   */
+  std::set<std::string> getPlanningPipelineNames(const std::string& group_name = "") const;
 
   /** \brief Get the stored instance of the planning scene monitor */
-  planning_scene_monitor::PlanningSceneMonitorConstPtr getPlanningSceneMonitor() const;
+  const planning_scene_monitor::PlanningSceneMonitorPtr& getPlanningSceneMonitor() const;
   planning_scene_monitor::PlanningSceneMonitorPtr getPlanningSceneMonitorNonConst();
 
-  std::shared_ptr<const tf2_ros::Buffer> getTFBuffer() const;
-  std::shared_ptr<tf2_ros::Buffer> getTFBuffer();
+  const std::shared_ptr<tf2_ros::Buffer>& getTFBuffer() const;
 
   /** \brief Get the stored instance of the trajectory execution manager */
-  trajectory_execution_manager::TrajectoryExecutionManagerConstPtr getTrajectoryExecutionManager() const;
+  const trajectory_execution_manager::TrajectoryExecutionManagerPtr& getTrajectoryExecutionManager() const;
   trajectory_execution_manager::TrajectoryExecutionManagerPtr getTrajectoryExecutionManagerNonConst();
 
-  /** \brief Execute a trajectory on the planning group specified by the robot's trajectory using the trajectory
-   * execution manager.
-   *  \param [in] robot_trajectory Contains trajectory info as well as metadata such as a RobotModel.
-   *  \param [in] controllers An optional list of ros2_controllers to execute with. If none, MoveIt will attempt to find
-   * a controller. The exact behavior of finding a controller depends on which MoveItControllerManager plugin is active.
-   *  \return moveit_controller_manager::ExecutionStatus::SUCCEEDED if successful
-   */
-  [[deprecated("MoveItCpp::execute() no longer requires a blocking parameter")]] moveit_controller_manager::ExecutionStatus
-  execute(const robot_trajectory::RobotTrajectoryPtr& robot_trajectory, bool blocking,
-          const std::vector<std::string>& controllers = std::vector<std::string>());
-
-  moveit_controller_manager::ExecutionStatus
-  execute(const robot_trajectory::RobotTrajectoryPtr& robot_trajectory,
-          const std::vector<std::string>& controllers = std::vector<std::string>());
-
-  /** \brief Utility to terminate the given planning pipeline */
-  bool terminatePlanningPipeline(const std::string& pipeline_name);
+  /** \brief Execute a trajectory on the planning group specified by group_name using the trajectory execution manager.
+   * If blocking is set to false, the execution is run in background and the function returns immediately. */
+  moveit_controller_manager::ExecutionStatus execute(const std::string& group_name,
+                                                     const robot_trajectory::RobotTrajectoryPtr& robot_trajectory,
+                                                     bool blocking = true);
 
 private:
   //  Core properties and instances
   rclcpp::Node::SharedPtr node_;
+  moveit::core::RobotModelConstPtr robot_model_;
   planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
 
   // Planning
-  std::unordered_map<std::string, planning_pipeline::PlanningPipelinePtr> planning_pipelines_;
-  std::unordered_map<std::string, std::set<std::string>> groups_algorithms_map_;
+  std::map<std::string, planning_pipeline::PlanningPipelinePtr> planning_pipelines_;
+  std::map<std::string, std::set<std::string>> groups_pipelines_map_;
+  std::map<std::string, std::set<std::string>> groups_algorithms_map_;
 
   // Execution
   trajectory_execution_manager::TrajectoryExecutionManagerPtr trajectory_execution_manager_;
 
-  rclcpp::Logger logger_;
+  /** \brief Reset all member variables */
+  void clearContents();
 
   /** \brief Initialize and setup the planning scene monitor */
   bool loadPlanningSceneMonitor(const PlanningSceneMonitorOptions& options);
@@ -193,3 +196,12 @@ private:
   bool loadPlanningPipelines(const PlanningPipelineOptions& options);
 };
 }  // namespace moveit_cpp
+
+namespace moveit
+{
+namespace planning_interface
+{
+using MoveItCpp [[deprecated("use moveit_cpp")]] = moveit_cpp::MoveItCpp;
+[[deprecated("use moveit_cpp")]] MOVEIT_DECLARE_PTR(MoveItCpp, moveit_cpp::MoveItCpp);
+}  // namespace planning_interface
+}  // namespace moveit

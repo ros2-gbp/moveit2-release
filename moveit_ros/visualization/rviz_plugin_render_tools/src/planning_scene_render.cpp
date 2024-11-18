@@ -75,7 +75,7 @@ void PlanningSceneRender::renderPlanningScene(const planning_scene::PlanningScen
                                               const Ogre::ColourValue& default_env_color,
                                               const Ogre::ColourValue& default_attached_color,
                                               OctreeVoxelRenderMode octree_voxel_rendering,
-                                              OctreeVoxelColorMode octree_color_mode, double default_scene_alpha)
+                                              OctreeVoxelColorMode octree_color_mode, float default_scene_alpha)
 {
   if (!scene)
     return;
@@ -91,7 +91,7 @@ void PlanningSceneRender::renderPlanningScene(const planning_scene::PlanningScen
     color.r = default_attached_color.r;
     color.g = default_attached_color.g;
     color.b = default_attached_color.b;
-    color.a = 1.0f;
+    color.a = default_attached_color.a;
     planning_scene::ObjectColorMap color_map;
     scene->getKnownObjectColors(color_map);
     scene_robot_->update(moveit::core::RobotStateConstPtr(rs), color, color_map);
@@ -102,7 +102,7 @@ void PlanningSceneRender::renderPlanningScene(const planning_scene::PlanningScen
   {
     collision_detection::CollisionEnv::ObjectConstPtr object = scene->getWorld()->getObject(id);
     Ogre::ColourValue color = default_env_color;
-    double alpha = default_scene_alpha;
+    float alpha = default_scene_alpha;
     if (scene->hasObjectColor(id))
     {
       const std_msgs::msg::ColorRGBA& c = scene->getObjectColor(id);

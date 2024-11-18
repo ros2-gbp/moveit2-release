@@ -204,7 +204,12 @@ def generate_move_group_launch(moveit_config):
         )
     )
     # inhibit these default MoveGroup capabilities (space separated)
-    ld.add_action(DeclareLaunchArgument("disable_capabilities", default_value=""))
+    ld.add_action(
+        DeclareLaunchArgument(
+            "disable_capabilities",
+            default_value=moveit_config.move_group_capabilities["disable_capabilities"],
+        )
+    )
 
     # do not copy dynamics information from /joint_states to internal robot monitoring
     # default to false, because almost nothing in move_group relies on this information
@@ -337,10 +342,8 @@ def generate_demo_launch(moveit_config, launch_package_path=None):
             package="controller_manager",
             executable="ros2_control_node",
             parameters=[
+                moveit_config.robot_description,
                 str(moveit_config.package_path / "config/ros2_controllers.yaml"),
-            ],
-            remappings=[
-                ("/controller_manager/robot_description", "/robot_description"),
             ],
         )
     )
