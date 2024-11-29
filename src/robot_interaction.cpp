@@ -35,11 +35,11 @@
 
 /* Author: Ioan Sucan, Adam Leeper */
 
-#include <moveit/robot_interaction/robot_interaction.h>
-#include <moveit/robot_interaction/interaction_handler.h>
-#include <moveit/robot_interaction/interactive_marker_helpers.h>
-#include <moveit/robot_interaction/kinematic_options_map.h>
-#include <moveit/transforms/transforms.h>
+#include <moveit/robot_interaction/robot_interaction.hpp>
+#include <moveit/robot_interaction/interaction_handler.hpp>
+#include <moveit/robot_interaction/interactive_marker_helpers.hpp>
+#include <moveit/robot_interaction/kinematic_options_map.hpp>
+#include <moveit/transforms/transforms.hpp>
 #include <interactive_markers/interactive_marker_server.hpp>
 #include <interactive_markers/menu_handler.hpp>
 #include <tf2_eigen/tf2_eigen.hpp>
@@ -65,7 +65,7 @@ RobotInteraction::RobotInteraction(const moveit::core::RobotModelConstPtr& robot
                                    const rclcpp::Node::SharedPtr& node, const std::string& ns)
   : robot_model_(robot_model)
   , node_(node)
-  , logger_(moveit::getLogger("moveit_ros_robot_interaction"))
+  , logger_(moveit::getLogger("moveit.ros.robot_interaction"))
   , kinematic_options_map_(std::make_shared<KinematicOptionsMap>())
 {
   topic_ = ns.empty() ? INTERACTIVE_MARKER_TOPIC : ns + "/" + INTERACTIVE_MARKER_TOPIC;

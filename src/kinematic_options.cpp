@@ -34,7 +34,7 @@
 
 /* Author: Acorn Pooley */
 
-#include <moveit/robot_interaction/kinematic_options.h>
+#include <moveit/robot_interaction/kinematic_options.hpp>
 #include <rclcpp/logging.hpp>
 #include <moveit/utils/logger.hpp>
 
@@ -51,7 +51,7 @@ bool robot_interaction::KinematicOptions::setStateFromIK(moveit::core::RobotStat
   const moveit::core::JointModelGroup* jmg = state.getJointModelGroup(group);
   if (!jmg)
   {
-    RCLCPP_ERROR(moveit::getLogger("KinematicOptions"), "No getJointModelGroup('%s') found", group.c_str());
+    RCLCPP_ERROR(moveit::getLogger("moveit.ros.kinematic_options"), "No getJointModelGroup('%s') found", group.c_str());
     return false;
   }
   bool result = state.setFromIK(jmg, pose, tip,
