@@ -2,6 +2,56 @@
 Changelog for package moveit_servo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.12.0 (2024-11-29)
+-------------------
+* Enhancement/use hpp for headers (`#3113 <https://github.com/ros-planning/moveit2/issues/3113>`_)
+* [moveit_servo] avoid race condition when calling ~/pause_servo (`#3059 <https://github.com/ros-planning/moveit2/issues/3059>`_)
+* Cleanup `#3056 <https://github.com/ros-planning/moveit2/issues/3056>`_ (`#3058 <https://github.com/ros-planning/moveit2/issues/3058>`_)
+* Wait for nonzero joint states in PSM in Servo CPP integration test (`#3056 <https://github.com/ros-planning/moveit2/issues/3056>`_)
+* [moveit_servo] fix: ensure ee_pose on planning_frame (`#3046 <https://github.com/ros-planning/moveit2/issues/3046>`_)
+* set filter state when no commands (`#3027 <https://github.com/ros-planning/moveit2/issues/3027>`_)
+* Obtain time from node. (`#3032 <https://github.com/ros-planning/moveit2/issues/3032>`_)
+* [Servo] Use velocity scaling properly in Cartesian and pose tracking commands (`#3007 <https://github.com/ros-planning/moveit2/issues/3007>`_)
+* Contributors: Dongya Jiang, Jelmer de Wolde, Paul Gesel, Robert Haschke, Sebastian Castro, Tom Noble
+
+2.11.0 (2024-09-16)
+-------------------
+* Support single-element joint limit margins vector and fix joint halting logic for multi-DOF Joints (`#2970 <https://github.com/moveit/moveit2/issues/2970>`_)
+* Implement realtime Ruckig jerk-limited smoothing (`#2956 <https://github.com/moveit/moveit2/issues/2956>`_)
+* Ensure the robot state is up-to-date before Servoing (`#2954 <https://github.com/moveit/moveit2/issues/2954>`_)
+* Correctly load smoothing plugins in Servo integration tests (`#2965 <https://github.com/moveit/moveit2/issues/2965>`_)
+* Small fixes to flaky MoveIt Servo integration tests (`#2962 <https://github.com/moveit/moveit2/issues/2962>`_)
+* Tune Servo params so it does not get stuck so easily (`#2939 <https://github.com/moveit/moveit2/issues/2939>`_)
+* Contributors: AndyZe, Sebastian Castro
+
+2.10.0 (2024-06-13)
+-------------------
+* Migrate ros-planning org to moveit (`#2847 <https://github.com/moveit/moveit2/issues/2847>`_)
+  * Rename github.com/ros-planning -> github.com/moveit
+  * Rename ros-planning.github.io -> moveit.github.io
+  * Rename ros-planning organization in docker and CI workflow files
+  - ghcr.io/ros-planning -> ghcr.io/moveit
+  - github.repository == 'moveit/*''
+* remove intraprocess comm warning (`#2752 <https://github.com/moveit/moveit2/issues/2752>`_)
+* Fix error message text in servo.cpp (`#2769 <https://github.com/moveit/moveit2/issues/2769>`_)
+* Fix launch parameters in Servo demos (`#2735 <https://github.com/moveit/moveit2/issues/2735>`_)
+  Co-authored-by: Sebastian Jahr <sebastian.jahr@picknik.ai>
+* [Servo] Fix collision checking with attached objects (`#2747 <https://github.com/moveit/moveit2/issues/2747>`_)
+* Unify log names (`#2720 <https://github.com/moveit/moveit2/issues/2720>`_)
+  Co-authored-by: Abishalini Sivaraman <abi.gpuram@gmail.com>
+* CMake format and lint in pre-commit (`#2683 <https://github.com/moveit/moveit2/issues/2683>`_)
+* Attempt to use SCHED_FIFO for Servo regardless of RT kernel (`#2653 <https://github.com/moveit/moveit2/issues/2653>`_)
+  * Attempt to use SCHED_FIFO for Servo regardless of RT kernel
+  * Update warning message if Servo fails to use SCHED_FIFO
+  Co-authored-by: AndyZe <andyz@utexas.edu>
+  * Update moveit_ros/moveit_servo/src/servo_node.cpp
+  Co-authored-by: Sebastian Castro <4603398+sea-bass@users.noreply.github.com>
+  ---------
+  Co-authored-by: AndyZe <andyz@utexas.edu>
+  Co-authored-by: Sebastian Castro <4603398+sea-bass@users.noreply.github.com>
+* Acceleration Limited Smoothing Plugin for Servo (`#2651 <https://github.com/moveit/moveit2/issues/2651>`_)
+* Contributors: Marc Bestmann, Nathan Brooks, Paul Gesel, Robert Haschke, Sebastian Castro, Sebastian Jahr, Stephanie Eng, Tyler Weaver
+
 2.9.0 (2024-01-09)
 ------------------
 * Add command queue to servo to account for latency (`#2594 <https://github.com/ros-planning/moveit2/issues/2594>`_)

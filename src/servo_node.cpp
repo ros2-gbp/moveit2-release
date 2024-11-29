@@ -67,27 +67,18 @@ ServoNode::ServoNode(const rclcpp::NodeOptions& options)
 {
   moveit::setNodeLoggerName(node_->get_name());
 
-  if (!options.use_intra_process_comms())
+  // Configure SCHED_FIFO and priority
+  if (realtime_tools::configure_sched_fifo(servo_params_.thread_priority))
   {
-    RCLCPP_WARN_STREAM(node_->get_logger(),
-                       "Intra-process communication is disabled, consider enabling it by adding: "
-                       "\nextra_arguments=[{'use_intra_process_comms' : True}]\nto the Servo composable node "
-                       "in the launch file");
+    RCLCPP_INFO_STREAM(node_->get_logger(), "Enabled SCHED_FIFO and higher thread priority.");
+  }
+  else
+  {
+    RCLCPP_WARN_STREAM(node_->get_logger(), "Could not enable FIFO RT scheduling policy. Continuing with the default.");
   }
 
   // Check if a realtime kernel is available
-  if (realtime_tools::has_realtime_kernel())
-  {
-    if (realtime_tools::configure_sched_fifo(servo_params_.thread_priority))
-    {
-      RCLCPP_INFO_STREAM(node_->get_logger(), "Realtime kernel available, higher thread priority has been set.");
-    }
-    else
-    {
-      RCLCPP_WARN_STREAM(node_->get_logger(), "Could not enable FIFO RT scheduling policy.");
-    }
-  }
-  else
+  if (!realtime_tools::has_realtime_kernel())
   {
     RCLCPP_WARN_STREAM(node_->get_logger(), "Realtime kernel is recommended for better performance.");
   }
@@ -160,13 +151,13 @@ void ServoNode::pauseServo(const std::shared_ptr<std_srvs::srv::SetBool::Request
   }
   else
   {
+    std::lock_guard<std::mutex> lock_guard(lock_);
     // Reset the smoothing plugin with the robot's current state in case the robot moved between pausing and unpausing.
-    last_commanded_state_ = servo_->getCurrentRobotState();
+    last_commanded_state_ = servo_->getCurrentRobotState(true /* block for current robot state */);
     servo_->resetSmoothing(last_commanded_state_);
 
     // clear out the command rolling window and reset last commanded state to be the current state
     joint_cmd_rolling_window_.clear();
-    last_commanded_state_ = servo_->getCurrentRobotState();
 
     // reactivate collision checking
     servo_->setCollisionChecking(true);
@@ -310,8 +301,10 @@ void ServoNode::servoLoop()
     RCLCPP_INFO(node_->get_logger(), "Waiting to receive robot state update.");
     rclcpp::sleep_for(std::chrono::seconds(1));
   }
-  KinematicState current_state = servo_->getCurrentRobotState();
+  KinematicState current_state = servo_->getCurrentRobotState(true /* block for current robot state */);
   last_commanded_state_ = current_state;
+  // Ensure the filter is up to date
+  servo_->resetSmoothing(current_state);
 
   // Get the robot state and joint model group info.
   moveit::core::RobotStatePtr robot_state = planning_scene_monitor_->getStateMonitor()->getCurrentState();
@@ -323,10 +316,12 @@ void ServoNode::servoLoop()
     // Skip processing if servoing is disabled.
     if (servo_paused_)
     {
+      servo_->resetSmoothing(current_state);
       servo_frequency.sleep();
       continue;
     }
 
+    std::lock_guard<std::mutex> lock_guard(lock_);
     const bool use_trajectory = servo_params_.command_out_type == "trajectory_msgs/JointTrajectory";
     const auto cur_time = node_->now();
 
@@ -338,7 +333,7 @@ void ServoNode::servoLoop()
     {
       // if all joint_cmd_rolling_window_ is empty or all commands in it are outdated, use current robot state
       joint_cmd_rolling_window_.clear();
-      current_state = servo_->getCurrentRobotState();
+      current_state = servo_->getCurrentRobotState(false /* block for current robot state */);
       current_state.velocities *= 0.0;
     }
 
