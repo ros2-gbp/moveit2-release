@@ -36,42 +36,53 @@
 
 #pragma once
 
-#include <moveit/move_group/move_group_capability.h>
-#include <rclcpp_action/rclcpp_action.hpp>
-#include <moveit_msgs/action/move_group.hpp>
-#include <memory>
+#include <rclcpp/rclcpp.hpp>
+#include <string>
+#include <moveit/macros/class_forward.hpp>
+
+namespace moveit_cpp
+{
+MOVEIT_CLASS_FORWARD(MoveItCpp);
+}
+
+namespace planning_scene_monitor
+{
+MOVEIT_CLASS_FORWARD(PlanningSceneMonitor);  // Defines PlanningSceneMonitorPtr, ConstPtr, WeakPtr... etc
+}
+
+namespace planning_pipeline
+{
+MOVEIT_CLASS_FORWARD(PlanningPipeline);  // Defines PlanningPipelinePtr, ConstPtr, WeakPtr... etc
+}
+
+namespace plan_execution
+{
+MOVEIT_CLASS_FORWARD(PlanExecution);  // Defines PlanExecutionPtr, ConstPtr, WeakPtr... etc
+}  // namespace plan_execution
+
+namespace trajectory_execution_manager
+{
+MOVEIT_CLASS_FORWARD(TrajectoryExecutionManager);  // Defines TrajectoryExecutionManagerPtr, ConstPtr, WeakPtr... etc
+}
 
 namespace move_group
 {
-using MGAction = moveit_msgs::action::MoveGroup;
-using MGActionGoal = rclcpp_action::ServerGoalHandle<MGAction>;
+MOVEIT_STRUCT_FORWARD(MoveGroupContext);
 
-class MoveGroupMoveAction : public MoveGroupCapability
+struct MoveGroupContext
 {
-public:
-  MoveGroupMoveAction();
+  MoveGroupContext(const moveit_cpp::MoveItCppPtr& moveit_cpp, const std::string& default_planning_pipeline,
+                   bool allow_trajectory_execution = false, bool debug = false);
+  ~MoveGroupContext();
 
-  void initialize() override;
+  bool status() const;
 
-private:
-  void executeMoveCallback(const std::shared_ptr<MGActionGoal>& goal);
-  void executeMoveCallbackPlanAndExecute(const std::shared_ptr<MGActionGoal>& goal,
-                                         std::shared_ptr<MGAction::Result>& action_res);
-  void executeMoveCallbackPlanOnly(const std::shared_ptr<MGActionGoal>& goal,
-                                   std::shared_ptr<MGAction::Result>& action_res);
-
-  void startMoveExecutionCallback();
-  void startMoveLookCallback();
-  void preemptMoveCallback();
-  void setMoveState(MoveGroupState state, const std::shared_ptr<MGActionGoal>& goal);
-
-  bool planUsingPlanningPipeline(const planning_interface::MotionPlanRequest& req,
-                                 plan_execution::ExecutableMotionPlan& plan);
-
-  std::shared_ptr<rclcpp_action::Server<MGAction>> execute_action_server_;
-
-  MoveGroupState move_state_;
-  bool preempt_requested_;
-  std::shared_ptr<MGActionGoal> goal_;
+  moveit_cpp::MoveItCppPtr moveit_cpp_;
+  planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
+  trajectory_execution_manager::TrajectoryExecutionManagerPtr trajectory_execution_manager_;
+  planning_pipeline::PlanningPipelinePtr planning_pipeline_;
+  plan_execution::PlanExecutionPtr plan_execution_;
+  bool allow_trajectory_execution_;
+  bool debug_;
 };
 }  // namespace move_group

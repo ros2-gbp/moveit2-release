@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2016, Michael 'v4hn' Goerner
+ *  Copyright (c) 2012, Willow Garage, Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,31 +32,35 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Michael 'v4hn' Goerner */
+/* Author: Ioan Sucan, Robert Haschke */
 
 #pragma once
 
-#include <moveit/move_group/move_group_capability.h>
-#include <moveit_msgs/srv/apply_planning_scene.hpp>
+#include <moveit/move_group/move_group_capability.hpp>
+#include <moveit_msgs/srv/query_planner_interfaces.hpp>
+#include <moveit_msgs/srv/get_planner_params.hpp>
+#include <moveit_msgs/srv/set_planner_params.hpp>
 
 namespace move_group
 {
-/**
- * Provides the ability to update the shared planning scene
- * with a remote blocking call using a ROS-Service
- */
-class ApplyPlanningSceneService : public MoveGroupCapability
+class MoveGroupQueryPlannersService : public MoveGroupCapability
 {
 public:
-  ApplyPlanningSceneService();
+  MoveGroupQueryPlannersService();
 
   void initialize() override;
 
 private:
-  bool applyScene(const std::shared_ptr<rmw_request_id_t>& request_header,
-                  const std::shared_ptr<moveit_msgs::srv::ApplyPlanningScene::Request>& req,
-                  const std::shared_ptr<moveit_msgs::srv::ApplyPlanningScene::Response>& res);
+  void queryInterface(const std::shared_ptr<moveit_msgs::srv::QueryPlannerInterfaces::Request>& /*req*/,
+                      const std::shared_ptr<moveit_msgs::srv::QueryPlannerInterfaces::Response>& res);
 
-  rclcpp::Service<moveit_msgs::srv::ApplyPlanningScene>::SharedPtr service_;
+  void getParams(const std::shared_ptr<moveit_msgs::srv::GetPlannerParams::Request>& req,
+                 const std::shared_ptr<moveit_msgs::srv::GetPlannerParams::Response>& res);
+  void setParams(const std::shared_ptr<moveit_msgs::srv::SetPlannerParams::Request>& req,
+                 const std::shared_ptr<moveit_msgs::srv::SetPlannerParams::Response>& /*res*/);
+
+  rclcpp::Service<moveit_msgs::srv::QueryPlannerInterfaces>::SharedPtr query_service_;
+  rclcpp::Service<moveit_msgs::srv::GetPlannerParams>::SharedPtr get_service_;
+  rclcpp::Service<moveit_msgs::srv::SetPlannerParams>::SharedPtr set_service_;
 };
 }  // namespace move_group
