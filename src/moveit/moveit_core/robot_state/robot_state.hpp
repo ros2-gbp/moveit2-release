@@ -38,20 +38,46 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#pragma GCC diagnostic push
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 #include <pybind11/eigen.h>
-#include <moveit/transforms/transforms.h>
+#pragma GCC diagnostic pop
+#include <moveit_py/moveit_py_utils/copy_ros_msg.hpp>
+#include <tf2_eigen/tf2_eigen.hpp>
+#include <moveit/robot_state/robot_state.hpp>
 
 namespace py = pybind11;
 
 namespace moveit_py
 {
-namespace bind_transforms
+namespace bind_robot_state
 {
-Eigen::MatrixXd getTransform(std::shared_ptr<moveit::core::Transforms>& transforms, std::string& from_frame);
+void update(moveit::core::RobotState* self, bool force, std::string& category);
 
-std::map<std::string, Eigen::MatrixXd> getAllTransforms(std::shared_ptr<moveit::core::Transforms>& transforms);
+Eigen::MatrixXd getFrameTransform(const moveit::core::RobotState* self, std::string& frame_id);
 
-void initTransforms(py::module& m);
+Eigen::MatrixXd getGlobalLinkTransform(const moveit::core::RobotState* self, std::string& link_name);
 
-}  // namespace bind_transforms
+geometry_msgs::msg::Pose getPose(const moveit::core::RobotState* self, const std::string& link_name);
+
+Eigen::VectorXd copyJointGroupPositions(const moveit::core::RobotState* self, const std::string& joint_model_group_name);
+Eigen::VectorXd copyJointGroupVelocities(const moveit::core::RobotState* self,
+                                         const std::string& joint_model_group_name);
+Eigen::VectorXd copyJointGroupAccelerations(const moveit::core::RobotState* self,
+                                            const std::string& joint_model_group_name);
+
+Eigen::MatrixXd getJacobian(const moveit::core::RobotState* self, const std::string& joint_model_group_name,
+                            const std::string& link_model_name, const Eigen::Vector3d& reference_point_position,
+                            bool use_quaternion_representation);
+
+Eigen::MatrixXd getJacobian(const moveit::core::RobotState* self, const std::string& joint_model_group_name,
+                            const Eigen::Vector3d& reference_point_position);
+
+bool setToDefaultValues(moveit::core::RobotState* self, const std::string& joint_model_group_name,
+                        const std::string& state_name);
+
+void initRobotState(py::module& m);
+}  // namespace bind_robot_state
 }  // namespace moveit_py

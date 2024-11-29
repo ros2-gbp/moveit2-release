@@ -37,32 +37,18 @@
 #pragma once
 
 #include <pybind11/pybind11.h>
-#include <pybind11/eigen.h>
 #include <pybind11/stl.h>
-#include <moveit_msgs/msg/robot_state.h>
-#include <moveit_msgs/msg/move_it_error_codes.h>
-#include <moveit_py/moveit_py_utils/ros_msg_typecasters.h>
-#include <moveit/planning_interface/planning_response.h>
+#include <pybind11/eigen.h>
+#include <moveit/robot_model/robot_model.hpp>
 
 namespace py = pybind11;
 
 namespace moveit_py
 {
-namespace bind_planning_interface
+namespace bind_robot_model
 {
-std::shared_ptr<robot_trajectory::RobotTrajectory>
-getMotionPlanResponseTrajectory(std::shared_ptr<planning_interface::MotionPlanResponse>& response);
-
-moveit_msgs::msg::RobotState
-getMotionPlanResponseStartState(std::shared_ptr<planning_interface::MotionPlanResponse>& response);
-
-moveit_msgs::msg::MoveItErrorCodes
-getMotionPlanResponseErrorCode(std::shared_ptr<planning_interface::MotionPlanResponse>& response);
-
-double getMotionPlanResponsePlanningTime(std::shared_ptr<planning_interface::MotionPlanResponse>& response);
-
-std::string getMotionPlanResponsePlannerId(std::shared_ptr<planning_interface::MotionPlanResponse>& response);
-
-void initMotionPlanResponse(py::module& m);
-}  // namespace bind_planning_interface
+bool satisfiesPositionBounds(const moveit::core::JointModelGroup* jmg, const Eigen::VectorXd& joint_positions,
+                             const double margin);
+void initJointModelGroup(py::module& m);
+}  // namespace bind_robot_model
 }  // namespace moveit_py

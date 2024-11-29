@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2023, Jafar Uruç
+ *  Copyright (c) 2022, Peter David Fagan
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of the copyright holder nor the names of its
+ *   * Neither the name of PickNik Inc. nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,21 +32,31 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Jafar Uruç */
+/* Author: Peter David Fagan */
 
 #pragma once
 
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 #include <pybind11/eigen.h>
-#include <moveit/robot_model/joint_model.h>
+#include <pybind11/stl.h>
+#include <moveit_py/moveit_py_utils/copy_ros_msg.hpp>
+#include <moveit_py/moveit_py_utils/ros_msg_typecasters.hpp>
+#include <moveit/planning_scene/planning_scene.hpp>
 
 namespace py = pybind11;
 
 namespace moveit_py
 {
-namespace bind_robot_model
+namespace bind_planning_scene
 {
-void initJointModel(py::module& m);
-}  // namespace bind_robot_model
+void applyCollisionObject(std::shared_ptr<planning_scene::PlanningScene>& planning_scene,
+                          moveit_msgs::msg::CollisionObject& collision_object_msg,
+                          std::optional<moveit_msgs::msg::ObjectColor> color_msg);
+
+Eigen::MatrixXd getFrameTransform(std::shared_ptr<planning_scene::PlanningScene>& planning_scene, const std::string& id);
+
+moveit_msgs::msg::PlanningScene getPlanningSceneMsg(std::shared_ptr<planning_scene::PlanningScene>& planning_scene);
+
+void initPlanningScene(py::module& m);
+}  // namespace bind_planning_scene
 }  // namespace moveit_py

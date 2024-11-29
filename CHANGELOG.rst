@@ -2,6 +2,37 @@
 Changelog for package moveit_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.12.0 (2024-11-29)
+-------------------
+* Enhancement/use hpp for headers (`#3113 <https://github.com/ros-planning/moveit2/issues/3113>`_)
+* Add use_padding flag + deprecate checkCollisionUnpadded() functions (`#3088 <https://github.com/ros-planning/moveit2/issues/3088>`_)
+* Fixed Typo get_trajectory_execution_manager in planning.pyi file (`#3029 <https://github.com/ros-planning/moveit2/issues/3029>`_)
+* Contributors: Jens Vanhooydonck, Sebastian Jahr, Tom Noble
+
+2.11.0 (2024-09-16)
+-------------------
+* Add python bindings for saving and loading geometry from a .scene file (`#2971 <https://github.com/moveit/moveit2/issues/2971>`_)
+* Add namespace to MoveitPy (`#2884 <https://github.com/moveit/moveit2/issues/2884>`_)
+* New planning scene message (`#2885 <https://github.com/moveit/moveit2/issues/2885>`_)
+* Contributors: Abhiroop Bhavsar, Bilal Gill, Jens Vanhooydonck
+
+2.10.0 (2024-06-13)
+-------------------
+* Migrate ros-planning org to moveit (`#2847 <https://github.com/moveit/moveit2/issues/2847>`_)
+  * Rename github.com/ros-planning -> github.com/moveit
+  * Rename ros-planning.github.io -> moveit.github.io
+  * Rename ros-planning organization in docker and CI workflow files
+  - ghcr.io/ros-planning -> ghcr.io/moveit
+  - github.repository == 'moveit/*''
+* Unify log names (`#2720 <https://github.com/moveit/moveit2/issues/2720>`_)
+  Co-authored-by: Abishalini Sivaraman <abi.gpuram@gmail.com>
+* Get configuration values of traj_exec_man (`#2702 <https://github.com/moveit/moveit2/issues/2702>`_)
+  * (ros_planning) get configuration values of traj_exec_man
+  * (py) get configuration values of traj_exec_man
+* CMake format and lint in pre-commit (`#2683 <https://github.com/moveit/moveit2/issues/2683>`_)
+* log after rclcpp init
+* Contributors: Henning Kayser, Matthijs van der Burgh, Robert Haschke, Sebastian Jahr, Tyler Weaver, peterdavidfagan
+
 2.9.0 (2024-01-09)
 ------------------
 * [PSM] Process collision object color when adding object trough the planning scene monitor (`#2567 <https://github.com/ros-planning/moveit2/issues/2567>`_)

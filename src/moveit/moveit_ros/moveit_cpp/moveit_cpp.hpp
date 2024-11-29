@@ -37,25 +37,24 @@
 #pragma once
 
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <pybind11/numpy.h>
 #include <pybind11/eigen.h>
-#include <moveit/robot_trajectory/robot_trajectory.h>
-#include <moveit_msgs/msg/robot_trajectory.hpp>
+#include <pybind11/stl.h>
+#include <moveit_msgs/msg/robot_state.hpp>
+#include <moveit_msgs/msg/move_it_error_codes.h>
+#include <moveit_py/moveit_py_utils/ros_msg_typecasters.hpp>
+#include <moveit/moveit_cpp/moveit_cpp.hpp>
+#include <moveit/moveit_cpp/planning_component.hpp>
 #include <rclcpp/rclcpp.hpp>
+
+#include "planning_component.hpp"
 
 namespace py = pybind11;
 
 namespace moveit_py
 {
-namespace bind_robot_trajectory
+namespace bind_moveit_cpp
 {
-moveit_msgs::msg::RobotTrajectory
-getRobotTrajectoryMsg(const robot_trajectory::RobotTrajectoryConstPtr& robot_trajectory,
-                      const std::vector<std::string>& joint_filter);
-robot_trajectory::RobotTrajectory
-setRobotTrajectoryMsg(const std::shared_ptr<robot_trajectory::RobotTrajectory>& robot_trajectory,
-                      const moveit::core::RobotState& robot_state, const moveit_msgs::msg::RobotTrajectory& msg);
-
-void initRobotTrajectory(py::module& m);
-}  // namespace bind_robot_trajectory
+void initMoveitPy(py::module& m);
+}  // namespace bind_moveit_cpp
 }  // namespace moveit_py
