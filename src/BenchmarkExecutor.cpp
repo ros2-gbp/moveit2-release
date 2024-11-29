@@ -34,22 +34,30 @@
 
 /* Author: Ryan Luna */
 
-#include <moveit/benchmarks/BenchmarkExecutor.h>
-#include <moveit/moveit_cpp/planning_component.h>
-#include <moveit/utils/lexical_casts.h>
-#include <moveit/utils/moveit_error_code.h>
-#include <moveit/robot_state/conversions.h>
-#include <moveit/version.h>
+#include <moveit/benchmarks/BenchmarkExecutor.hpp>
+#include <moveit/moveit_cpp/planning_component.hpp>
+#include <moveit/utils/lexical_casts.hpp>
+#include <moveit/utils/moveit_error_code.hpp>
+#include <moveit/robot_state/conversions.hpp>
+#include <moveit/version.hpp>
 #include <tf2_eigen/tf2_eigen.hpp>
 #include <moveit/utils/logger.hpp>
 
-// TODO(henningkayser): Switch to boost/timer/progress_display.hpp with Boost 1.72
-// boost/progress.hpp is deprecated and will be replaced by boost/timer/progress_display.hpp in Boost 1.72.
-// Until then we need to suppress the deprecation warning.
-#define BOOST_ALLOW_DEPRECATED_HEADERS
 #include <boost/regex.hpp>
+
+#if __has_include(<boost/timer/progress_display.hpp>)
+#include <boost/timer/progress_display.hpp>
+using boost_progress_display = boost::timer::progress_display;
+#else
+// boost < 1.72
+#define BOOST_TIMER_ENABLE_DEPRECATED 1
 #include <boost/progress.hpp>
-#undef BOOST_ALLOW_DEPRECATED_HEADERS
+#undef BOOST_TIMER_ENABLE_DEPRECATED
+using boost_progress_display = boost::progress_display;
+#endif
+
+#include <boost/math/constants/constants.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <math.h>
 #include <limits>
@@ -68,7 +76,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("benchmark_executor");
+  return moveit::getLogger("moveit.benchmarks.executor");
 }
 }  // namespace
 
@@ -776,7 +784,7 @@ void BenchmarkExecutor::runBenchmark(moveit_msgs::msg::MotionPlanRequest request
   }
   num_planners += options.parallel_planning_pipelines.size();
 
-  boost::progress_display progress(num_planners * options.runs, std::cout);
+  boost_progress_display progress(num_planners * options.runs, std::cout);
 
   // Iterate through all planning pipelines
   auto planning_pipelines = moveit_cpp_->getPlanningPipelines();
@@ -1002,10 +1010,11 @@ void BenchmarkExecutor::collectMetrics(PlannerRunData& metrics,
 
       // compute correctness and clearance
       collision_detection::CollisionRequest req;
+      req.pad_environment_collisions = false;
       for (std::size_t k = 0; k < p.getWayPointCount(); ++k)
       {
         collision_detection::CollisionResult res;
-        planning_scene_->checkCollisionUnpadded(req, res, p.getWayPoint(k));
+        planning_scene_->checkCollision(req, res, p.getWayPoint(k));
         if (res.collision)
           correct = false;
         if (!p.getWayPoint(k).satisfiesBounds())
