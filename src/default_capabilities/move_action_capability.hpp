@@ -36,27 +36,42 @@
 
 #pragma once
 
-#include <moveit/move_group/move_group_capability.h>
-#include <moveit_msgs/srv/get_cartesian_path.hpp>
-#include <moveit_msgs/msg/display_trajectory.hpp>
+#include <moveit/move_group/move_group_capability.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
+#include <moveit_msgs/action/move_group.hpp>
+#include <memory>
 
 namespace move_group
 {
-class MoveGroupCartesianPathService : public MoveGroupCapability
+using MGAction = moveit_msgs::action::MoveGroup;
+using MGActionGoal = rclcpp_action::ServerGoalHandle<MGAction>;
+
+class MoveGroupMoveAction : public MoveGroupCapability
 {
 public:
-  MoveGroupCartesianPathService();
+  MoveGroupMoveAction();
 
   void initialize() override;
 
 private:
-  bool computeService(const std::shared_ptr<rmw_request_id_t>& request_header,
-                      const std::shared_ptr<moveit_msgs::srv::GetCartesianPath::Request>& req,
-                      const std::shared_ptr<moveit_msgs::srv::GetCartesianPath::Response>& res);
+  void executeMoveCallback(const std::shared_ptr<MGActionGoal>& goal);
+  void executeMoveCallbackPlanAndExecute(const std::shared_ptr<MGActionGoal>& goal,
+                                         std::shared_ptr<MGAction::Result>& action_res);
+  void executeMoveCallbackPlanOnly(const std::shared_ptr<MGActionGoal>& goal,
+                                   std::shared_ptr<MGAction::Result>& action_res);
 
-  rclcpp::Service<moveit_msgs::srv::GetCartesianPath>::SharedPtr cartesian_path_service_;
-  rclcpp::Publisher<moveit_msgs::msg::DisplayTrajectory>::SharedPtr display_path_;
+  void startMoveExecutionCallback();
+  void startMoveLookCallback();
+  void preemptMoveCallback();
+  void setMoveState(MoveGroupState state, const std::shared_ptr<MGActionGoal>& goal);
 
-  bool display_computed_paths_;
+  bool planUsingPlanningPipeline(const planning_interface::MotionPlanRequest& req,
+                                 plan_execution::ExecutableMotionPlan& plan);
+
+  std::shared_ptr<rclcpp_action::Server<MGAction>> execute_action_server_;
+
+  MoveGroupState move_state_;
+  bool preempt_requested_;
+  std::shared_ptr<MGActionGoal> goal_;
 };
 }  // namespace move_group

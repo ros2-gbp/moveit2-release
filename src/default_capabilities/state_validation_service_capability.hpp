@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2016, Michael 'v4hn' Goerner
+ *  Copyright (c) 2012, Willow Garage, Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,31 +32,27 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Michael 'v4hn' Goerner */
+/* Author: Ioan Sucan */
 
 #pragma once
 
-#include <moveit/move_group/move_group_capability.h>
-#include <moveit_msgs/srv/apply_planning_scene.hpp>
+#include <moveit/move_group/move_group_capability.hpp>
+#include <moveit_msgs/srv/get_state_validity.hpp>
 
 namespace move_group
 {
-/**
- * Provides the ability to update the shared planning scene
- * with a remote blocking call using a ROS-Service
- */
-class ApplyPlanningSceneService : public MoveGroupCapability
+class MoveGroupStateValidationService : public MoveGroupCapability
 {
 public:
-  ApplyPlanningSceneService();
+  MoveGroupStateValidationService();
 
   void initialize() override;
 
 private:
-  bool applyScene(const std::shared_ptr<rmw_request_id_t>& request_header,
-                  const std::shared_ptr<moveit_msgs::srv::ApplyPlanningScene::Request>& req,
-                  const std::shared_ptr<moveit_msgs::srv::ApplyPlanningScene::Response>& res);
+  bool computeService(const std::shared_ptr<rmw_request_id_t>& request_header,
+                      const std::shared_ptr<moveit_msgs::srv::GetStateValidity::Request>& req,
+                      const std::shared_ptr<moveit_msgs::srv::GetStateValidity::Response>& res);
 
-  rclcpp::Service<moveit_msgs::srv::ApplyPlanningScene>::SharedPtr service_;
+  rclcpp::Service<moveit_msgs::srv::GetStateValidity>::SharedPtr validity_service_;
 };
 }  // namespace move_group

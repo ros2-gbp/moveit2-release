@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2019, Hamburg University
+ *  Copyright (c) 2016, Kentaro Wada.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *   * Neither the name of Hamburg University nor the names of its
+ *   * Neither the name of Willow Garage nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -32,28 +32,40 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Jonas Tietz */
+/*
+ * Capability of execute trajectory with a ROS action.
+ *
+ * Author: Kentaro Wada
+ * */
 
 #pragma once
 
-#include <moveit/move_group/move_group_capability.h>
-#include <thread>
+#include <moveit/move_group/move_group_capability.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
+#include <moveit_msgs/action/execute_trajectory.hpp>
+
+#include <memory>
 
 namespace move_group
 {
-class TfPublisher : public MoveGroupCapability
+using ExecTrajectory = moveit_msgs::action::ExecuteTrajectory;
+using ExecTrajectoryGoal = rclcpp_action::ServerGoalHandle<ExecTrajectory>;
+
+class MoveGroupExecuteTrajectoryAction : public MoveGroupCapability
 {
 public:
-  TfPublisher();
-  ~TfPublisher() override;
+  MoveGroupExecuteTrajectoryAction();
 
   void initialize() override;
 
 private:
-  void publishPlanningSceneFrames();
-  int rate_;
-  std::string prefix_;
-  std::thread thread_;
-  bool keep_running_;
+  void executePathCallback(const std::shared_ptr<ExecTrajectoryGoal>& goal);
+  void executePath(const std::shared_ptr<ExecTrajectoryGoal>& goal, std::shared_ptr<ExecTrajectory::Result>& action_res);
+
+  void preemptExecuteTrajectoryCallback();
+  void setExecuteTrajectoryState(MoveGroupState state, const std::shared_ptr<ExecTrajectoryGoal>& goal);
+
+  std::shared_ptr<rclcpp_action::Server<ExecTrajectory>> execute_action_server_;
 };
+
 }  // namespace move_group

@@ -34,18 +34,18 @@
 
 /* Author: Ioan Sucan */
 
-#include "cartesian_path_service_capability.h"
-#include <moveit/moveit_cpp/moveit_cpp.h>
-#include <moveit/robot_state/conversions.h>
-#include <moveit/utils/message_checks.h>
-#include <moveit/collision_detection/collision_tools.h>
+#include "cartesian_path_service_capability.hpp"
+#include <moveit/moveit_cpp/moveit_cpp.hpp>
+#include <moveit/robot_state/conversions.hpp>
+#include <moveit/utils/message_checks.hpp>
+#include <moveit/collision_detection/collision_tools.hpp>
 #include <tf2_eigen/tf2_eigen.hpp>
-#include <moveit/move_group/capability_names.h>
-#include <moveit/planning_pipeline/planning_pipeline.h>
-#include <moveit/robot_state/robot_state.h>
-#include <moveit/robot_state/cartesian_interpolator.h>
+#include <moveit/move_group/capability_names.hpp>
+#include <moveit/planning_pipeline/planning_pipeline.hpp>
+#include <moveit/robot_state/robot_state.hpp>
+#include <moveit/robot_state/cartesian_interpolator.hpp>
 #include <moveit_msgs/msg/display_trajectory.hpp>
-#include <moveit/trajectory_processing/time_optimal_trajectory_generation.h>
+#include <moveit/trajectory_processing/time_optimal_trajectory_generation.hpp>
 #include <moveit/utils/logger.hpp>
 
 using moveit::getLogger;
@@ -68,7 +68,7 @@ bool isStateValid(const planning_scene::PlanningScene* planning_scene,
 
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("cartesian_path_service_capability");
+  return moveit::getLogger("moveit.ros.move_group.cartesian_path_service_capability");
 }
 }  // namespace
 
@@ -177,11 +177,15 @@ bool MoveGroupCartesianPathService::computeService(
                       "and jump threshold %lf (in %s reference frame)",
                       static_cast<unsigned int>(waypoints.size()), link_name.c_str(), req->max_step,
                       req->jump_threshold, global_frame ? "global" : "link");
+          moveit::core::JumpThreshold jump_threshold = moveit::core::JumpThreshold::disabled();
+          if (req->jump_threshold > 0.0)
+          {
+            jump_threshold = moveit::core::JumpThreshold::relative(req->jump_threshold);
+          }
           std::vector<moveit::core::RobotStatePtr> traj;
           res->fraction = moveit::core::CartesianInterpolator::computeCartesianPath(
               &start_state, jmg, traj, start_state.getLinkModel(link_name), waypoints, global_frame,
-              moveit::core::MaxEEFStep(req->max_step), moveit::core::JumpThreshold::relative(req->jump_threshold),
-              constraint_fn);
+              moveit::core::MaxEEFStep(req->max_step), moveit::core::CartesianPrecision{}, constraint_fn);
           moveit::core::robotStateToRobotStateMsg(start_state, res->start_state);
 
           robot_trajectory::RobotTrajectory rt(context_->planning_scene_monitor_->getRobotModel(), req->group_name);

@@ -34,9 +34,9 @@
 
 /* Author: Michael Goerner */
 
-#include "apply_planning_scene_service_capability.h"
-#include <moveit/moveit_cpp/moveit_cpp.h>
-#include <moveit/move_group/capability_names.h>
+#include "apply_planning_scene_service_capability.hpp"
+#include <moveit/moveit_cpp/moveit_cpp.hpp>
+#include <moveit/move_group/capability_names.hpp>
 #include <moveit/utils/logger.hpp>
 
 namespace move_group
@@ -67,7 +67,7 @@ bool ApplyPlanningSceneService::applyScene(const std::shared_ptr<rmw_request_id_
 {
   if (!context_->planning_scene_monitor_)
   {
-    RCLCPP_ERROR(moveit::getLogger("ApplyPlanningSceneService"),
+    RCLCPP_ERROR(moveit::getLogger("moveit.ros.move_group.apply_planning_scene_service"),
                  "Cannot apply PlanningScene as no scene is monitored.");
     return true;
   }

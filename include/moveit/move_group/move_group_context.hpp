@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2016, Kentaro Wada.
+ *  Copyright (c) 2012, Willow Garage, Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,40 +32,57 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/*
- * Capability of execute trajectory with a ROS action.
- *
- * Author: Kentaro Wada
- * */
+/* Author: Ioan Sucan */
 
 #pragma once
 
-#include <moveit/move_group/move_group_capability.h>
-#include <rclcpp_action/rclcpp_action.hpp>
-#include <moveit_msgs/action/execute_trajectory.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <string>
+#include <moveit/macros/class_forward.hpp>
 
-#include <memory>
+namespace moveit_cpp
+{
+MOVEIT_CLASS_FORWARD(MoveItCpp);
+}
+
+namespace planning_scene_monitor
+{
+MOVEIT_CLASS_FORWARD(PlanningSceneMonitor);  // Defines PlanningSceneMonitorPtr, ConstPtr, WeakPtr... etc
+}
+
+namespace planning_pipeline
+{
+MOVEIT_CLASS_FORWARD(PlanningPipeline);  // Defines PlanningPipelinePtr, ConstPtr, WeakPtr... etc
+}
+
+namespace plan_execution
+{
+MOVEIT_CLASS_FORWARD(PlanExecution);  // Defines PlanExecutionPtr, ConstPtr, WeakPtr... etc
+}  // namespace plan_execution
+
+namespace trajectory_execution_manager
+{
+MOVEIT_CLASS_FORWARD(TrajectoryExecutionManager);  // Defines TrajectoryExecutionManagerPtr, ConstPtr, WeakPtr... etc
+}
 
 namespace move_group
 {
-using ExecTrajectory = moveit_msgs::action::ExecuteTrajectory;
-using ExecTrajectoryGoal = rclcpp_action::ServerGoalHandle<ExecTrajectory>;
+MOVEIT_STRUCT_FORWARD(MoveGroupContext);
 
-class MoveGroupExecuteTrajectoryAction : public MoveGroupCapability
+struct MoveGroupContext
 {
-public:
-  MoveGroupExecuteTrajectoryAction();
+  MoveGroupContext(const moveit_cpp::MoveItCppPtr& moveit_cpp, const std::string& default_planning_pipeline,
+                   bool allow_trajectory_execution = false, bool debug = false);
+  ~MoveGroupContext();
 
-  void initialize() override;
+  bool status() const;
 
-private:
-  void executePathCallback(const std::shared_ptr<ExecTrajectoryGoal>& goal);
-  void executePath(const std::shared_ptr<ExecTrajectoryGoal>& goal, std::shared_ptr<ExecTrajectory::Result>& action_res);
-
-  void preemptExecuteTrajectoryCallback();
-  void setExecuteTrajectoryState(MoveGroupState state, const std::shared_ptr<ExecTrajectoryGoal>& goal);
-
-  std::shared_ptr<rclcpp_action::Server<ExecTrajectory>> execute_action_server_;
+  moveit_cpp::MoveItCppPtr moveit_cpp_;
+  planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
+  trajectory_execution_manager::TrajectoryExecutionManagerPtr trajectory_execution_manager_;
+  planning_pipeline::PlanningPipelinePtr planning_pipeline_;
+  plan_execution::PlanExecutionPtr plan_execution_;
+  bool allow_trajectory_execution_;
+  bool debug_;
 };
-
 }  // namespace move_group

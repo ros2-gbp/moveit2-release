@@ -36,42 +36,33 @@
 
 #pragma once
 
-#include <moveit/move_group/move_group_capability.h>
-#include <rclcpp_action/rclcpp_action.hpp>
-#include <moveit_msgs/action/move_group.hpp>
-#include <memory>
+#include <moveit/move_group/move_group_capability.hpp>
+#include <moveit_msgs/srv/get_position_ik.hpp>
+#include <moveit_msgs/srv/get_position_fk.hpp>
 
 namespace move_group
 {
-using MGAction = moveit_msgs::action::MoveGroup;
-using MGActionGoal = rclcpp_action::ServerGoalHandle<MGAction>;
-
-class MoveGroupMoveAction : public MoveGroupCapability
+class MoveGroupKinematicsService : public MoveGroupCapability
 {
 public:
-  MoveGroupMoveAction();
+  MoveGroupKinematicsService();
 
   void initialize() override;
 
 private:
-  void executeMoveCallback(const std::shared_ptr<MGActionGoal>& goal);
-  void executeMoveCallbackPlanAndExecute(const std::shared_ptr<MGActionGoal>& goal,
-                                         std::shared_ptr<MGAction::Result>& action_res);
-  void executeMoveCallbackPlanOnly(const std::shared_ptr<MGActionGoal>& goal,
-                                   std::shared_ptr<MGAction::Result>& action_res);
+  bool computeIKService(const std::shared_ptr<rmw_request_id_t>& request_header,
+                        const std::shared_ptr<moveit_msgs::srv::GetPositionIK::Request>& req,
+                        const std::shared_ptr<moveit_msgs::srv::GetPositionIK::Response>& res);
+  bool computeFKService(const std::shared_ptr<rmw_request_id_t>& request_header,
+                        const std::shared_ptr<moveit_msgs::srv::GetPositionFK::Request>& req,
+                        const std::shared_ptr<moveit_msgs::srv::GetPositionFK::Response>& res);
 
-  void startMoveExecutionCallback();
-  void startMoveLookCallback();
-  void preemptMoveCallback();
-  void setMoveState(MoveGroupState state, const std::shared_ptr<MGActionGoal>& goal);
+  void computeIK(moveit_msgs::msg::PositionIKRequest& req, moveit_msgs::msg::RobotState& solution,
+                 moveit_msgs::msg::MoveItErrorCodes& error_code, moveit::core::RobotState& rs,
+                 const moveit::core::GroupStateValidityCallbackFn& constraint =
+                     moveit::core::GroupStateValidityCallbackFn()) const;
 
-  bool planUsingPlanningPipeline(const planning_interface::MotionPlanRequest& req,
-                                 plan_execution::ExecutableMotionPlan& plan);
-
-  std::shared_ptr<rclcpp_action::Server<MGAction>> execute_action_server_;
-
-  MoveGroupState move_state_;
-  bool preempt_requested_;
-  std::shared_ptr<MGActionGoal> goal_;
+  rclcpp::Service<moveit_msgs::srv::GetPositionFK>::SharedPtr fk_service_;
+  rclcpp::Service<moveit_msgs::srv::GetPositionIK>::SharedPtr ik_service_;
 };
 }  // namespace move_group

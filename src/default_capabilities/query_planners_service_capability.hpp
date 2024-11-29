@@ -32,25 +32,35 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Ioan Sucan */
+/* Author: Ioan Sucan, Robert Haschke */
+
+#pragma once
 
 #include <moveit/move_group/move_group_capability.hpp>
-#include <pluginlib/class_loader.hpp>
-#include <fmt/format.h>
+#include <moveit_msgs/srv/query_planner_interfaces.hpp>
+#include <moveit_msgs/srv/get_planner_params.hpp>
+#include <moveit_msgs/srv/set_planner_params.hpp>
 
-int main(int /*argc*/, char** /*argv*/)
+namespace move_group
 {
-  try
-  {
-    pluginlib::ClassLoader<move_group::MoveGroupCapability> capability_plugin_loader("moveit_ros_move_group",
-                                                                                     "move_group::MoveGroupCapability");
-    std::cout << "Available capabilities:\n"
-              << fmt::format("{}", fmt::join(capability_plugin_loader.getDeclaredClasses(), "\n")) << '\n';
-  }
-  catch (pluginlib::PluginlibException& ex)
-  {
-    std::cerr << "Exception while creating plugin loader for move_group capabilities: " << ex.what() << '\n';
-  }
+class MoveGroupQueryPlannersService : public MoveGroupCapability
+{
+public:
+  MoveGroupQueryPlannersService();
 
-  return 0;
-}
+  void initialize() override;
+
+private:
+  void queryInterface(const std::shared_ptr<moveit_msgs::srv::QueryPlannerInterfaces::Request>& /*req*/,
+                      const std::shared_ptr<moveit_msgs::srv::QueryPlannerInterfaces::Response>& res);
+
+  void getParams(const std::shared_ptr<moveit_msgs::srv::GetPlannerParams::Request>& req,
+                 const std::shared_ptr<moveit_msgs::srv::GetPlannerParams::Response>& res);
+  void setParams(const std::shared_ptr<moveit_msgs::srv::SetPlannerParams::Request>& req,
+                 const std::shared_ptr<moveit_msgs::srv::SetPlannerParams::Response>& /*res*/);
+
+  rclcpp::Service<moveit_msgs::srv::QueryPlannerInterfaces>::SharedPtr query_service_;
+  rclcpp::Service<moveit_msgs::srv::GetPlannerParams>::SharedPtr get_service_;
+  rclcpp::Service<moveit_msgs::srv::SetPlannerParams>::SharedPtr set_service_;
+};
+}  // namespace move_group

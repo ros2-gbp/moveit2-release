@@ -36,33 +36,23 @@
 
 #pragma once
 
-#include <moveit/move_group/move_group_capability.h>
-#include <moveit_msgs/srv/get_position_ik.hpp>
-#include <moveit_msgs/srv/get_position_fk.hpp>
+#include <moveit/move_group/move_group_capability.hpp>
+#include <moveit_msgs/srv/get_motion_plan.hpp>
 
 namespace move_group
 {
-class MoveGroupKinematicsService : public MoveGroupCapability
+class MoveGroupPlanService : public MoveGroupCapability
 {
 public:
-  MoveGroupKinematicsService();
+  MoveGroupPlanService();
 
   void initialize() override;
 
 private:
-  bool computeIKService(const std::shared_ptr<rmw_request_id_t>& request_header,
-                        const std::shared_ptr<moveit_msgs::srv::GetPositionIK::Request>& req,
-                        const std::shared_ptr<moveit_msgs::srv::GetPositionIK::Response>& res);
-  bool computeFKService(const std::shared_ptr<rmw_request_id_t>& request_header,
-                        const std::shared_ptr<moveit_msgs::srv::GetPositionFK::Request>& req,
-                        const std::shared_ptr<moveit_msgs::srv::GetPositionFK::Response>& res);
+  bool computePlanService(const std::shared_ptr<rmw_request_id_t>& request_header,
+                          const std::shared_ptr<moveit_msgs::srv::GetMotionPlan::Request>& req,
+                          const std::shared_ptr<moveit_msgs::srv::GetMotionPlan::Response>& res);
 
-  void computeIK(moveit_msgs::msg::PositionIKRequest& req, moveit_msgs::msg::RobotState& solution,
-                 moveit_msgs::msg::MoveItErrorCodes& error_code, moveit::core::RobotState& rs,
-                 const moveit::core::GroupStateValidityCallbackFn& constraint =
-                     moveit::core::GroupStateValidityCallbackFn()) const;
-
-  rclcpp::Service<moveit_msgs::srv::GetPositionFK>::SharedPtr fk_service_;
-  rclcpp::Service<moveit_msgs::srv::GetPositionIK>::SharedPtr ik_service_;
+  rclcpp::Service<moveit_msgs::srv::GetMotionPlan>::SharedPtr plan_service_;
 };
 }  // namespace move_group
