@@ -35,16 +35,16 @@
 /* Author: Ioan Sucan */
 
 #include <boost/algorithm/string.hpp>
-#include <moveit/planning_scene/planning_scene.h>
-#include <moveit/collision_detection/occupancy_map.h>
-#include <moveit/collision_detection_fcl/collision_detector_allocator_fcl.h>
+#include <moveit/planning_scene/planning_scene.hpp>
+#include <moveit/collision_detection/occupancy_map.hpp>
+#include <moveit/collision_detection_fcl/collision_detector_allocator_fcl.hpp>
 #include <geometric_shapes/shape_operations.h>
-#include <moveit/collision_detection/collision_tools.h>
-#include <moveit/trajectory_processing/trajectory_tools.h>
-#include <moveit/robot_state/conversions.h>
-#include <moveit/exceptions/exceptions.h>
-#include <moveit/robot_state/attached_body.h>
-#include <moveit/utils/message_checks.h>
+#include <moveit/collision_detection/collision_tools.hpp>
+#include <moveit/trajectory_processing/trajectory_tools.hpp>
+#include <moveit/robot_state/conversions.hpp>
+#include <moveit/exceptions/exceptions.hpp>
+#include <moveit/robot_state/attached_body.hpp>
+#include <moveit/utils/message_checks.hpp>
 #include <octomap_msgs/conversions.h>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
@@ -394,14 +394,20 @@ void PlanningScene::pushDiffs(const PlanningScenePtr& scene)
 void PlanningScene::checkCollision(const collision_detection::CollisionRequest& req,
                                    collision_detection::CollisionResult& res)
 {
-  if (getCurrentState().dirtyCollisionBodyTransforms())
-  {
-    checkCollision(req, res, getCurrentStateNonConst());
-  }
-  else
-  {
-    checkCollision(req, res, getCurrentState());
-  }
+  checkCollision(req, res, getCurrentStateNonConst());
+}
+
+void PlanningScene::checkCollision(const collision_detection::CollisionRequest& req,
+                                   collision_detection::CollisionResult& res) const
+{
+  checkCollision(req, res, getCurrentState(), getAllowedCollisionMatrix());
+}
+
+void PlanningScene::checkCollision(const collision_detection::CollisionRequest& req,
+                                   collision_detection::CollisionResult& res,
+                                   moveit::core::RobotState& robot_state) const
+{
+  checkCollision(req, res, robot_state, getAllowedCollisionMatrix());
 }
 
 void PlanningScene::checkCollision(const collision_detection::CollisionRequest& req,
@@ -411,17 +417,15 @@ void PlanningScene::checkCollision(const collision_detection::CollisionRequest& 
   checkCollision(req, res, robot_state, getAllowedCollisionMatrix());
 }
 
-void PlanningScene::checkSelfCollision(const collision_detection::CollisionRequest& req,
-                                       collision_detection::CollisionResult& res)
+void PlanningScene::checkCollision(const collision_detection::CollisionRequest& req,
+                                   collision_detection::CollisionResult& res, moveit::core::RobotState& robot_state,
+                                   const collision_detection::AllowedCollisionMatrix& acm) const
 {
-  if (getCurrentState().dirtyCollisionBodyTransforms())
+  if (robot_state.dirtyCollisionBodyTransforms())
   {
-    checkSelfCollision(req, res, getCurrentStateNonConst());
+    robot_state.updateCollisionBodyTransforms();
   }
-  else
-  {
-    checkSelfCollision(req, res, getCurrentState());
-  }
+  checkCollision(req, res, static_cast<const moveit::core::RobotState&>(robot_state), acm);
 }
 
 void PlanningScene::checkCollision(const collision_detection::CollisionRequest& req,
@@ -430,24 +434,64 @@ void PlanningScene::checkCollision(const collision_detection::CollisionRequest& 
                                    const collision_detection::AllowedCollisionMatrix& acm) const
 {
   // check collision with the world using the padded version
-  getCollisionEnv()->checkRobotCollision(req, res, robot_state, acm);
+  req.pad_environment_collisions ? getCollisionEnv()->checkRobotCollision(req, res, robot_state, acm) :
+                                   getCollisionEnvUnpadded()->checkRobotCollision(req, res, robot_state, acm);
+
+  // Return early if a collision was found and the number of contacts found already exceed `req.max_contacts`, if
+  // `req.contacts` is enabled.
+  if (res.collision && (!req.contacts || res.contacts.size() >= req.max_contacts))
+  {
+    return;
+  }
 
   // do self-collision checking with the unpadded version of the robot
-  if (!res.collision || (req.contacts && res.contacts.size() < req.max_contacts))
-    getCollisionEnvUnpadded()->checkSelfCollision(req, res, robot_state, acm);
+  req.pad_self_collisions ? getCollisionEnv()->checkSelfCollision(req, res, robot_state, acm) :
+                            getCollisionEnvUnpadded()->checkSelfCollision(req, res, robot_state, acm);
 }
 
 void PlanningScene::checkCollisionUnpadded(const collision_detection::CollisionRequest& req,
                                            collision_detection::CollisionResult& res)
 {
-  if (getCurrentState().dirtyCollisionBodyTransforms())
-  {
-    checkCollisionUnpadded(req, res, getCurrentStateNonConst(), getAllowedCollisionMatrix());
-  }
-  else
-  {
-    checkCollisionUnpadded(req, res, getCurrentState(), getAllowedCollisionMatrix());
-  }
+  collision_detection::CollisionRequest new_req = req;
+  new_req.pad_environment_collisions = false;
+  checkCollision(req, res, getCurrentStateNonConst(), getAllowedCollisionMatrix());
+}
+
+void PlanningScene::checkCollisionUnpadded(const collision_detection::CollisionRequest& req,
+                                           collision_detection::CollisionResult& res) const
+{
+  collision_detection::CollisionRequest new_req = req;
+  new_req.pad_environment_collisions = false;
+  checkCollision(new_req, res, getCurrentState(), getAllowedCollisionMatrix());
+}
+
+void PlanningScene::checkCollisionUnpadded(const collision_detection::CollisionRequest& req,
+                                           collision_detection::CollisionResult& res,
+                                           const moveit::core::RobotState& robot_state) const
+{
+  collision_detection::CollisionRequest new_req = req;
+  new_req.pad_environment_collisions = false;
+  checkCollision(new_req, res, robot_state, getAllowedCollisionMatrix());
+}
+
+void PlanningScene::checkCollisionUnpadded(const collision_detection::CollisionRequest& req,
+                                           collision_detection::CollisionResult& res,
+                                           moveit::core::RobotState& robot_state) const
+{
+  collision_detection::CollisionRequest new_req = req;
+  new_req.pad_environment_collisions = false;
+  checkCollision(new_req, res, static_cast<const moveit::core::RobotState&>(robot_state), getAllowedCollisionMatrix());
+}
+
+void PlanningScene::checkCollisionUnpadded(const collision_detection::CollisionRequest& req,
+                                           collision_detection::CollisionResult& res,
+                                           moveit::core::RobotState& robot_state,
+                                           const collision_detection::AllowedCollisionMatrix& acm) const
+{
+  robot_state.updateCollisionBodyTransforms();
+  collision_detection::CollisionRequest new_req = req;
+  new_req.pad_environment_collisions = false;
+  checkCollision(new_req, res, static_cast<const moveit::core::RobotState&>(robot_state), acm);
 }
 
 void PlanningScene::checkCollisionUnpadded(const collision_detection::CollisionRequest& req,
@@ -455,14 +499,59 @@ void PlanningScene::checkCollisionUnpadded(const collision_detection::CollisionR
                                            const moveit::core::RobotState& robot_state,
                                            const collision_detection::AllowedCollisionMatrix& acm) const
 {
-  // check collision with the world using the unpadded version
-  getCollisionEnvUnpadded()->checkRobotCollision(req, res, robot_state, acm);
+  collision_detection::CollisionRequest new_req = req;
+  new_req.pad_environment_collisions = false;
+  checkCollision(req, res, robot_state, acm);
+}
 
-  // do self-collision checking with the unpadded version of the robot
-  if (!res.collision || (req.contacts && res.contacts.size() < req.max_contacts))
+void PlanningScene::checkSelfCollision(const collision_detection::CollisionRequest& req,
+                                       collision_detection::CollisionResult& res)
+{
+  checkSelfCollision(req, res, getCurrentStateNonConst());
+}
+
+void PlanningScene::checkSelfCollision(const collision_detection::CollisionRequest& req,
+                                       collision_detection::CollisionResult& res) const
+{
+  checkSelfCollision(req, res, getCurrentState());
+}
+
+void PlanningScene::checkSelfCollision(const collision_detection::CollisionRequest& req,
+                                       collision_detection::CollisionResult& res,
+                                       moveit::core::RobotState& robot_state) const
+{
+  if (robot_state.dirtyCollisionBodyTransforms())
   {
-    getCollisionEnvUnpadded()->checkSelfCollision(req, res, robot_state, acm);
+    robot_state.updateCollisionBodyTransforms();
   }
+  checkSelfCollision(req, res, static_cast<const moveit::core::RobotState&>(robot_state), getAllowedCollisionMatrix());
+}
+
+void PlanningScene::checkSelfCollision(const collision_detection::CollisionRequest& req,
+                                       collision_detection::CollisionResult& res,
+                                       const moveit::core::RobotState& robot_state) const
+{
+  checkSelfCollision(req, res, robot_state, getAllowedCollisionMatrix());
+}
+
+void PlanningScene::checkSelfCollision(const collision_detection::CollisionRequest& req,
+                                       collision_detection::CollisionResult& res, moveit::core::RobotState& robot_state,
+                                       const collision_detection::AllowedCollisionMatrix& acm) const
+{
+  if (robot_state.dirtyCollisionBodyTransforms())
+  {
+    robot_state.updateCollisionBodyTransforms();
+  }
+  checkSelfCollision(req, res, static_cast<const moveit::core::RobotState&>(robot_state), acm);
+}
+
+void PlanningScene::checkSelfCollision(const collision_detection::CollisionRequest& req,
+                                       collision_detection::CollisionResult& res,
+                                       const moveit::core::RobotState& robot_state,
+                                       const collision_detection::AllowedCollisionMatrix& acm) const
+{
+  req.pad_self_collisions ? getCollisionEnv()->checkSelfCollision(req, res, robot_state, acm) :
+                            getCollisionEnvUnpadded()->checkSelfCollision(req, res, robot_state, acm);
 }
 
 void PlanningScene::getCollidingPairs(collision_detection::CollisionResult::ContactMap& contacts)
