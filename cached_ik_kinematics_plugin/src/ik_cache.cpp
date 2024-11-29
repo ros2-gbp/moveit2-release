@@ -38,7 +38,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include <moveit/cached_ik_kinematics_plugin/cached_ik_kinematics_plugin.h>
+#include <moveit/cached_ik_kinematics_plugin/cached_ik_kinematics_plugin.hpp>
 #include <moveit/utils/logger.hpp>
 
 namespace cached_ik_kinematics_plugin
@@ -47,7 +47,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("dynamics_solver");
+  return moveit::getLogger("moveit.core.dynamics_solver");
 }
 }  // namespace
 IKCache::IKCache()

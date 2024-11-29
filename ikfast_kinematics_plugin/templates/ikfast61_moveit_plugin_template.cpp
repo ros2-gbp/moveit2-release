@@ -42,8 +42,8 @@
  */
 
 #include <rclcpp/rclcpp.hpp>
-#include <moveit/kinematics_base/kinematics_base.h>
-#include <moveit/robot_state/robot_state.h>
+#include <moveit/kinematics_base/kinematics_base.hpp>
+#include <moveit/robot_state/robot_state.hpp>
 #include <Eigen/Geometry>
 #include <tf2_kdl/tf2_kdl.hpp>
 #include <tf2_eigen/tf2_eigen.hpp>
@@ -67,7 +67,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("_ROBOT_NAME___GROUP_NAME__ikfast_solver");
+  return moveit::getLogger("moveit.core._ROBOT_NAME___GROUP_NAME__ikfast_solver");
 }
 }  // namespace
 
@@ -808,7 +808,10 @@ bool IKFastKinematicsPlugin::getPositionFK(const std::vector<std::string>& link_
     return false;
   }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wvla-cxx-extension"
   IkReal angles[num_joints_];
+#pragma clang diagnostic pop
   for (unsigned char i = 0; i < num_joints_; ++i)
     angles[i] = joint_angles[i];
 
