@@ -32,23 +32,28 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-/* Author: Bilal Gill */
+/* Author: Sebastian Jahr
+   Desc: This capability creates an URDF string with joints and links of a requested joint model group */
 
 #pragma once
 
-#include <moveit/move_group/move_group_capability.h>
-#include <moveit_msgs/srv/load_geometry_from_file.hpp>
+#include <moveit/move_group/move_group_capability.hpp>
+#include <moveit_msgs/srv/get_group_urdf.hpp>
 
 namespace move_group
 {
 /**
- * @brief Move group capability to save CollisionObjects in a PlanningScene to a .scene file
+ * @brief Move group capability to create an URDF string for a joint model group
  *
  */
-class LoadGeometryFromFileService : public MoveGroupCapability
+class GetUrdfService : public MoveGroupCapability
 {
 public:
-  LoadGeometryFromFileService();
+  /**
+   * @brief Constructor
+   *
+   */
+  GetUrdfService();
 
   /**
    * @brief Initializes service when plugin is loaded
@@ -57,6 +62,6 @@ public:
   void initialize() override;
 
 private:
-  rclcpp::Service<moveit_msgs::srv::LoadGeometryFromFile>::SharedPtr load_geometry_service_;
+  rclcpp::Service<moveit_msgs::srv::GetGroupUrdf>::SharedPtr get_urdf_service_;
 };
 }  // namespace move_group
