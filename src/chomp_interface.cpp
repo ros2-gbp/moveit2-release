@@ -34,7 +34,7 @@
 
 /* Author: E. Gil Jones */
 
-#include <chomp_interface/chomp_interface.h>
+#include <chomp_interface/chomp_interface.hpp>
 #include <moveit/utils/logger.hpp>
 
 namespace chomp_interface
@@ -43,7 +43,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("chomp_optimizer");
+  return moveit::getLogger("moveit.planners.chomp");
 }
 }  // namespace
 
