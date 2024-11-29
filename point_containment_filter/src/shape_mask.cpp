@@ -34,7 +34,7 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/point_containment_filter/shape_mask.h>
+#include <moveit/point_containment_filter/shape_mask.hpp>
 #include <geometric_shapes/body_operations.h>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <rclcpp/logger.hpp>
@@ -45,7 +45,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("shape_mask");
+  return moveit::getLogger("moveit.ros.shape_mask");
 }
 }  // namespace
 

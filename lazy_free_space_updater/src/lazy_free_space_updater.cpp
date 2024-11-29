@@ -34,7 +34,7 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/lazy_free_space_updater/lazy_free_space_updater.h>
+#include <moveit/lazy_free_space_updater/lazy_free_space_updater.hpp>
 #include <rclcpp/logging.hpp>
 #include <rclcpp/clock.hpp>
 #include <moveit/utils/logger.hpp>
@@ -51,7 +51,7 @@ LazyFreeSpaceUpdater::LazyFreeSpaceUpdater(const collision_detection::OccMapTree
   , process_model_cells_set_(nullptr)
   , update_thread_([this] { lazyUpdateThread(); })
   , process_thread_([this] { processThread(); })
-  , logger_(moveit::getLogger("lazy_free_space_updater"))
+  , logger_(moveit::getLogger("moveit.ros.lazy_free_space_updater"))
 {
 }
 

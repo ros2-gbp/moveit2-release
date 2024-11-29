@@ -42,7 +42,7 @@
 #include <GL/glut.h>
 #endif
 #include <GL/freeglut.h>
-#include <moveit/mesh_filter/gl_renderer.h>
+#include <moveit/mesh_filter/gl_renderer.hpp>
 #include <moveit/utils/logger.hpp>
 #include <sstream>
 #include <fstream>
@@ -213,7 +213,7 @@ void mesh_filter::GLRenderer::getColorBuffer(unsigned char* buffer) const
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void mesh_filter::GLRenderer::getDepthBuffer(double* buffer) const
+void mesh_filter::GLRenderer::getDepthBuffer(float* buffer) const
 {
   glBindFramebuffer(GL_FRAMEBUFFER, fbo_id_);
   glBindTexture(GL_TEXTURE_2D, depth_id_);
@@ -344,7 +344,7 @@ GLuint mesh_filter::GLRenderer::loadShaders(const string& vertex_source, const s
     glGetProgramInfoLog(program_id, info_log_length, nullptr, &program_error_message[0]);
     std::size_t l = strnlen(&program_error_message[0], program_error_message.size());
     if (l > 0)
-      RCLCPP_ERROR(moveit::getLogger("gl_renderer"), "%s\n", &program_error_message[0]);
+      RCLCPP_ERROR(moveit::getLogger("moveit.ros.gl_renderer"), "%s\n", &program_error_message[0]);
   }
 
   if (vertex_shader_id)
@@ -387,7 +387,7 @@ void mesh_filter::GLRenderer::createGLContext()
 
   if (context_it == s_context.end())
   {
-    s_context.at(thread_id) = std::pair<unsigned, GLuint>(1, 0);
+    s_context.insert({ thread_id, std::pair<unsigned, GLuint>(1, 0) });
 
     glutInitWindowPosition(glutGet(GLUT_SCREEN_WIDTH) + 30000, 0);
     glutInitWindowSize(1, 1);

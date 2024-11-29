@@ -37,7 +37,7 @@
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 // MoveIt
-#include <moveit/semantic_world/semantic_world.h>
+#include <moveit/semantic_world/semantic_world.hpp>
 #include <geometric_shapes/shape_operations.h>
 #include <moveit_msgs/msg/planning_scene.hpp>
 #include <moveit/utils/logger.hpp>
@@ -67,7 +67,7 @@ namespace semantic_world
 
 SemanticWorld::SemanticWorld(const rclcpp::Node::SharedPtr& node,
                              const planning_scene::PlanningSceneConstPtr& planning_scene)
-  : planning_scene_(planning_scene), node_handle_(node), logger_(moveit::getLogger("semantic_world"))
+  : planning_scene_(planning_scene), node_handle_(node), logger_(moveit::getLogger("moveit.ros.semantic_world"))
 
 {
   table_subscriber_ = node_handle_->create_subscription<object_recognition_msgs::msg::TableArray>(
