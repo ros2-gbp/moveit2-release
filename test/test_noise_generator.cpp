@@ -34,42 +34,43 @@
 
 /** @file
  * @author Henning Kayser
- * @brief Planning Context implementation for STOMP
- **/
+ */
 
-#pragma once
+#include <gtest/gtest.h>
+#include <stomp_moveit/noise_generators.hpp>
 
-#include <moveit/planning_interface/planning_interface.hpp>
+constexpr size_t TIMESTEPS = 100;
+constexpr size_t VARIABLES = 6;
+static const std::vector<double> STDDEV(VARIABLES, 0.2);
+static const Eigen::MatrixXd VALUES = Eigen::MatrixXd::Constant(VARIABLES, TIMESTEPS, 1.0);
+static const Eigen::MatrixXd NOISY_VALUES = Eigen::MatrixXd::Constant(VARIABLES, TIMESTEPS, 0.0);
+static const Eigen::MatrixXd NOISE = Eigen::MatrixXd::Constant(VARIABLES, TIMESTEPS, 0.0);
 
-#include <stomp_moveit_parameters.hpp>
-
-// Forward declaration
-namespace stomp
+TEST(NoiseGeneratorTest, testStartEndUnchanged)
 {
-class Stomp;
+  auto noise_gen = stomp_moveit::noise::getNormalDistributionGenerator(TIMESTEPS, STDDEV);
+
+  auto noise = NOISE;
+  auto noisy_values = NOISY_VALUES;
+
+  noise_gen(VALUES, noisy_values, noise);
+
+  // Test that noise creates output unlike the input
+  EXPECT_NE(noise, NOISE);
+  EXPECT_NE(noisy_values, NOISY_VALUES);
+  EXPECT_NE(VALUES, noisy_values);
+
+  // Test that the dimensions of the output matches the input
+  EXPECT_EQ(noise.size(), NOISE.size());
+  EXPECT_EQ(noisy_values.size(), NOISY_VALUES.size());
+
+  // Test that start and end columns (=states) are not modified
+  EXPECT_EQ(VALUES.col(0), noisy_values.col(0));
+  EXPECT_EQ(VALUES.col(TIMESTEPS - 1), noisy_values.col(TIMESTEPS - 1));
 }
 
-namespace stomp_moveit
+int main(int argc, char** argv)
 {
-class StompPlanningContext : public planning_interface::PlanningContext
-{
-public:
-  StompPlanningContext(const std::string& name, const std::string& group_name, const stomp_moveit::Params& params);
-
-  void solve(planning_interface::MotionPlanResponse& res) override;
-
-  void solve(planning_interface::MotionPlanDetailedResponse& res) override;
-
-  bool terminate() override;
-
-  void clear() override;
-
-  void setPathPublisher(const std::shared_ptr<rclcpp::Publisher<visualization_msgs::msg::MarkerArray>>& path_publisher);
-  std::shared_ptr<rclcpp::Publisher<visualization_msgs::msg::MarkerArray>> getPathPublisher();
-
-private:
-  const stomp_moveit::Params params_;
-  std::shared_ptr<stomp::Stomp> stomp_;
-  std::shared_ptr<rclcpp::Publisher<visualization_msgs::msg::MarkerArray>> path_publisher_;
-};
-}  // namespace stomp_moveit
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
