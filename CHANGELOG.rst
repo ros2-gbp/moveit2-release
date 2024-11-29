@@ -2,6 +2,36 @@
 Changelog for package moveit_ros_planning_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.12.0 (2024-11-29)
+-------------------
+* Enhancement/use hpp for headers (`#3113 <https://github.com/ros-planning/moveit2/issues/3113>`_)
+* Enhancement/moveit ros1 ports (`#3041 <https://github.com/ros-planning/moveit2/issues/3041>`_)
+* remove dead pick and place code (`#3025 <https://github.com/ros-planning/moveit2/issues/3025>`_)
+* Contributors: Michael Ferguson, Tom Noble
+
+2.11.0 (2024-09-16)
+-------------------
+
+2.10.0 (2024-06-13)
+-------------------
+* Apply clang-tidy fixes
+* Migrate ros-planning org to moveit (`#2847 <https://github.com/moveit/moveit2/issues/2847>`_)
+  * Rename github.com/ros-planning -> github.com/moveit
+  * Rename ros-planning.github.io -> moveit.github.io
+  * Rename ros-planning organization in docker and CI workflow files
+  - ghcr.io/ros-planning -> ghcr.io/moveit
+  - github.repository == 'moveit/*''
+* Add getNodeHandle impl (`#2840 <https://github.com/moveit/moveit2/issues/2840>`_)
+  Co-authored-by: Sebastian Jahr <sebastian.jahr@picknik.ai>
+* Unify log names (`#2720 <https://github.com/moveit/moveit2/issues/2720>`_)
+  Co-authored-by: Abishalini Sivaraman <abi.gpuram@gmail.com>
+* Add parameter api integration test (`#2662 <https://github.com/moveit/moveit2/issues/2662>`_)
+* CMake format and lint in pre-commit (`#2683 <https://github.com/moveit/moveit2/issues/2683>`_)
+* Remove unused python content from planning interface directory (`#2665 <https://github.com/moveit/moveit2/issues/2665>`_)
+  * Remove unused python content from planning interface directory
+  * Cleanup test cmake
+* Contributors: Robert Haschke, Sebastian Jahr, Tyler Weaver, methylDragon
+
 2.9.0 (2024-01-09)
 ------------------
 * Update ros2_control usage (`#2620 <https://github.com/ros-planning/moveit2/issues/2620>`_)

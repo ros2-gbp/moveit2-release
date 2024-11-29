@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2012, Willow Garage, Inc.
+ *  Copyright (c) 2013, Willow Garage, Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -36,61 +36,33 @@
 
 #pragma once
 
-#include <boost/python.hpp>
-#include <boost/python/stl_iterator.hpp>
-#include <string>
-#include <vector>
-#include <map>
+#include <memory>
+#include <tf2_ros/buffer.h>
+#include <moveit/planning_scene_monitor/current_state_monitor.hpp>
+#include <moveit/robot_model_loader/robot_model_loader.hpp>
 
 namespace moveit
 {
-namespace py_bindings_tools
+namespace planning_interface
 {
-template <typename T>
-std::vector<T> typeFromList(const boost::python::object& values)
-{
-  boost::python::stl_input_iterator<T> begin(values), end;
-  std::vector<T> v;
-  v.assign(begin, end);
-  return v;
-}
+std::shared_ptr<tf2_ros::Buffer> getSharedTF();
 
-template <typename T>
-boost::python::list listFromType(const std::vector<T>& v)
-{
-  boost::python::list l;
-  for (std::size_t i = 0; i < v.size(); ++i)
-    l.append(v[i]);
-  return l;
-}
+robot_model_loader::RobotModelLoaderPtr getSharedRobotModelLoader(const rclcpp::Node::SharedPtr& node,
+                                                                  const std::string& robot_description);
 
-template <typename T>
-boost::python::dict dictFromType(const std::map<std::string, T>& v)
-{
-  boost::python::dict d;
-  for (typename std::map<std::string, T>::const_iterator it = v.begin(); it != v.end(); ++it)
-    d[it->first] = it->second;
-  return d;
-}
+moveit::core::RobotModelConstPtr getSharedRobotModel(const rclcpp::Node::SharedPtr& node,
+                                                     const std::string& robot_description);
 
-std::vector<double> doubleFromList(const boost::python::object& values)
-{
-  return typeFromList<double>(values);
-}
+/**
+  @brief getSharedStateMonitor
 
-std::vector<std::string> stringFromList(const boost::python::object& values)
-{
-  return typeFromList<std::string>(values);
-}
-
-boost::python::list listFromDouble(const std::vector<double>& v)
-{
-  return listFromType<double>(v);
-}
-
-boost::python::list listFromString(const std::vector<std::string>& v)
-{
-  return listFromType<std::string>(v);
-}
-}  // namespace py_bindings_tools
+  @param node A rclcpp::Node::SharePtr to pass node specific configurations, such as callbacks queues.
+  @param robot_model
+  @param tf_buffer
+  @return
+ */
+planning_scene_monitor::CurrentStateMonitorPtr
+getSharedStateMonitor(const rclcpp::Node::SharedPtr& node, const moveit::core::RobotModelConstPtr& robot_model,
+                      const std::shared_ptr<tf2_ros::Buffer>& tf_buffer);
+}  // namespace planning_interface
 }  // namespace moveit
