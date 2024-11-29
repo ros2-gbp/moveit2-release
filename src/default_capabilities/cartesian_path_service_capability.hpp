@@ -36,23 +36,27 @@
 
 #pragma once
 
-#include <moveit/move_group/move_group_capability.h>
-#include <moveit_msgs/srv/get_motion_plan.hpp>
+#include <moveit/move_group/move_group_capability.hpp>
+#include <moveit_msgs/srv/get_cartesian_path.hpp>
+#include <moveit_msgs/msg/display_trajectory.hpp>
 
 namespace move_group
 {
-class MoveGroupPlanService : public MoveGroupCapability
+class MoveGroupCartesianPathService : public MoveGroupCapability
 {
 public:
-  MoveGroupPlanService();
+  MoveGroupCartesianPathService();
 
   void initialize() override;
 
 private:
-  bool computePlanService(const std::shared_ptr<rmw_request_id_t>& request_header,
-                          const std::shared_ptr<moveit_msgs::srv::GetMotionPlan::Request>& req,
-                          const std::shared_ptr<moveit_msgs::srv::GetMotionPlan::Response>& res);
+  bool computeService(const std::shared_ptr<rmw_request_id_t>& request_header,
+                      const std::shared_ptr<moveit_msgs::srv::GetCartesianPath::Request>& req,
+                      const std::shared_ptr<moveit_msgs::srv::GetCartesianPath::Response>& res);
 
-  rclcpp::Service<moveit_msgs::srv::GetMotionPlan>::SharedPtr plan_service_;
+  rclcpp::Service<moveit_msgs::srv::GetCartesianPath>::SharedPtr cartesian_path_service_;
+  rclcpp::Publisher<moveit_msgs::msg::DisplayTrajectory>::SharedPtr display_path_;
+
+  bool display_computed_paths_;
 };
 }  // namespace move_group
