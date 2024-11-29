@@ -41,7 +41,7 @@
  *  NOTE q = joint positions
  **/
 
-#include "load_test_robot.h"
+#include "load_test_robot.hpp"
 
 #include <memory>
 #include <string>
@@ -50,11 +50,11 @@
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 
-#include <moveit/robot_model/robot_model.h>
-#include <moveit/robot_state/robot_state.h>
-#include <moveit/robot_state/conversions.h>
-#include <moveit/utils/robot_model_test_utils.h>
-#include <moveit/ompl_interface/detail/ompl_constraints.h>
+#include <moveit/robot_model/robot_model.hpp>
+#include <moveit/robot_state/robot_state.hpp>
+#include <moveit/robot_state/conversions.hpp>
+#include <moveit/utils/robot_model_test_utils.hpp>
+#include <moveit/ompl_interface/detail/ompl_constraints.hpp>
 #include <moveit_msgs/msg/constraints.hpp>
 #include <moveit/utils/logger.hpp>
 
@@ -65,7 +65,7 @@
 
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("test_ompl_constraints");
+  return moveit::getLogger("moveit.planners.ompl.test_constraints");
 }
 
 /** \brief Number of times to run a test that uses randomly generated input. **/
@@ -252,7 +252,7 @@ protected:
     // But these issues do not prevent us to use the ConstrainedPlanningStateSpace! :)
     // The jacobian test is expected to fail because of the discontinuous constraint derivative.
     // In addition not all samples returned from the state sampler will be valid.
-    // For more details: https://github.com/ros-planning/moveit/issues/2092#issuecomment-669911722
+    // For more details: https://github.com/moveit/moveit/issues/2092#issuecomment-669911722
     try
     {
       constrained_state_space->sanityChecks();

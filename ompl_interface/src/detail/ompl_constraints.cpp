@@ -37,7 +37,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include <moveit/ompl_interface/detail/ompl_constraints.h>
+#include <moveit/ompl_interface/detail/ompl_constraints.hpp>
 #include <moveit/utils/logger.hpp>
 
 #include <tf2_eigen/tf2_eigen.hpp>
@@ -48,7 +48,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("ompl_constraints");
+  return moveit::getLogger("moveit.planners.ompl.constraints");
 }
 }  // namespace
 

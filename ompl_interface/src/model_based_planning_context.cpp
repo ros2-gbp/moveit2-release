@@ -39,17 +39,17 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <moveit/ompl_interface/model_based_planning_context.h>
-#include <moveit/ompl_interface/detail/state_validity_checker.h>
-#include <moveit/ompl_interface/detail/constrained_sampler.h>
-#include <moveit/ompl_interface/detail/constrained_goal_sampler.h>
-#include <moveit/ompl_interface/detail/goal_union.h>
-#include <moveit/ompl_interface/detail/projection_evaluators.h>
-#include <moveit/ompl_interface/detail/constraints_library.h>
+#include <moveit/ompl_interface/model_based_planning_context.hpp>
+#include <moveit/ompl_interface/detail/state_validity_checker.hpp>
+#include <moveit/ompl_interface/detail/constrained_sampler.hpp>
+#include <moveit/ompl_interface/detail/constrained_goal_sampler.hpp>
+#include <moveit/ompl_interface/detail/goal_union.hpp>
+#include <moveit/ompl_interface/detail/projection_evaluators.hpp>
+#include <moveit/ompl_interface/detail/constraints_library.hpp>
 
-#include <moveit/kinematic_constraints/utils.h>
+#include <moveit/kinematic_constraints/utils.hpp>
 
-#include <moveit/utils/lexical_casts.h>
+#include <moveit/utils/lexical_casts.hpp>
 #include <moveit/utils/logger.hpp>
 
 #include <ompl/config.h>
@@ -74,7 +74,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("ompl_model_based_planning_context");
+  return moveit::getLogger("moveit.planners.ompl.model_based_planning_context");
 }
 }  // namespace
 
@@ -771,6 +771,7 @@ void ModelBasedPlanningContext::postSolve()
 
 void ModelBasedPlanningContext::solve(planning_interface::MotionPlanResponse& res)
 {
+  res.planner_id = request_.planner_id;
   res.error_code = solve(request_.allowed_planning_time, request_.num_planning_attempts);
   if (res.error_code.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
   {
@@ -800,12 +801,11 @@ void ModelBasedPlanningContext::solve(planning_interface::MotionPlanResponse& re
 
 void ModelBasedPlanningContext::solve(planning_interface::MotionPlanDetailedResponse& res)
 {
-  moveit_msgs::msg::MoveItErrorCodes moveit_result =
-      solve(request_.allowed_planning_time, request_.num_planning_attempts);
-  if (moveit_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
+  res.planner_id = request_.planner_id;
+  res.error_code = solve(request_.allowed_planning_time, request_.num_planning_attempts);
+  if (res.error_code.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
   {
     RCLCPP_INFO(getLogger(), "Unable to solve the planning problem");
-    res.error_code.val = moveit_msgs::msg::MoveItErrorCodes::PLANNING_FAILED;
     return;
   }
 
@@ -843,7 +843,6 @@ void ModelBasedPlanningContext::solve(planning_interface::MotionPlanDetailedResp
 
   RCLCPP_DEBUG(getLogger(), "%s: Returning successful solution with %lu states", getName().c_str(),
                getOMPLSimpleSetup()->getSolutionPath().getStateCount());
-  res.error_code.val = moveit_result.val;
 }
 
 const moveit_msgs::msg::MoveItErrorCodes ModelBasedPlanningContext::solve(double timeout, unsigned int count)

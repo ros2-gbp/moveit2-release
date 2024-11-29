@@ -34,7 +34,7 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/ompl_interface/parameterization/model_based_state_space.h>
+#include <moveit/ompl_interface/parameterization/model_based_state_space.hpp>
 #include <utility>
 #include <moveit/utils/logger.hpp>
 
@@ -44,7 +44,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("ompl_model_based_state_space");
+  return moveit::getLogger("moveit.planners.ompl.model_based_state_space");
 }
 }  // namespace
 
