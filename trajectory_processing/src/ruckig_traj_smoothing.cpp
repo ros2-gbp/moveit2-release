@@ -39,7 +39,7 @@
 #include <cmath>
 #include <Eigen/Geometry>
 #include <limits>
-#include <moveit/trajectory_processing/ruckig_traj_smoothing.h>
+#include <moveit/trajectory_processing/ruckig_traj_smoothing.hpp>
 #include <vector>
 #include <moveit/utils/logger.hpp>
 
@@ -57,7 +57,7 @@ constexpr double OVERSHOOT_CHECK_PERIOD = 0.01;  // sec
 
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("ruckig_traj_smoothing");
+  return moveit::getLogger("moveit.core.ruckig_traj_smoothing");
 }
 }  // namespace
 

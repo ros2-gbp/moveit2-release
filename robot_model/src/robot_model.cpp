@@ -35,7 +35,7 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/robot_model/robot_model.h>
+#include <moveit/robot_model/robot_model.hpp>
 #include <geometric_shapes/shape_operations.h>
 #include <rclcpp/logger.hpp>
 #include <algorithm>
@@ -54,7 +54,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("robot_model");
+  return moveit::getLogger("moveit.core.robot_model");
 }
 }  // namespace
 

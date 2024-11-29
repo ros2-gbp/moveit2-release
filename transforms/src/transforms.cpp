@@ -34,7 +34,7 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/transforms/transforms.h>
+#include <moveit/transforms/transforms.hpp>
 #include <geometric_shapes/check_isometry.h>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
@@ -50,7 +50,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("transforms");
+  return moveit::getLogger("moveit.core.transforms");
 }
 }  // namespace
 

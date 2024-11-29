@@ -34,8 +34,8 @@
 
 /* Author: Mrinal Kalakrishnan, Ken Anderson, E. Gil Jones */
 
-#include <moveit/distance_field/distance_field.h>
-#include <moveit/distance_field/find_internal_points.h>
+#include <moveit/distance_field/distance_field.hpp>
+#include <moveit/distance_field/find_internal_points.hpp>
 #include <geometric_shapes/body_operations.h>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
@@ -51,7 +51,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("distance_field");
+  return moveit::getLogger("moveit.core.distance_field");
 }
 }  // namespace
 

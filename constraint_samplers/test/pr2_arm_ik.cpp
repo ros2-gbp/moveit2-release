@@ -36,7 +36,7 @@
 
 #include <angles/angles.h>
 #include <moveit/utils/logger.hpp>
-#include "pr2_arm_ik.h"
+#include "pr2_arm_ik.hpp"
 
 /**** List of angles (for reference) *******
       th1 = shoulder/turret pan
@@ -54,7 +54,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("moveit_constaint_samplers.test.pr2_arm_ik");
+  return moveit::getLogger("moveit.core.moveit_constaint_samplers.test.pr2_arm_ik");
 }
 }  // namespace
 
@@ -804,6 +804,6 @@ bool PR2ArmIK::checkJointLimits(const double joint_value, const int joint_num) c
     jv = angles::normalize_angle(joint_value * angle_multipliers_[joint_num]);
   }
 
-  return !(jv < min_angles_[joint_num] || jv > max_angles_[joint_num]);
+  return jv >= min_angles_[joint_num] && jv <= max_angles_[joint_num];
 }
 }  // namespace pr2_arm_kinematics

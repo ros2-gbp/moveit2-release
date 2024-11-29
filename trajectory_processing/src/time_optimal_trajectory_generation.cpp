@@ -42,7 +42,7 @@
 #include <Eigen/Geometry>
 #include <algorithm>
 #include <cmath>
-#include <moveit/trajectory_processing/time_optimal_trajectory_generation.h>
+#include <moveit/trajectory_processing/time_optimal_trajectory_generation.hpp>
 #include <vector>
 #include <moveit/utils/logger.hpp>
 
@@ -56,7 +56,7 @@ constexpr double DEFAULT_SCALING_FACTOR = 1.0;
 
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("time_optimal_trajectory_generation");
+  return moveit::getLogger("moveit.core.time_optimal_trajectory_generation");
 }
 }  // namespace
 
@@ -586,7 +586,7 @@ bool Trajectory::integrateForward(std::list<TrajectoryStep>& trajectory, double 
     if (next_discontinuity != switching_points.end() && path_pos > next_discontinuity->first)
     {
       // Avoid having a TrajectoryStep with path_pos near a switching point which will cause an almost identical
-      // TrajectoryStep get added in the next run (https://github.com/ros-planning/moveit/issues/1665)
+      // TrajectoryStep get added in the next run (https://github.com/moveit/moveit/issues/1665)
       if (path_pos - next_discontinuity->first < EPS)
       {
         continue;

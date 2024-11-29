@@ -36,7 +36,7 @@
 /* Author: Ioan Sucan, Dave Coleman */
 
 #include <boost/variant.hpp>
-#include <moveit/robot_state/conversions.h>
+#include <moveit/robot_state/conversions.hpp>
 #include <geometric_shapes/shape_operations.h>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
@@ -56,7 +56,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("conversions");
+  return moveit::getLogger("moveit.core.conversions");
 }
 
 bool jointStateToRobotStateImpl(const sensor_msgs::msg::JointState& joint_state, RobotState& state)

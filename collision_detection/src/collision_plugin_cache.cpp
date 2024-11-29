@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <moveit/collision_detection/collision_plugin_cache.h>
+#include <moveit/collision_detection/collision_plugin_cache.hpp>
 #include <pluginlib/class_loader.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
@@ -45,7 +45,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("collision_detection_plugin_cache");
+  return moveit::getLogger("moveit.core.collision_detection_plugin_cache");
 }
 }  // namespace
 

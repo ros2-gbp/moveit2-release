@@ -40,9 +40,9 @@
 #include <algorithm>
 #include <cmath>
 
-#include <moveit/robot_model/robot_model.h>
+#include <moveit/robot_model/robot_model.hpp>
 #include <moveit/utils/logger.hpp>
-#include "pr2_arm_kinematics_plugin.h"
+#include "pr2_arm_kinematics_plugin.hpp"
 
 using namespace KDL;
 using namespace std;
@@ -53,7 +53,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("moveit_constraint_samplers.test.pr2_arm_kinematics_plugin");
+  return moveit::getLogger("moveit.core.moveit_constraint_samplers.test.pr2_arm_kinematics_plugin");
 }
 }  // namespace
 

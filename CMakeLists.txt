@@ -18,8 +18,11 @@ find_package(geometric_shapes REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(kdl_parser REQUIRED)
 find_package(moveit_msgs REQUIRED)
-find_package(OCTOMAP REQUIRED)
+# Enforce system version liboctomap-dev
+# https://github.com/moveit/moveit2/issues/2862
+find_package(octomap 1.9.7...<1.10.0 REQUIRED)
 find_package(octomap_msgs REQUIRED)
+find_package(osqp REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(random_numbers REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -65,39 +68,41 @@ add_subdirectory(transforms)
 add_subdirectory(utils)
 add_subdirectory(version)
 
-
 install(
-  TARGETS
-    collision_detector_bullet_plugin
-    moveit_butterworth_filter
-    moveit_butterworth_parameters
-    moveit_collision_detection
-    moveit_collision_detection_bullet
-    moveit_collision_detection_fcl
-    moveit_collision_distance_field
-    moveit_constraint_samplers
-    moveit_distance_field
-    moveit_dynamics_solver
-    moveit_exceptions
-    moveit_kinematic_constraints
-    moveit_kinematics_base
-    moveit_kinematics_metrics
-    moveit_macros
-    moveit_planning_interface
-    moveit_planning_scene
-    moveit_robot_model
-    moveit_robot_state
-    moveit_robot_trajectory
-    moveit_smoothing_base
-    moveit_test_utils
-    moveit_trajectory_processing
-    moveit_transforms
-    moveit_utils
+  TARGETS collision_detector_bullet_plugin
+          collision_detector_fcl_plugin
+          moveit_acceleration_filter
+          moveit_acceleration_filter_parameters
+          moveit_butterworth_filter
+          moveit_butterworth_filter_parameters
+          moveit_collision_detection
+          moveit_collision_detection_bullet
+          moveit_collision_detection_fcl
+          moveit_collision_distance_field
+          moveit_constraint_samplers
+          moveit_distance_field
+          moveit_dynamics_solver
+          moveit_exceptions
+          moveit_kinematic_constraints
+          moveit_kinematics_base
+          moveit_kinematics_metrics
+          moveit_macros
+          moveit_planning_interface
+          moveit_planning_scene
+          moveit_robot_model
+          moveit_robot_state
+          moveit_robot_trajectory
+          moveit_ruckig_filter
+          moveit_ruckig_filter_parameters
+          moveit_smoothing_base
+          moveit_test_utils
+          moveit_trajectory_processing
+          moveit_transforms
+          moveit_utils
   EXPORT moveit_coreTargets
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-)
+  RUNTIME DESTINATION bin)
 
 ament_export_targets(moveit_coreTargets HAS_LIBRARY_TARGET)
 ament_export_dependencies(
@@ -113,8 +118,9 @@ ament_export_dependencies(
   geometry_msgs
   kdl_parser
   moveit_msgs
-  OCTOMAP
+  octomap
   octomap_msgs
+  osqp
   pluginlib
   random_numbers
   rclcpp
@@ -131,26 +137,17 @@ ament_export_dependencies(
   urdf
   urdfdom
   urdfdom_headers
-  visualization_msgs
-)
+  visualization_msgs)
 
 # Plugin exports
-pluginlib_export_plugin_description_file(moveit_core collision_detector_fcl_description.xml)
-pluginlib_export_plugin_description_file(moveit_core collision_detector_bullet_description.xml)
-pluginlib_export_plugin_description_file(moveit_core filter_plugin_butterworth.xml)
-
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-
-  # These don't pass yet, disable them for now
-  set(ament_cmake_copyright_FOUND TRUE)
-  set(ament_cmake_cpplint_FOUND TRUE)
-  set(ament_cmake_flake8_FOUND TRUE)
-  set(ament_cmake_uncrustify_FOUND TRUE)
-  set(ament_cmake_lint_cmake_FOUND TRUE)
-
-  # Run all lint tests in package.xml except those listed above
-  ament_lint_auto_find_test_dependencies()
-endif()
+pluginlib_export_plugin_description_file(moveit_core
+                                         collision_detector_fcl_description.xml)
+pluginlib_export_plugin_description_file(
+  moveit_core collision_detector_bullet_description.xml)
+pluginlib_export_plugin_description_file(moveit_core
+                                         filter_plugin_acceleration.xml)
+pluginlib_export_plugin_description_file(moveit_core
+                                         filter_plugin_butterworth.xml)
+pluginlib_export_plugin_description_file(moveit_core filter_plugin_ruckig.xml)
 
 ament_package(CONFIG_EXTRAS ConfigExtras.cmake)

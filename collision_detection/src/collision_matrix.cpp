@@ -34,7 +34,7 @@
 
 /* Author: Ioan Sucan, E. Gil Jones */
 
-#include <moveit/collision_detection/collision_matrix.h>
+#include <moveit/collision_detection/collision_matrix.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
 #include <functional>
@@ -47,7 +47,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("collision_detection_matrix");
+  return moveit::getLogger("moveit.core.collision_detection_matrix");
 }
 }  // namespace
 

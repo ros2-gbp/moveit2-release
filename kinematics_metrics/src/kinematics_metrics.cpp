@@ -38,7 +38,7 @@
 #include <Eigen/Eigenvalues>
 #include <limits>
 #include <math.h>
-#include <moveit/kinematics_metrics/kinematics_metrics.h>
+#include <moveit/kinematics_metrics/kinematics_metrics.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
 #include <moveit/utils/logger.hpp>
@@ -49,7 +49,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("kinematics_metrics");
+  return moveit::getLogger("moveit.core.kinematics_metrics");
 }
 }  // namespace
 

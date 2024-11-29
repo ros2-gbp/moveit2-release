@@ -34,7 +34,7 @@
 
 /* Author: Acorn Pooley, Ioan Sucan */
 
-#include <moveit/collision_detection/world.h>
+#include <moveit/collision_detection/world.hpp>
 #include <geometric_shapes/check_isometry.h>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
@@ -46,7 +46,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("collision_detection_world");
+  return moveit::getLogger("moveit.core.collision_detection_world");
 }
 }  // namespace
 
@@ -109,6 +109,7 @@ void World::addToObject(const std::string& object_id, const Eigen::Isometry3d& p
 std::vector<std::string> World::getObjectIds() const
 {
   std::vector<std::string> ids;
+  ids.reserve(objects_.size());
   for (const auto& object : objects_)
     ids.push_back(object.first);
   return ids;
@@ -253,6 +254,26 @@ bool World::moveShapeInObject(const std::string& object_id, const shapes::ShapeC
         notify(it->second, MOVE_SHAPE);
         return true;
       }
+    }
+  }
+  return false;
+}
+
+bool World::moveShapesInObject(const std::string& object_id, const EigenSTL::vector_Isometry3d& shape_poses)
+{
+  auto it = objects_.find(object_id);
+  if (it != objects_.end())
+  {
+    if (shape_poses.size() == it->second->shapes_.size())
+    {
+      for (std::size_t i = 0; i < shape_poses.size(); ++i)
+      {
+        ASSERT_ISOMETRY(shape_poses[i])  // unsanitized input, could contain a non-isometry
+        it->second->shape_poses_[i] = shape_poses[i];
+        it->second->global_shape_poses_[i] = it->second->pose_ * shape_poses[i];
+      }
+      notify(it->second, MOVE_SHAPE);
+      return true;
     }
   }
   return false;

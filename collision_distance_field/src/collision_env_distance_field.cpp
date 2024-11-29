@@ -34,17 +34,17 @@
 
 /* Author: E. Gil Jones */
 
-#include <moveit/robot_model/robot_model.h>
+#include <moveit/robot_model/robot_model.hpp>
 #include <rclcpp/clock.hpp>
 #include <rclcpp/duration.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
 #include <rclcpp/time.hpp>
 #include <tf2_eigen/tf2_eigen.hpp>
-#include <moveit/collision_distance_field/collision_env_distance_field.h>
-#include <moveit/collision_distance_field/collision_common_distance_field.h>
-#include <moveit/distance_field/propagation_distance_field.h>
-#include <moveit/collision_distance_field/collision_detector_allocator_distance_field.h>
+#include <moveit/collision_distance_field/collision_env_distance_field.hpp>
+#include <moveit/collision_distance_field/collision_common_distance_field.hpp>
+#include <moveit/distance_field/propagation_distance_field.hpp>
+#include <moveit/collision_distance_field/collision_detector_allocator_distance_field.hpp>
 #include <functional>
 #include <memory>
 #include <utility>
@@ -61,7 +61,7 @@ CollisionEnvDistanceField::CollisionEnvDistanceField(
     const std::map<std::string, std::vector<CollisionSphere>>& link_body_decompositions, double size_x, double size_y,
     double size_z, const Eigen::Vector3d& origin, bool use_signed_distance_field, double resolution,
     double collision_tolerance, double max_propogation_distance, double /*padding*/, double /*scale*/)
-  : CollisionEnv(robot_model), logger_(moveit::getLogger("collision_robot_distance_field"))
+  : CollisionEnv(robot_model), logger_(moveit::getLogger("moveit.core.collision_robot_distance_field"))
 {
   initialize(link_body_decompositions, Eigen::Vector3d(size_x, size_y, size_z), origin, use_signed_distance_field,
              resolution, collision_tolerance, max_propogation_distance);
@@ -80,7 +80,8 @@ CollisionEnvDistanceField::CollisionEnvDistanceField(
     const std::map<std::string, std::vector<CollisionSphere>>& link_body_decompositions, double size_x, double size_y,
     double size_z, const Eigen::Vector3d& origin, bool use_signed_distance_field, double resolution,
     double collision_tolerance, double max_propogation_distance, double padding, double scale)
-  : CollisionEnv(robot_model, world, padding, scale), logger_(moveit::getLogger("collision_robot_distance_field"))
+  : CollisionEnv(robot_model, world, padding, scale)
+  , logger_(moveit::getLogger("moveit.core.collision_robot_distance_field"))
 {
   initialize(link_body_decompositions, Eigen::Vector3d(size_x, size_y, size_z), origin, use_signed_distance_field,
              resolution, collision_tolerance, max_propogation_distance);

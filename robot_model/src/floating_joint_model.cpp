@@ -39,7 +39,7 @@
 #include <Eigen/Geometry>
 #include <geometric_shapes/check_isometry.h>
 #include <limits>
-#include <moveit/robot_model/floating_joint_model.h>
+#include <moveit/robot_model/floating_joint_model.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
 #include <moveit/utils/logger.hpp>
@@ -54,7 +54,7 @@ constexpr size_t STATE_SPACE_DIMENSION = 7;
 
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("floating_joint_model");
+  return moveit::getLogger("moveit.core.floating_joint_model");
 }
 
 }  // namespace

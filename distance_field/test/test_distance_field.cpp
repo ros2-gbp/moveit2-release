@@ -36,9 +36,9 @@
 
 #include <gtest/gtest.h>
 
-#include <moveit/distance_field/voxel_grid.h>
-#include <moveit/distance_field/propagation_distance_field.h>
-#include <moveit/distance_field/find_internal_points.h>
+#include <moveit/distance_field/voxel_grid.hpp>
+#include <moveit/distance_field/propagation_distance_field.hpp>
+#include <moveit/distance_field/find_internal_points.hpp>
 #include <geometric_shapes/body_operations.h>
 #include <tf2_eigen/tf2_eigen.hpp>
 #include <octomap/octomap.h>
@@ -807,20 +807,17 @@ TEST(TestSignedPropagationDistanceField, TestPerformance)
                                     PERF_ORIGIN_Z, PERF_MAX_DIST, true);
 
   EigenSTL::vector_Vector3d bad_vec;
-  unsigned int count = 0;
   for (unsigned int z = UNIFORM_DISTANCE; z < worstdfu.getZNumCells() - UNIFORM_DISTANCE; z += UNIFORM_DISTANCE)
   {
     for (unsigned int x = UNIFORM_DISTANCE; x < worstdfu.getXNumCells() - UNIFORM_DISTANCE; x += UNIFORM_DISTANCE)
     {
       for (unsigned int y = UNIFORM_DISTANCE; y < worstdfu.getYNumCells() - UNIFORM_DISTANCE; y += UNIFORM_DISTANCE)
       {
-        count++;
         Eigen::Vector3d loc;
         bool valid = worstdfu.gridToWorld(x, y, z, loc.x(), loc.y(), loc.z());
 
         if (!valid)
         {
-          // RCLCPP_WARN("distance_field", "Something wrong");
           continue;
         }
         bad_vec.push_back(loc);
