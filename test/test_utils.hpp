@@ -43,15 +43,15 @@
 #endif
 
 #include <moveit_msgs/msg/motion_sequence_request.hpp>
-#include <pilz_industrial_motion_planner/limits_container.h>
-#include <pilz_industrial_motion_planner/trajectory_blend_request.h>
-#include <pilz_industrial_motion_planner/trajectory_blend_response.h>
-#include <pilz_industrial_motion_planner/trajectory_generator.h>
+#include <pilz_industrial_motion_planner/limits_container.hpp>
+#include <pilz_industrial_motion_planner/trajectory_blend_request.hpp>
+#include <pilz_industrial_motion_planner/trajectory_blend_response.hpp>
+#include <pilz_industrial_motion_planner/trajectory_generator.hpp>
 #include <boost/core/demangle.hpp>
 #include <math.h>
-#include <moveit/kinematic_constraints/utils.h>
-#include <moveit/planning_interface/planning_interface.h>
-#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit/kinematic_constraints/utils.hpp>
+#include <moveit/planning_interface/planning_interface.hpp>
+#include <moveit/robot_trajectory/robot_trajectory.hpp>
 #include <moveit_msgs/msg/constraints.hpp>
 #include <moveit_msgs/action/move_group.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
@@ -477,7 +477,7 @@ checkCartesianRotationalPath(const robot_trajectory::RobotTrajectoryConstPtr& tr
 inline bool isMonotonouslyDecreasing(const std::vector<double>& vec, double tol)
 {
   return std::is_sorted(vec.begin(), vec.end(), [tol](double a, double b) {
-    return !(std::abs(a - b) < tol || a < b);  // true -> a is ordered before b -> list is not sorted
+    return std::abs(a - b) >= tol && a >= b;  // true -> a is ordered before b -> list is not sorted
   });
 }
 

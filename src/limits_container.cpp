@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <pilz_industrial_motion_planner/limits_container.h>
+#include <pilz_industrial_motion_planner/limits_container.hpp>
 #include <rclcpp/logger.hpp>
 #include <moveit/utils/logger.hpp>
 
@@ -42,7 +42,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("pilz_limits_container");
+  return moveit::getLogger("moveit.planners.pilz.limits_container");
 }
 }  // namespace
 

@@ -34,14 +34,14 @@
 
 #include <rclcpp/logging.hpp>
 
-#include <pilz_industrial_motion_planner/pilz_industrial_motion_planner.h>
+#include <pilz_industrial_motion_planner/pilz_industrial_motion_planner.hpp>
 
-#include <pilz_industrial_motion_planner/planning_context_loader.h>
-#include <pilz_industrial_motion_planner/planning_context_loader_ptp.h>
-#include <pilz_industrial_motion_planner/planning_exceptions.h>
+#include <pilz_industrial_motion_planner/planning_context_loader.hpp>
+#include <pilz_industrial_motion_planner/planning_context_loader_ptp.hpp>
+#include <pilz_industrial_motion_planner/planning_exceptions.hpp>
 
 #include "cartesian_limits_parameters.hpp"
-#include <pilz_industrial_motion_planner/joint_limits_aggregator.h>
+#include <pilz_industrial_motion_planner/joint_limits_aggregator.hpp>
 
 #include <pluginlib/class_list_macros.hpp>
 
@@ -57,7 +57,7 @@ namespace
 const std::string PARAM_NAMESPACE_LIMITS = "robot_description_planning";
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("pilz_industrial_motion_planner");
+  return moveit::getLogger("moveit.planners.pilz.command_planner");
 }
 }  // namespace
 

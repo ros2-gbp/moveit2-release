@@ -36,13 +36,13 @@
 
 // Modified by Pilz GmbH & Co. KG
 
-#include <pilz_industrial_motion_planner/move_group_sequence_service.h>
+#include <pilz_industrial_motion_planner/move_group_sequence_service.hpp>
 
-#include <pilz_industrial_motion_planner/capability_names.h>
-#include <pilz_industrial_motion_planner/command_list_manager.h>
-#include <pilz_industrial_motion_planner/trajectory_generation_exceptions.h>
+#include <pilz_industrial_motion_planner/capability_names.hpp>
+#include <pilz_industrial_motion_planner/command_list_manager.hpp>
+#include <pilz_industrial_motion_planner/trajectory_generation_exceptions.hpp>
 
-#include <moveit/moveit_cpp/moveit_cpp.h>
+#include <moveit/moveit_cpp/moveit_cpp.hpp>
 #include <moveit/utils/logger.hpp>
 
 namespace pilz_industrial_motion_planner
@@ -51,7 +51,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("pilz_move_group_sequence_service");
+  return moveit::getLogger("moveit.planners.pilz.move_group_sequence_service");
 }
 }  // namespace
 MoveGroupSequenceService::MoveGroupSequenceService() : MoveGroupCapability("SequenceService")

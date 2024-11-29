@@ -32,9 +32,9 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <pilz_industrial_motion_planner/planning_context_loader_ptp.h>
-#include <moveit/planning_scene/planning_scene.h>
-#include <pilz_industrial_motion_planner/planning_context_ptp.h>
+#include <pilz_industrial_motion_planner/planning_context_loader_ptp.hpp>
+#include <moveit/planning_scene/planning_scene.hpp>
+#include <pilz_industrial_motion_planner/planning_context_ptp.hpp>
 #include <moveit/utils/logger.hpp>
 
 #include <pluginlib/class_list_macros.hpp>
@@ -43,7 +43,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("pilz_planning_context_loader_ptp");
+  return moveit::getLogger("moveit.planners.pilz.planning_context_loader.ptp");
 }
 }  // namespace
 
