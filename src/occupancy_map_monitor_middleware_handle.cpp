@@ -35,7 +35,7 @@
 /* Author: Tyler Weaver */
 
 #include <moveit/occupancy_map_monitor/occupancy_map_monitor_middleware_handle.hpp>
-#include <moveit/occupancy_map_monitor/occupancy_map_updater.h>
+#include <moveit/occupancy_map_monitor/occupancy_map_updater.hpp>
 #include <moveit/utils/logger.hpp>
 
 #include <pluginlib/class_loader.hpp>
@@ -53,7 +53,9 @@ namespace occupancy_map_monitor
 OccupancyMapMonitorMiddlewareHandle::OccupancyMapMonitorMiddlewareHandle(const rclcpp::Node::SharedPtr& node,
                                                                          double map_resolution,
                                                                          const std::string& map_frame)
-  : node_{ node }, parameters_{ map_resolution, map_frame, {} }, logger_(moveit::getLogger("occupancy_map_monitor"))
+  : node_{ node }
+  , parameters_{ map_resolution, map_frame, {} }
+  , logger_(moveit::getLogger("moveit.ros.occupancy_map_monitor"))
 {
   try
   {

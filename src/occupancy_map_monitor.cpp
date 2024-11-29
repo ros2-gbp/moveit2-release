@@ -34,8 +34,8 @@
 
 /* Author: Ioan Sucan, Jon Binney */
 
-#include <moveit/collision_detection/occupancy_map.h>
-#include <moveit/occupancy_map_monitor/occupancy_map_monitor.h>
+#include <moveit/collision_detection/occupancy_map.hpp>
+#include <moveit/occupancy_map_monitor/occupancy_map_monitor.hpp>
 #include <moveit/occupancy_map_monitor/occupancy_map_monitor_middleware_handle.hpp>
 #include <moveit_msgs/srv/load_map.hpp>
 #include <moveit_msgs/srv/save_map.hpp>
@@ -73,7 +73,7 @@ OccupancyMapMonitor::OccupancyMapMonitor(std::unique_ptr<MiddlewareHandle> middl
   , debug_info_{ false }
   , mesh_handle_count_{ 0 }
   , active_{ false }
-  , logger_(moveit::getLogger("occupancy_map_monitor"))
+  , logger_(moveit::getLogger("moveit.ros.occupancy_map_monitor"))
 {
   if (middleware_handle_ == nullptr)
   {
