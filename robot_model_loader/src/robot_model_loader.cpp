@@ -34,7 +34,7 @@
 
 /* Author: Ioan Sucan, E. Gil Jones */
 
-#include <moveit/robot_model_loader/robot_model_loader.h>
+#include <moveit/robot_model_loader/robot_model_loader.hpp>
 #include <rclcpp/clock.hpp>
 #include <rclcpp/duration.hpp>
 #include <rclcpp/logger.hpp>
@@ -49,7 +49,7 @@ namespace robot_model_loader
 
 RobotModelLoader::RobotModelLoader(const rclcpp::Node::SharedPtr& node, const std::string& robot_description,
                                    bool load_kinematics_solvers)
-  : node_(node), logger_(moveit::getLogger("robot_model_loader"))
+  : node_(node), logger_(moveit::getLogger("moveit.ros.robot_model_loader"))
 {
   Options opt(robot_description);
   opt.load_kinematics_solvers = load_kinematics_solvers;
@@ -57,7 +57,7 @@ RobotModelLoader::RobotModelLoader(const rclcpp::Node::SharedPtr& node, const st
 }
 
 RobotModelLoader::RobotModelLoader(const rclcpp::Node::SharedPtr& node, const Options& opt)
-  : node_(node), logger_(moveit::getLogger("robot_model_loader"))
+  : node_(node), logger_(moveit::getLogger("moveit.ros.robot_model_loader"))
 {
   configure(opt);
 }

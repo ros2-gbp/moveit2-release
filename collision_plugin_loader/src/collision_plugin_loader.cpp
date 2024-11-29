@@ -32,12 +32,12 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <moveit/collision_plugin_loader/collision_plugin_loader.h>
+#include <moveit/collision_plugin_loader/collision_plugin_loader.hpp>
 #include <moveit/utils/logger.hpp>
 
 namespace collision_detection
 {
-CollisionPluginLoader::CollisionPluginLoader() : logger_(moveit::getLogger("collision_plugin_loader"))
+CollisionPluginLoader::CollisionPluginLoader() : logger_(moveit::getLogger("moveit.ros.collision_plugin_loader"))
 {
 }
 

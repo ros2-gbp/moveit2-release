@@ -36,9 +36,9 @@
  * Desc: This adapter checks if the start state is in collision.
  */
 
-#include <moveit/planning_interface/planning_request_adapter.h>
-#include <moveit/robot_state/conversions.h>
-#include <moveit/trajectory_processing/trajectory_tools.h>
+#include <moveit/planning_interface/planning_request_adapter.hpp>
+#include <moveit/robot_state/conversions.hpp>
+#include <moveit/trajectory_processing/trajectory_tools.hpp>
 #include <class_loader/class_loader.hpp>
 #include <rclcpp/logging.hpp>
 #include <rclcpp/node.hpp>
@@ -54,7 +54,7 @@ namespace default_planning_request_adapters
 class CheckStartStateCollision : public planning_interface::PlanningRequestAdapter
 {
 public:
-  CheckStartStateCollision() : logger_(moveit::getLogger("validate_start_state"))
+  CheckStartStateCollision() : logger_(moveit::getLogger("moveit.ros.validate_start_state"))
   {
   }
 
@@ -85,8 +85,18 @@ public:
     }
     else
     {
+      collision_detection::CollisionResult::ContactMap contacts;
+      planning_scene->getCollidingPairs(contacts);
+
+      std::string contact_information = std::to_string(contacts.size()) + " contact(s) detected : ";
+
+      for (const auto& [contact_pair, contact_info] : contacts)
+      {
+        contact_information.append(contact_pair.first + " - " + contact_pair.second + ", ");
+      }
+
       status.val = moveit_msgs::msg::MoveItErrorCodes::START_STATE_IN_COLLISION;
-      status.message = std::string("Start state in collision.");
+      status.message = std::string(contact_information);
     }
     status.source = getDescription();
     return status;

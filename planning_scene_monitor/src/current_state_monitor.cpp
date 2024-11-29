@@ -34,7 +34,7 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/planning_scene_monitor/current_state_monitor.h>
+#include <moveit/planning_scene_monitor/current_state_monitor.hpp>
 #include <moveit/planning_scene_monitor/current_state_monitor_middleware_handle.hpp>
 #include <moveit/utils/logger.hpp>
 
@@ -60,7 +60,7 @@ CurrentStateMonitor::CurrentStateMonitor(std::unique_ptr<CurrentStateMonitor::Mi
   , copy_dynamics_(false)
   , error_(std::numeric_limits<double>::epsilon())
   , use_sim_time_(use_sim_time)
-  , logger_(moveit::getLogger("current_state_monitor"))
+  , logger_(moveit::getLogger("moveit.ros.current_state_monitor"))
 {
   robot_state_.setToDefaultValues();
 }

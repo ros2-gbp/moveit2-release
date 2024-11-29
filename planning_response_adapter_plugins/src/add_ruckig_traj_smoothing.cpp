@@ -38,8 +38,8 @@
  */
 
 #include <moveit/utils/logger.hpp>
-#include <moveit/planning_interface/planning_response_adapter.h>
-#include <moveit/trajectory_processing/ruckig_traj_smoothing.h>
+#include <moveit/planning_interface/planning_response_adapter.hpp>
+#include <moveit/trajectory_processing/ruckig_traj_smoothing.hpp>
 #include <class_loader/class_loader.hpp>
 #include <moveit_msgs/msg/move_it_error_codes.hpp>
 
@@ -52,7 +52,7 @@ using namespace trajectory_processing;
 class AddRuckigTrajectorySmoothing : public planning_interface::PlanningResponseAdapter
 {
 public:
-  AddRuckigTrajectorySmoothing() : logger_(moveit::getLogger("add_ruckig_trajectory_smoothing"))
+  AddRuckigTrajectorySmoothing() : logger_(moveit::getLogger("moveit.ros.add_ruckig_trajectory_smoothing"))
   {
   }
 

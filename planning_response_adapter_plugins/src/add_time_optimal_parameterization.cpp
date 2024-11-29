@@ -34,8 +34,8 @@
 
 /* Author: Ioan Sucan, Michael Ferguson */
 
-#include <moveit/planning_interface/planning_response_adapter.h>
-#include <moveit/trajectory_processing/time_optimal_trajectory_generation.h>
+#include <moveit/planning_interface/planning_response_adapter.hpp>
+#include <moveit/trajectory_processing/time_optimal_trajectory_generation.hpp>
 #include <class_loader/class_loader.hpp>
 #include <moveit/utils/logger.hpp>
 
@@ -49,7 +49,7 @@ using namespace trajectory_processing;
 class AddTimeOptimalParameterization : public planning_interface::PlanningResponseAdapter
 {
 public:
-  AddTimeOptimalParameterization() : logger_(moveit::getLogger("add_time_optimal_parameterization"))
+  AddTimeOptimalParameterization() : logger_(moveit::getLogger("moveit.ros.add_time_optimal_parameterization"))
   {
   }
 

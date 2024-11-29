@@ -43,9 +43,9 @@
  * outside its limits for it to be “fixable”.
  */
 
-#include <moveit/planning_interface/planning_request_adapter.h>
-#include <moveit/trajectory_processing/trajectory_tools.h>
-#include <moveit/robot_state/conversions.h>
+#include <moveit/planning_interface/planning_request_adapter.hpp>
+#include <moveit/trajectory_processing/trajectory_tools.hpp>
+#include <moveit/robot_state/conversions.hpp>
 #include <class_loader/class_loader.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
@@ -62,7 +62,7 @@ namespace default_planning_request_adapters
 class CheckStartStateBounds : public planning_interface::PlanningRequestAdapter
 {
 public:
-  CheckStartStateBounds() : logger_(moveit::getLogger("check_start_state_bounds"))
+  CheckStartStateBounds() : logger_(moveit::getLogger("moveit.ros.check_start_state_bounds"))
   {
   }
 

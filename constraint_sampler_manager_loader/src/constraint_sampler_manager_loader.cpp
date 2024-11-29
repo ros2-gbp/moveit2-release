@@ -34,7 +34,7 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/constraint_sampler_manager_loader/constraint_sampler_manager_loader.h>
+#include <moveit/constraint_sampler_manager_loader/constraint_sampler_manager_loader.hpp>
 #include <pluginlib/class_loader.hpp>
 #include <boost/tokenizer.hpp>
 #include <rclcpp/logger.hpp>
@@ -50,7 +50,7 @@ class ConstraintSamplerManagerLoader::Helper
 {
 public:
   Helper(const rclcpp::Node::SharedPtr& node, const constraint_samplers::ConstraintSamplerManagerPtr& csm)
-    : node_(node), logger_(moveit::getLogger("constraint_sampler_manager_loader"))
+    : node_(node), logger_(moveit::getLogger("moveit.ros.constraint_sampler_manager_loader"))
   {
     if (node_->has_parameter("constraint_samplers"))
     {
