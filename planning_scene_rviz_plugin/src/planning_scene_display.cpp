@@ -35,10 +35,10 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/common_planning_interface_objects/common_objects.h>
-#include <moveit/planning_scene_rviz_plugin/planning_scene_display.h>
-#include <moveit/rviz_plugin_render_tools/robot_state_visualization.h>
-#include <moveit/rviz_plugin_render_tools/octomap_render.h>
+#include <moveit/common_planning_interface_objects/common_objects.hpp>
+#include <moveit/planning_scene_rviz_plugin/planning_scene_display.hpp>
+#include <moveit/rviz_plugin_render_tools/robot_state_visualization.hpp>
+#include <moveit/rviz_plugin_render_tools/octomap_render.hpp>
 
 #include <rviz_common/transformation/transformation_manager.hpp>
 #include <rviz_default_plugins/robot/robot.hpp>
@@ -55,7 +55,7 @@
 #include <OgreSceneManager.h>
 #include <OgreSceneNode.h>
 
-#include <moveit/utils/rclcpp_utils.h>
+#include <moveit/utils/rclcpp_utils.hpp>
 #include <moveit/utils/logger.hpp>
 
 namespace moveit_rviz_plugin
@@ -67,7 +67,7 @@ PlanningSceneDisplay::PlanningSceneDisplay(bool listen_to_planning_scene, bool s
   : Display()
   , planning_scene_needs_render_(true)
   , current_scene_time_(0.0f)
-  , logger_(moveit::getLogger("planning_scene_display"))
+  , logger_(moveit::getLogger("moveit.ros.planning_scene_display"))
 {
   move_group_ns_property_ = new rviz_common::properties::StringProperty("Move Group Namespace", "",
                                                                         "The name of the ROS namespace in "
@@ -356,10 +356,10 @@ void PlanningSceneDisplay::changedSceneName()
 void PlanningSceneDisplay::renderPlanningScene()
 {
   QColor color = scene_color_property_->getColor();
-  Ogre::ColourValue env_color(color.redF(), color.greenF(), color.blueF());
+  Ogre::ColourValue env_color(color.redF(), color.greenF(), color.blueF(), scene_alpha_property_->getFloat());
   if (attached_body_color_property_)
     color = attached_body_color_property_->getColor();
-  Ogre::ColourValue attached_color(color.redF(), color.greenF(), color.blueF());
+  Ogre::ColourValue attached_color(color.redF(), color.greenF(), color.blueF(), robot_alpha_property_->getFloat());
 
   try
   {
