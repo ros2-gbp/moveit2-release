@@ -34,12 +34,12 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/warehouse/planning_scene_storage.h>
-#include <moveit/warehouse/constraints_storage.h>
-#include <moveit/warehouse/state_storage.h>
-#include <moveit/planning_scene_monitor/planning_scene_monitor.h>
-#include <moveit/kinematic_constraints/utils.h>
-#include <moveit/robot_state/conversions.h>
+#include <moveit/warehouse/planning_scene_storage.hpp>
+#include <moveit/warehouse/constraints_storage.hpp>
+#include <moveit/warehouse/state_storage.hpp>
+#include <moveit/planning_scene_monitor/planning_scene_monitor.hpp>
+#include <moveit/kinematic_constraints/utils.hpp>
+#include <moveit/robot_state/conversions.hpp>
 #include <tf2_eigen/tf2_eigen.hpp>
 #include <boost/program_options/cmdline.hpp>
 #include <boost/program_options/options_description.hpp>
@@ -51,7 +51,7 @@ static const std::string ROBOT_DESCRIPTION = "robot_description";
 
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("import_from_text");
+  return moveit::getLogger("moveit.ros.import_from_text");
 }
 
 void parseStart(std::istream& in, planning_scene_monitor::PlanningSceneMonitor* psm,

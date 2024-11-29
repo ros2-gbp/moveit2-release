@@ -36,7 +36,7 @@
 
 #include <sys/types.h>
 #include <signal.h>
-#include <moveit/warehouse/warehouse_connector.h>
+#include <moveit/warehouse/warehouse_connector.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
 #include <rclcpp/utilities.hpp>
@@ -46,7 +46,7 @@ namespace
 {
 rclcpp::Logger getLogger()
 {
-  return moveit::getLogger("warehouse_connector");
+  return moveit::getLogger("moveit.ros.warehouse_connector");
 }
 }  // namespace
 

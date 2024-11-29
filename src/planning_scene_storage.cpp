@@ -34,7 +34,7 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/warehouse/planning_scene_storage.h>
+#include <moveit/warehouse/planning_scene_storage.hpp>
 #include <utility>
 #include <rclcpp/serialization.hpp>
 #include <regex>
@@ -49,7 +49,7 @@ using warehouse_ros::Metadata;
 using warehouse_ros::Query;
 
 moveit_warehouse::PlanningSceneStorage::PlanningSceneStorage(warehouse_ros::DatabaseConnection::Ptr conn)
-  : MoveItMessageStorage(std::move(conn)), logger_(moveit::getLogger("moveit_warehouse_planning_scene_storage"))
+  : MoveItMessageStorage(std::move(conn)), logger_(moveit::getLogger("moveit.ros.warehouse_planning_scene_storage"))
 {
   createCollections();
 }
