@@ -2,14 +2,16 @@
 Changelog for package moveit_planners_stomp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.12.2 (2025-02-15)
+2.13.1 (2025-04-15)
 -------------------
-* Update includes for generate_parameter_library 0.4.0 (`#3255 <https://github.com/ros-planning/moveit2/issues/3255>`_) (`#3258 <https://github.com/ros-planning/moveit2/issues/3258>`_)
-* Fix passing different types to std::min in cost_functions.hpp (`#3244 <https://github.com/ros-planning/moveit2/issues/3244>`_) (`#3245 <https://github.com/ros-planning/moveit2/issues/3245>`_)
-* Contributors: Sebastian Castro, Silvio Traversaro, mergify[bot]
+* Add `stomp` target link to `moveit_planners_stomp` tests (`#3437 <https://github.com/ros-planning/moveit2/issues/3437>`_)
+* Contributors: Bckempa
 
-2.12.1 (2024-12-18)
+2.13.0 (2025-02-15)
 -------------------
+* Update includes for generate_parameter_library 0.4.0 (`#3255 <https://github.com/ros-planning/moveit2/issues/3255>`_)
+* Fix passing different types to std::min in cost_functions.hpp (`#3244 <https://github.com/ros-planning/moveit2/issues/3244>`_)
+* Contributors: Sebastian Castro, Silvio Traversaro
 
 2.12.0 (2024-11-29)
 -------------------

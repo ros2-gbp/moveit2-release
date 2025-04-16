@@ -2,15 +2,17 @@
 Changelog for package moveit_ros_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.12.2 (2025-02-15)
+2.13.1 (2025-04-15)
 -------------------
-* Use attached object colors as is in Rviz plugin (`#3274 <https://github.com/ros-planning/moveit2/issues/3274>`_) (`#3278 <https://github.com/ros-planning/moveit2/issues/3278>`_)
-* Contributors: Aleksey Nogin, mergify[bot]
+* Planning scene monitor: reliable QoS (`#3400 <https://github.com/ros-planning/moveit2/issues/3400>`_)
+* Respect robot alpha value in trail trajectory visual (`#3353 <https://github.com/ros-planning/moveit2/issues/3353>`_)
+* Contributors: Aleksey Nogin, Florian Beck, Mark Johnson
 
-2.12.1 (2024-12-18)
+2.13.0 (2025-02-15)
 -------------------
-* Fix MeshShape::clear() for safer mesh removal (`#3164 <https://github.com/ros-planning/moveit2/issues/3164>`_) (`#3167 <https://github.com/ros-planning/moveit2/issues/3167>`_)
-* Contributors: Matt Wang
+* Use attached object colors as is in Rviz plugin (`#3274 <https://github.com/ros-planning/moveit2/issues/3274>`_)
+* Fix MeshShape::clear() for safer mesh removal (`#3164 <https://github.com/ros-planning/moveit2/issues/3164>`_)
+* Contributors: Aleksey Nogin, Matt Wang
 
 2.12.0 (2024-11-29)
 -------------------
