@@ -1,1 +1,1 @@
-{"base": "dc735fc5c", "parent": "debian/rolling/moveit_setup_app_plugins", "previous": "48ab10c81", "trim": "", "trimbase": ""}
+{"base": "c892d4f98072", "parent": "debian/kilted/moveit_setup_app_plugins", "previous": "fafddf97de7f", "trim": "", "trimbase": ""}
