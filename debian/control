@@ -1,0 +1,12 @@
+Source: ros-kilted-moveit-resources-prbt-pg70-support
+Section: misc
+Priority: optional
+Maintainer: Alexander Gutenkunst <a.gutenkunst@pilz.de>
+Build-Depends: debhelper (>= 9.0.0), ros-kilted-ament-cmake, ros-kilted-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-kilted-moveit-resources-prbt-pg70-support
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-kilted-moveit-resources-prbt-ikfast-manipulator-plugin, ros-kilted-moveit-resources-prbt-moveit-config, ros-kilted-moveit-resources-prbt-support, ros-kilted-xacro, ros-kilted-ros-workspace
+Description: PRBT support for Schunk pg70 gripper.
