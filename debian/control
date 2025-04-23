@@ -1,0 +1,12 @@
+Source: ros-kilted-moveit-ros-warehouse
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libfmt-dev, ros-kilted-ament-cmake, ros-kilted-moveit-common, ros-kilted-moveit-core, ros-kilted-moveit-ros-planning, ros-kilted-rclcpp, ros-kilted-tf2-eigen, ros-kilted-tf2-ros, ros-kilted-warehouse-ros, ros-kilted-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-kilted-moveit-ros-warehouse
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libfmt-dev, ros-kilted-moveit-common, ros-kilted-moveit-core, ros-kilted-moveit-ros-planning, ros-kilted-rclcpp, ros-kilted-tf2-eigen, ros-kilted-tf2-ros, ros-kilted-warehouse-ros, ros-kilted-ros-workspace
+Description: Components of MoveIt connecting to MongoDB
