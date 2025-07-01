@@ -1,0 +1,12 @@
+Source: ros-kilted-moveit-ros-planning-interface
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libeigen3-dev, python3-dev, ros-kilted-ament-cmake, ros-kilted-ament-cmake-gtest <!nocheck>, ros-kilted-eigen3-cmake-module, ros-kilted-geometry-msgs, ros-kilted-moveit-common, ros-kilted-moveit-configs-utils <!nocheck>, ros-kilted-moveit-core, ros-kilted-moveit-msgs, ros-kilted-moveit-resources-fanuc-moveit-config <!nocheck>, ros-kilted-moveit-resources-panda-moveit-config <!nocheck>, ros-kilted-moveit-ros-move-group, ros-kilted-moveit-ros-planning, ros-kilted-moveit-ros-warehouse, ros-kilted-moveit-simple-controller-manager <!nocheck>, ros-kilted-rclcpp, ros-kilted-rclcpp-action, ros-kilted-rclpy, ros-kilted-ros-testing <!nocheck>, ros-kilted-rviz2 <!nocheck>, ros-kilted-tf2, ros-kilted-tf2-eigen, ros-kilted-tf2-geometry-msgs, ros-kilted-tf2-ros, ros-kilted-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-kilted-moveit-ros-planning-interface
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python3-dev, ros-kilted-geometry-msgs, ros-kilted-moveit-common, ros-kilted-moveit-core, ros-kilted-moveit-msgs, ros-kilted-moveit-ros-move-group, ros-kilted-moveit-ros-planning, ros-kilted-moveit-ros-warehouse, ros-kilted-rclcpp, ros-kilted-rclcpp-action, ros-kilted-rclpy, ros-kilted-tf2, ros-kilted-tf2-eigen, ros-kilted-tf2-geometry-msgs, ros-kilted-tf2-ros, ros-kilted-ros-workspace
+Description: Components of MoveIt that offer simpler remote (as from another ROS 2 node) interfaces to planning and execution
