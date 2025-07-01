@@ -1,0 +1,12 @@
+Source: ros-kilted-moveit-planners-chomp
+Section: misc
+Priority: optional
+Maintainer: Chittaranjan Srinivas Swaminathan <chitt@live.in>
+Build-Depends: debhelper (>= 9.0.0), ros-kilted-ament-cmake, ros-kilted-chomp-motion-planner, ros-kilted-moveit-common, ros-kilted-moveit-core, ros-kilted-pluginlib, ros-kilted-rclcpp, ros-kilted-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-kilted-moveit-planners-chomp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-kilted-chomp-motion-planner, ros-kilted-moveit-common, ros-kilted-moveit-core, ros-kilted-pluginlib, ros-kilted-rclcpp, ros-kilted-ros-workspace
+Description: The interface for using CHOMP within MoveIt
