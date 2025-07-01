@@ -1,1 +1,1 @@
-{"base": "f7ae1a4cc", "parent": "debian/rolling/moveit_planners_stomp", "previous": "8cecbda86", "trim": "", "trimbase": ""}
+{"base": "59da5c37b", "parent": "debian/rolling/moveit_planners_stomp", "previous": "3f49deabc", "trim": "", "trimbase": ""}
