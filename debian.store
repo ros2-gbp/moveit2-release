@@ -1,1 +1,1 @@
-{"base": "24da1294a", "parent": "debian/rolling/moveit_setup_srdf_plugins", "previous": "b5a4be493", "trim": "", "trimbase": ""}
+{"base": "ccd498eaf", "parent": "debian/rolling/moveit_setup_srdf_plugins", "previous": "b72cb0ef1", "trim": "", "trimbase": ""}
