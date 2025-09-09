@@ -1,0 +1,12 @@
+Source: ros-kilted-moveit-setup-assistant
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), qtbase5-dev, ros-kilted-ament-cmake, ros-kilted-ament-cmake-gtest <!nocheck>, ros-kilted-ament-index-cpp, ros-kilted-moveit-resources-panda-moveit-config <!nocheck>, ros-kilted-moveit-setup-framework, ros-kilted-moveit-setup-srdf-plugins, ros-kilted-pluginlib, ros-kilted-rclcpp, ros-kilted-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-kilted-moveit-setup-assistant
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, qtbase5-dev, ros-kilted-ament-index-cpp, ros-kilted-moveit-configs-utils, ros-kilted-moveit-setup-app-plugins, ros-kilted-moveit-setup-controllers, ros-kilted-moveit-setup-core-plugins, ros-kilted-moveit-setup-framework, ros-kilted-moveit-setup-srdf-plugins, ros-kilted-pluginlib, ros-kilted-rclcpp, ros-kilted-ros-workspace
+Description: Generates a configuration package that makes it easy to use MoveIt
