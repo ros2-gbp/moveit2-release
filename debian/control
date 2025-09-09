@@ -1,0 +1,12 @@
+Source: ros-kilted-moveit-ros-control-interface
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ros-kilted-ament-cmake, ros-kilted-controller-manager-msgs, ros-kilted-moveit-common, ros-kilted-moveit-core, ros-kilted-moveit-simple-controller-manager, ros-kilted-pluginlib (>= 1.11.2), ros-kilted-rclcpp-action, ros-kilted-trajectory-msgs, ros-kilted-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-kilted-moveit-ros-control-interface
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-kilted-controller-manager-msgs, ros-kilted-moveit-common, ros-kilted-moveit-core, ros-kilted-moveit-simple-controller-manager, ros-kilted-pluginlib (>= 1.11.2), ros-kilted-rclcpp-action, ros-kilted-trajectory-msgs, ros-kilted-ros-workspace
+Description: ros_control controller manager interface for MoveIt
