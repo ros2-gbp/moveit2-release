@@ -1,0 +1,12 @@
+Source: ros-rolling-moveit-ros-trajectory-cache
+Section: misc
+Priority: optional
+Maintainer: Brandon Ong <methylDragon@intrinsic.ai>
+Build-Depends: debhelper (>= 9.0.0), python3-pytest <!nocheck>, ros-rolling-ament-cmake, ros-rolling-ament-cmake-pytest <!nocheck>, ros-rolling-ament-cmake-uncrustify <!nocheck>, ros-rolling-geometry-msgs, ros-rolling-launch-pytest <!nocheck>, ros-rolling-launch-testing-ament-cmake <!nocheck>, ros-rolling-moveit-common, ros-rolling-moveit-configs-utils <!nocheck>, ros-rolling-moveit-planners-ompl <!nocheck>, ros-rolling-moveit-resources <!nocheck>, ros-rolling-moveit-ros-planning-interface, ros-rolling-rclcpp, ros-rolling-rclcpp-action, ros-rolling-rmf-utils <!nocheck>, ros-rolling-robot-state-publisher <!nocheck>, ros-rolling-ros2-control <!nocheck>, ros-rolling-tf2-ros, ros-rolling-trajectory-msgs, ros-rolling-warehouse-ros-sqlite <!nocheck>, ros-rolling-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-rolling-moveit-ros-trajectory-cache
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python3-yaml, ros-rolling-geometry-msgs, ros-rolling-moveit-common, ros-rolling-moveit-ros, ros-rolling-moveit-ros-planning-interface, ros-rolling-rclcpp, ros-rolling-rclcpp-action, ros-rolling-tf2-ros, ros-rolling-trajectory-msgs, ros-rolling-xacro, ros-rolling-ros-workspace
+Description: A trajectory cache for MoveIt 2 motion plans and cartesian plans.
