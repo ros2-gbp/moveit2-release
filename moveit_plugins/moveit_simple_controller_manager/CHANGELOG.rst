@@ -2,24 +2,19 @@
 Changelog for package moveit_simple_controller_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.14.1 (2025-09-09)
--------------------
-* Use "&&" instead of "and" (`#3510 <https://github.com/moveit/moveit2/issues/3510>`_)
-* Contributors: Silvio Traversaro
-
-2.14.0 (2025-06-13)
+2.12.4 (2025-12-05)
 -------------------
 
-2.13.2 (2025-04-16)
+2.12.3 (2025-04-15)
 -------------------
 
-2.13.1 (2025-04-15)
+2.12.2 (2025-02-15)
 -------------------
+* Parallel gripper controller (`#3246 <https://github.com/ros-planning/moveit2/issues/3246>`_) (`#3260 <https://github.com/ros-planning/moveit2/issues/3260>`_)
+* Contributors: Marq Rasmussen, mergify[bot]
 
-2.13.0 (2025-02-15)
+2.12.1 (2024-12-18)
 -------------------
-* Parallel gripper controller (`#3246 <https://github.com/ros-planning/moveit2/issues/3246>`_)
-* Contributors: Marq Rasmussen
 
 2.12.0 (2024-11-29)
 -------------------

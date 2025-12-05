@@ -2,33 +2,24 @@
 Changelog for package moveit_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.14.1 (2025-09-09)
+2.12.4 (2025-12-05)
 -------------------
-* Update pre-commit-config (`#2805 <https://github.com/moveit/moveit2/issues/2805>`_)
-* Contributors: mosfet80
-
-2.14.0 (2025-06-13)
--------------------
-* Fix arg name in PlanningScene stub file (`#3489 <https://github.com/moveit/moveit2/issues/3489>`_)
 * Python PlanningScene API: add set_current_state() (`#3481 <https://github.com/moveit/moveit2/issues/3481>`_)
-* Allow conversion rclpy.Time <-> rclcpp::Time (`#3453 <https://github.com/moveit/moveit2/issues/3453>`_)
-  Co-authored-by: Robert Haschke <rhaschke@users.noreply.github.com>
-* Contributors: Samuele Sandrini, Shobin vinod, matthias88
+* Allow conversion rclpy.Time <-> rclcpp::Time (`#3453 <https://github.com/moveit/moveit2/issues/3453>`_) (`#3455 <https://github.com/moveit/moveit2/issues/3455>`_)
 
-2.13.2 (2025-04-16)
+2.12.3 (2025-04-15)
 -------------------
-
-2.13.1 (2025-04-15)
--------------------
-* Allow conversion from list[str] to std::vector<std::string> (`#3423 <https://github.com/ros-planning/moveit2/issues/3423>`_)
-* feat: add remapping argument to MoveItPy initialization (`#3367 <https://github.com/ros-planning/moveit2/issues/3367>`_)
+* Allow conversion from list[str] to std::vector<std::string> (`#3423 <https://github.com/ros-planning/moveit2/issues/3423>`_) (`#3425 <https://github.com/ros-planning/moveit2/issues/3425>`_)
+* feat: add remapping argument to MoveItPy initialization (`#3367 <https://github.com/ros-planning/moveit2/issues/3367>`_) (`#3386 <https://github.com/ros-planning/moveit2/issues/3386>`_).
 * Contributors: Jens Vanhooydonck, Kazuya Oguma
 
-2.13.0 (2025-02-15)
+2.12.2 (2025-02-15)
 -------------------
-* move TrajectoryExecutionManager::clear() to private (`#3226 <https://github.com/ros-planning/moveit2/issues/3226>`_)
-* Update CMakeLists.txt (`#3218 <https://github.com/ros-planning/moveit2/issues/3218>`_)
-* Contributors: Dongya Jiang, mosfet80
+* move TrajectoryExecutionManager::clear() to private (`#3226 <https://github.com/ros-planning/moveit2/issues/3226>`_) (`#3238 <https://github.com/ros-planning/moveit2/issues/3238>`_)
+* Contributors: Dongya Jiang, mergify[bot]
+
+2.12.1 (2024-12-18)
+-------------------
 
 2.12.0 (2024-11-29)
 -------------------

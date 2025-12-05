@@ -158,20 +158,20 @@ private:
   };
 
   bool getNextSwitchingPoint(double path_pos, TrajectoryStep& next_switching_point, double& before_acceleration,
-                             double& after_acceleration) const;
+                             double& after_acceleration);
   bool getNextAccelerationSwitchingPoint(double path_pos, TrajectoryStep& next_switching_point,
-                                         double& before_acceleration, double& after_acceleration) const;
+                                         double& before_acceleration, double& after_acceleration);
   bool getNextVelocitySwitchingPoint(double path_pos, TrajectoryStep& next_switching_point, double& before_acceleration,
-                                     double& after_acceleration) const;
+                                     double& after_acceleration);
   bool integrateForward(std::list<TrajectoryStep>& trajectory, double acceleration);
   void integrateBackward(std::list<TrajectoryStep>& start_trajectory, double path_pos, double path_vel,
                          double acceleration);
-  double getMinMaxPathAcceleration(double path_position, double path_velocity, bool max) const;
-  double getMinMaxPhaseSlope(double path_position, double path_velocity, bool max) const;
+  double getMinMaxPathAcceleration(double path_position, double path_velocity, bool max);
+  double getMinMaxPhaseSlope(double path_position, double path_velocity, bool max);
   double getAccelerationMaxPathVelocity(double path_pos) const;
   double getVelocityMaxPathVelocity(double path_pos) const;
-  double getAccelerationMaxPathVelocityDeriv(double path_pos) const;
-  double getVelocityMaxPathVelocityDeriv(double path_pos) const;
+  double getAccelerationMaxPathVelocityDeriv(double path_pos);
+  double getVelocityMaxPathVelocityDeriv(double path_pos);
 
   std::list<TrajectoryStep>::const_iterator getTrajectorySegment(double time) const;
 

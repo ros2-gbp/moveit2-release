@@ -2,34 +2,32 @@
 Changelog for package moveit_servo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.14.1 (2025-09-09)
+2.12.4 (2025-12-05)
 -------------------
+* Fix severe warning from class loader in servo (`#3577 <https://github.com/moveit/moveit2/issues/3577>`_) (`#3598 <https://github.com/moveit/moveit2/issues/3598>`_)
 
-2.14.0 (2025-06-13)
+2.12.3 (2025-04-15)
 -------------------
-* Remove gripper_controllers dependency (`#3474 <https://github.com/moveit/moveit2/issues/3474>`_)
-* Contributors: Felix Exner (fexner)
-
-2.13.2 (2025-04-16)
--------------------
-
-2.13.1 (2025-04-15)
--------------------
-* Minor typo fix in simulated Panda servo config (`#3444 <https://github.com/ros-planning/moveit2/issues/3444>`_)
-* Fix Servo JointJog Crash (`#3351 <https://github.com/ros-planning/moveit2/issues/3351>`_)
+* Minor typo fix in simulated Panda servo config (`#3444 <https://github.com/ros-planning/moveit2/issues/3444>`_) (`#3445 <https://github.com/ros-planning/moveit2/issues/3445>`_)
+* Fix Servo JointJog Crash (`#3351 <https://github.com/ros-planning/moveit2/issues/3351>`_) (`#3401 <https://github.com/ros-planning/moveit2/issues/3401>`_)
 * Contributors: Gautham Sam, Matthew Foran
 
-2.13.0 (2025-02-15)
+2.12.2 (2025-02-15)
 -------------------
-* Update current state even if servo is paused (`#3341 <https://github.com/ros-planning/moveit2/issues/3341>`_)
-* Update robot state if time since last command exceeds timeout (`#3251 <https://github.com/ros-planning/moveit2/issues/3251>`_)
-* Fix docstring for Servo smoothHalt function (`#3298 <https://github.com/ros-planning/moveit2/issues/3298>`_)
-* servo_keyboard_input: Add Windows support (`#3290 <https://github.com/ros-planning/moveit2/issues/3290>`_)
-* Servo Node - pause service: check if request is different than current state. (`#3265 <https://github.com/ros-planning/moveit2/issues/3265>`_)
-* Reduce mutex scope in Servo thread (`#3259 <https://github.com/ros-planning/moveit2/issues/3259>`_)
-* Update includes for generate_parameter_library 0.4.0 (`#3255 <https://github.com/ros-planning/moveit2/issues/3255>`_)
-* Address deprecations of StaticSingleThreadedExecutor and realtime_tools/thread_priority.hpp (`#3139 <https://github.com/ros-planning/moveit2/issues/3139>`_)
-* Contributors: Henning Kayser, Jelmer de Wolde, Kazuya Oguma, Paul Gesel, Sebastian Castro, Silvio Traversaro
+* Update current state even if servo is paused (`#3341 <https://github.com/ros-planning/moveit2/issues/3341>`_) (`#3347 <https://github.com/ros-planning/moveit2/issues/3347>`_)
+* Servo Node - pause service: check if request is different than current state. (`#3265 <https://github.com/ros-planning/moveit2/issues/3265>`_) (`#3348 <https://github.com/ros-planning/moveit2/issues/3348>`_)
+* Update robot state if time since last command exceeds timeout (`#3251 <https://github.com/ros-planning/moveit2/issues/3251>`_) (`#3334 <https://github.com/ros-planning/moveit2/issues/3334>`_)
+* Fix docstring for Servo smoothHalt function (`#3298 <https://github.com/ros-planning/moveit2/issues/3298>`_) (`#3308 <https://github.com/ros-planning/moveit2/issues/3308>`_)
+* servo_keyboard_input: Add Windows support (`#3290 <https://github.com/ros-planning/moveit2/issues/3290>`_) (`#3291 <https://github.com/ros-planning/moveit2/issues/3291>`_)
+* Reduce mutex scope in Servo thread (`#3259 <https://github.com/ros-planning/moveit2/issues/3259>`_) (`#3262 <https://github.com/ros-planning/moveit2/issues/3262>`_)
+* Update includes for generate_parameter_library 0.4.0 (`#3255 <https://github.com/ros-planning/moveit2/issues/3255>`_) (`#3258 <https://github.com/ros-planning/moveit2/issues/3258>`_)
+* Contributors: Henning Kayser, Jelmer de Wolde, Kazuya Oguma, Paul Gesel, Sebastian Castro, Silvio Traversaro, mergify[bot]
+
+2.12.1 (2024-12-18)
+-------------------
+* re-enable cmake warnings (`#3028 <https://github.com/ros-planning/moveit2/issues/3028>`_) (backport `#3172 <https://github.com/ros-planning/moveit2/issues/3172>`_) (`#3173 <https://github.com/ros-planning/moveit2/issues/3173>`_)
+  * Add conditional include for realtime_helpers.hpp
+* Contributors: Michael Ferguson, Sebastian Castro
 
 2.12.0 (2024-11-29)
 -------------------

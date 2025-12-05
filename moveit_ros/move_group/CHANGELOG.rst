@@ -2,33 +2,24 @@
 Changelog for package moveit_ros_move_group
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.14.1 (2025-09-09)
--------------------
-* Fix link to fmt::fmt imported target (`#3507 <https://github.com/moveit/moveit2/issues/3507>`_)
-* Contributors: Silvio Traversaro
-
-2.14.0 (2025-06-13)
--------------------
-* Adds multi (joint) state validation service (`#3426 <https://github.com/moveit/moveit2/issues/3426>`_)
-  Co-authored-by: Tom Noble <tom@rivelinrobotics.com>
-  Co-authored-by: Mark Johnson <104826595+rr-mark@users.noreply.github.com>
-* Contributors: Lucian
-
-2.13.2 (2025-04-16)
+2.12.4 (2025-12-05)
 -------------------
 
-2.13.1 (2025-04-15)
+2.12.3 (2025-04-15)
 -------------------
-* Ports moveit1 `#3689 <https://github.com/ros-planning/moveit/issues/3689>`_ (`#3357 <https://github.com/ros-planning/moveit2/issues/3357>`_)
-  * Publish planning scene while planning (`#3689 <https://github.com/ros-planning/moveit/issues/3689>`_)
+* Ports moveit1 `#3689 <https://github.com/ros-planning/moveit/issues/3689>`_ (`#3357 <https://github.com/ros-planning/moveit2/issues/3357>`_) (`#3365 <https://github.com/ros-planning/moveit2/issues/3365>`_)
+  * Publish planning scene while planning (`#3689 <https://github.com/ros-planning/moveit/issue/3689>`_)
 * Contributors: Mark Johnson
 
-2.13.0 (2025-02-15)
+2.12.2 (2025-02-15)
 -------------------
-* Ports moveit `#3676 <https://github.com/ros-planning/moveit2/issues/3676>`_ and `#3682 <https://github.com/ros-planning/moveit2/issues/3682>`_ (`#3283 <https://github.com/ros-planning/moveit2/issues/3283>`_)
-* Remove plugins from export set (`#3227 <https://github.com/ros-planning/moveit2/issues/3227>`_)
-* move TrajectoryExecutionManager::clear() to private (`#3226 <https://github.com/ros-planning/moveit2/issues/3226>`_)
-* Contributors: Dongya Jiang, Mark Johnson, Michael Görner, Robert Haschke, Paul Gesel
+* Ports moveit `#3676 <https://github.com/ros-planning/moveit2/issues/3676>`_ and `#3682 <https://github.com/ros-planning/moveit2/issues/3682>`_ (`#3283 <https://github.com/ros-planning/moveit2/issues/3283>`_) (`#3318 <https://github.com/ros-planning/moveit2/issues/3318>`_)
+* Remove plugins from export set (`#3227 <https://github.com/ros-planning/moveit2/issues/3227>`_) (`#3242 <https://github.com/ros-planning/moveit2/issues/3242>`_)
+* move TrajectoryExecutionManager::clear() to private (`#3226 <https://github.com/ros-planning/moveit2/issues/3226>`_) (`#3238 <https://github.com/ros-planning/moveit2/issues/3238>`_)
+* Contributors: Dongya Jiang, Mark Johnson, Michael Görner, Paul Gesel, Robert Haschke, mergify[bot]
+
+2.12.1 (2024-12-18)
+-------------------
 
 2.12.0 (2024-11-29)
 -------------------

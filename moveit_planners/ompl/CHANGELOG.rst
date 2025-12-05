@@ -2,19 +2,18 @@
 Changelog for package moveit_planners_ompl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.14.1 (2025-09-09)
+2.12.4 (2025-12-05)
+-------------------
+* Update ompl_interface with latest version of OMPL (`#2994 <https://github.com/moveit/moveit2/issues/2994>`_) (`#3600 <https://github.com/moveit/moveit2/issues/3600>`_)
+* [OMPL] also check constraints in StateValidityCallback (`#3586 <https://github.com/moveit/moveit2/issues/3586>`_) (`#3611 <https://github.com/moveit/moveit2/issues/3611>`_)
+
+2.12.3 (2025-04-15)
 -------------------
 
-2.14.0 (2025-06-13)
+2.12.2 (2025-02-15)
 -------------------
 
-2.13.2 (2025-04-16)
--------------------
-
-2.13.1 (2025-04-15)
--------------------
-
-2.13.0 (2025-02-15)
+2.12.1 (2024-12-18)
 -------------------
 
 2.12.0 (2024-11-29)

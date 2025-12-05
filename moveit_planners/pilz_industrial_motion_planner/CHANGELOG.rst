@@ -2,28 +2,25 @@
 Changelog for package pilz_industrial_motion_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.14.1 (2025-09-09)
+2.12.4 (2025-12-05)
 -------------------
 
-2.14.0 (2025-06-13)
+2.12.3 (2025-04-15)
 -------------------
-
-2.13.2 (2025-04-16)
--------------------
-
-2.13.1 (2025-04-15)
--------------------
-* Ports moveit1 `#3689 <https://github.com/ros-planning/moveit/issues/3689>`_ (`#3357 <https://github.com/ros-planning/moveit2/issues/3357>`_)
+* Ports moveit1 `#3689 <https://github.com/ros-planning/moveit/issues/3689>`_ (`#3357 <https://github.com/ros-planning/moveit2/issues/3357>`_) (`#3365 <https://github.com/ros-planning/moveit/issues/3365>`_)
   * Publish planning scene while planning (`#3689 <https://github.com/ros-planning/moveit/issues/3689>`_)
 * Contributors: Mark Johnson
 
-2.13.0 (2025-02-15)
+2.12.2 (2025-02-15)
 -------------------
-* Update includes for generate_parameter_library 0.4.0 (`#3255 <https://github.com/ros-planning/moveit2/issues/3255>`_)
-* pilz_industrial_motion_planner: Use tf2::fromMsg instead of tf2::convert (`#3219 <https://github.com/ros-planning/moveit2/issues/3219>`_)
-* Use ! in place of not keyword for Pilz and CHOMP planners (`#3217 <https://github.com/ros-planning/moveit2/issues/3217>`_)
-* Update deprecated tf2 imports from .h to .hpp (`#3197 <https://github.com/ros-planning/moveit2/issues/3197>`_)
-* Contributors: Sebastian Castro, Silvio Traversaro
+* Update includes for generate_parameter_library 0.4.0 (`#3255 <https://github.com/ros-planning/moveit2/issues/3255>`_) (`#3258 <https://github.com/ros-planning/moveit2/issues/3258>`_)
+* pilz_industrial_motion_planner: Use tf2::fromMsg instead of tf2::convert (`#3219 <https://github.com/ros-planning/moveit2/issues/3219>`_) (`#3224 <https://github.com/ros-planning/moveit2/issues/3224>`_)
+* Use ! in place of not keyword for Pilz and CHOMP planners (`#3217 <https://github.com/ros-planning/moveit2/issues/3217>`_) (`#3222 <https://github.com/ros-planning/moveit2/issues/3222>`_)
+* Update deprecated tf2 imports from .h to .hpp (`#3197 <https://github.com/ros-planning/moveit2/issues/3197>`_) (`#3200 <https://github.com/ros-planning/moveit2/issues/3200>`_)
+* Contributors: Sebastian Castro, Silvio Traversaro, mergify[bot]
+
+2.12.1 (2024-12-18)
+-------------------
 
 2.12.0 (2024-11-29)
 -------------------

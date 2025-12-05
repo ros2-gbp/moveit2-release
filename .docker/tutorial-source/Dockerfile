@@ -4,7 +4,7 @@
 # Source build of the repos file from the tutorial site
 
 ARG ROS_DISTRO=rolling
-ARG GZ_VERSION=ionic
+ARG GZ_VERSION=harmonic
 
 FROM moveit/moveit2:${ROS_DISTRO}-ci
 LABEL maintainer Tyler Weaver tyler@picknik.ai

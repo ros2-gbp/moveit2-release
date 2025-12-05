@@ -2,43 +2,40 @@
 Changelog for package moveit_ros_planning
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.14.1 (2025-09-09)
+2.12.4 (2025-12-05)
 -------------------
+* PSM: finish thread on rclcpp::shutdown (`#3484 <https://github.com/moveit/moveit2/issues/3484>`_) (`#3486 <https://github.com/moveit/moveit2/issues/3486>`_)
+* Fix seg fault with attached objects during motion execution (`#3466 <https://github.com/moveit/moveit2/issues/3466>`_) (`#3470 <https://github.com/moveit/moveit2/issues/3470>`_)
 
-2.14.0 (2025-06-13)
+2.12.3 (2025-04-15)
 -------------------
-* PSM: finish thread on rclcpp::shutdown (`#3484 <https://github.com/moveit/moveit2/issues/3484>`_)
-* Fix seg fault with attached objects during motion execution (`#3466 <https://github.com/moveit/moveit2/issues/3466>`_)
-* Contributors: Marq Rasmussen
-
-2.13.2 (2025-04-16)
--------------------
-
-2.13.1 (2025-04-15)
--------------------
-* Make the destructors of the base classes of planning adapters virtual and close move_group gracefully (`#3435 <https://github.com/ros-planning/moveit2/issues/3435>`_)
-* fix: ensure attached objects update during motion execution (`#3327 <https://github.com/ros-planning/moveit2/issues/3327>`_)
-* Planning scene monitor: reliable QoS (`#3400 <https://github.com/ros-planning/moveit2/issues/3400>`_)
-* Ports moveit1 `#3689 <https://github.com/ros-planning/moveit/issues/3689>`_ (`#3357 <https://github.com/ros-planning/moveit2/issues/3357>`_)
+* Make the destructors of the base classes of planning adapters virtual and close move_group gracefully (`#3435 <https://github.com/ros-planning/moveit2/issues/3435>`_) (`#3443 <https://github.com/ros-planning/moveit2/issues/3443>`_)
+* fix: ensure attached objects update during motion execution (`#3327 <https://github.com/ros-planning/moveit2/issues/3327>`_) (`#3414 <https://github.com/ros-planning/moveit2/issues/3414>`_)
+* Planning scene monitor: reliable QoS (`#3400 <https://github.com/ros-planning/moveit2/issues/3400>`_) (`#3410 <https://github.com/ros-planning/moveit2/issues/3410>`_)
+* Ports moveit1 `#3689 <https://github.com/ros-planning/moveit/issues/3689>`_ (`#3357 <https://github.com/ros-planning/moveit2/issues/3357>`_) (`#3365 <https://github.com/ros-planning/moveit/issues/3365>`_)
+* fix: explicitly add the same namespace as the parent node (`#3360 <https://github.com/ros-planning/moveit2/issues/3360>`_) (`#3362 <https://github.com/ros-planning/moveit2/issues/3362>`_)
   * Publish planning scene while planning (`#3689 <https://github.com/ros-planning/moveit/issues/3689>`_)
-* fix: explicitly add the same namespace as the parent node (`#3360 <https://github.com/ros-planning/moveit2/issues/3360>`_)
 * Contributors: Aleksey Nogin, Cihat Kurtuluş Altıparmak, Kazuya Oguma, Marco Magri, Mark Johnson
 
-2.13.0 (2025-02-15)
+2.12.2 (2025-02-15)
 -------------------
-* Enable allowed_execution_duration_scaling and allowed_goal_duration_margin for each controller (`#3335 <https://github.com/ros-planning/moveit2/issues/3335>`_)
-* Add allowed_start_tolerance_joints parameter (Port moveit`#3287 <https://github.com/ros-planning/moveit2/issues/3287>`_) (`#3309 <https://github.com/ros-planning/moveit2/issues/3309>`_)
-* load robot_description from other namespace (`#3269 <https://github.com/ros-planning/moveit2/issues/3269>`_)
-* Ports moveit `#3676 <https://github.com/ros-planning/moveit2/issues/3676>`_ and `#3682 <https://github.com/ros-planning/moveit2/issues/3682>`_ (`#3283 <https://github.com/ros-planning/moveit2/issues/3283>`_)
-* Update includes for generate_parameter_library 0.4.0 (`#3255 <https://github.com/ros-planning/moveit2/issues/3255>`_)
-* [moveit_ros] fix race condition when stopping trajectory execution (`#3198 <https://github.com/ros-planning/moveit2/issues/3198>`_)
-* move TrajectoryExecutionManager::clear() to private (`#3226 <https://github.com/ros-planning/moveit2/issues/3226>`_)
-* Don't destroy objects on attach (`#3205 <https://github.com/ros-planning/moveit2/issues/3205>`_)
-* Simplify scene update that does not include new robot_state (`#3206 <https://github.com/ros-planning/moveit2/issues/3206>`_)
-* Fix planning_scene_monitor sync when passed empty robot state (`#3187 <https://github.com/ros-planning/moveit2/issues/3187>`_)
-* Update deprecated tf2 imports from .h to .hpp (`#3197 <https://github.com/ros-planning/moveit2/issues/3197>`_)
-* Fix logic in CheckStartStateBounds adapter (`#3143 <https://github.com/ros-planning/moveit2/issues/3143>`_)
-* Contributors: Daniel García López, Dongya Jiang, Mark Johnson, Marq Rasmussen, Michael Görner, RLi43, Robert Haschke, Sebastian Castro
+* Enable allowed_execution_duration_scaling and allowed_goal_duration_margin for each controller (`#3335 <https://github.com/ros-planning/moveit2/issues/3335>`_) (`#3338 <https://github.com/ros-planning/moveit2/issues/3338>`_)
+* Add allowed_start_tolerance_joints parameter (Port moveit`#3287 <https://github.com/ros-planning/moveit2/issues/3287>`_) (`#3309 <https://github.com/ros-planning/moveit2/issues/3309>`_) (`#3328 <https://github.com/ros-planning/moveit2/issues/3328>`_)
+* load robot_description from other namespace (`#3269 <https://github.com/ros-planning/moveit2/issues/3269>`_) (`#3325 <https://github.com/ros-planning/moveit2/issues/3325>`_)
+* Ports moveit `#3676 <https://github.com/ros-planning/moveit2/issues/3676>`_ and `#3682 <https://github.com/ros-planning/moveit2/issues/3682>`_ (`#3283 <https://github.com/ros-planning/moveit2/issues/3283>`_) (`#3318 <https://github.com/ros-planning/moveit2/issues/3318>`_)
+* Update includes for generate_parameter_library 0.4.0 (`#3255 <https://github.com/ros-planning/moveit2/issues/3255>`_) (`#3258 <https://github.com/ros-planning/moveit2/issues/3258>`_)
+* [moveit_ros] fix race condition when stopping trajectory execution (`#3198 <https://github.com/ros-planning/moveit2/issues/3198>`_) (`#3240 <https://github.com/ros-planning/moveit2/issues/3240>`_)
+* move TrajectoryExecutionManager::clear() to private (`#3226 <https://github.com/ros-planning/moveit2/issues/3226>`_) (`#3238 <https://github.com/ros-planning/moveit2/issues/3238>`_)
+* Don't destroy objects on attach (`#3205 <https://github.com/ros-planning/moveit2/issues/3205>`_) (`#3214 <https://github.com/ros-planning/moveit2/issues/3214>`_)
+* Simplify scene update that does not include new robot_state (`#3206 <https://github.com/ros-planning/moveit2/issues/3206>`_) (`#3208 <https://github.com/ros-planning/moveit2/issues/3208>`_)
+* Fix planning_scene_monitor sync when passed empty robot state (`#3187 <https://github.com/ros-planning/moveit2/issues/3187>`_) (`#3204 <https://github.com/ros-planning/moveit2/issues/3204>`_)
+* Update deprecated tf2 imports from .h to .hpp (`#3197 <https://github.com/ros-planning/moveit2/issues/3197>`_) (`#3200 <https://github.com/ros-planning/moveit2/issues/3200>`_)
+* Contributors: Daniel García López, Dongya Jiang, Mark Johnson, Marq Rasmussen, Michael Görner, RLi43, Robert Haschke, Sebastian Castro, mergify[bot]
+
+2.12.1 (2024-12-18)
+-------------------
+* Fix logic in CheckStartStateBounds adapter (`#3143 <https://github.com/ros-planning/moveit2/issues/3143>`_) (`#3148 <https://github.com/ros-planning/moveit2/issues/3148>`_)
+* Contributors: Sebastian Castro
 
 2.12.0 (2024-11-29)
 -------------------

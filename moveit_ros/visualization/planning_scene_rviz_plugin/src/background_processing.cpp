@@ -34,8 +34,6 @@
 
 /* Author: Ioan Sucan */
 
-#include <mutex>
-
 #include <moveit/planning_scene_rviz_plugin/background_processing.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>

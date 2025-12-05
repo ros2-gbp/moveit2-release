@@ -2,25 +2,20 @@
 Changelog for package moveit_setup_framework
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.14.1 (2025-09-09)
+2.12.4 (2025-12-05)
 -------------------
 
-2.14.0 (2025-06-13)
+2.12.3 (2025-04-15)
 -------------------
 
-2.13.2 (2025-04-16)
+2.12.2 (2025-02-15)
 -------------------
+* Explicit convert from std::filesystem::path to std::string for Windows compatibility (`#3249 <https://github.com/ros-planning/moveit2/issues/3249>`_) (`#3254 <https://github.com/ros-planning/moveit2/issues/3254>`_)
+* Fix: Conditionally install launch directory if it exists (`#3191 <https://github.com/ros-planning/moveit2/issues/3191>`_) (`#3195 <https://github.com/ros-planning/moveit2/issues/3195>`_)
+* Contributors: Filippo Bosi, Silvio Traversaro, mergify[bot]
 
-2.13.1 (2025-04-15)
+2.12.1 (2024-12-18)
 -------------------
-* Use ament_cmake_ros build tool in moveit_setup_assistant packages (`#3441 <https://github.com/ros-planning/moveit2/issues/3441>`_)
-* Contributors: Sebastian Castro
-
-2.13.0 (2025-02-15)
--------------------
-* Explicit convert from std::filesystem::path to std::string for Windows compatibility (`#3249 <https://github.com/ros-planning/moveit2/issues/3249>`_)
-* Fix: Conditionally install launch directory if it exists (`#3191 <https://github.com/ros-planning/moveit2/issues/3191>`_)
-* Contributors: Filippo Bosi, Silvio Traversaro
 
 2.12.0 (2024-11-29)
 -------------------
