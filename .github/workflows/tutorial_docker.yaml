@@ -9,14 +9,14 @@ on:
   merge_group:
   push:
     branches:
-      - jazzy
+      - main
 
 jobs:
   tutorial-source:
     strategy:
       fail-fast: false
       matrix:
-        ROS_DISTRO: [jazzy]
+        ROS_DISTRO: [rolling]
     runs-on: ubuntu-latest
     permissions:
       packages: write
