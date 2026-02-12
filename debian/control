@@ -1,0 +1,12 @@
+Source: ros-kilted-moveit-setup-framework
+Section: misc
+Priority: optional
+Maintainer: David V. Lu!! <davidvlu@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), libfmt-dev, ros-kilted-ament-cmake-ros, ros-kilted-ament-index-cpp, ros-kilted-moveit-common, ros-kilted-moveit-core, ros-kilted-moveit-ros-planning, ros-kilted-moveit-ros-visualization, ros-kilted-pluginlib, ros-kilted-rclcpp, ros-kilted-rviz-common, ros-kilted-rviz-rendering, ros-kilted-srdfdom, ros-kilted-urdf, ros-kilted-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-kilted-moveit-setup-framework
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libfmt-dev, ros-kilted-ament-index-cpp, ros-kilted-moveit-common, ros-kilted-moveit-core, ros-kilted-moveit-ros-planning, ros-kilted-moveit-ros-visualization, ros-kilted-pluginlib, ros-kilted-rclcpp, ros-kilted-rviz-common, ros-kilted-rviz-rendering, ros-kilted-srdfdom, ros-kilted-urdf, ros-kilted-ros-workspace
+Description: C++ Interface for defining setup steps for MoveIt Setup Assistant
