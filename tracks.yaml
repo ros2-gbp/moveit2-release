@@ -145,13 +145,13 @@ tracks:
       :{release_inc} --os-name fedora
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
       :{release_inc} --os-name rhel
-    devel_branch: main
+    devel_branch: kilted
     last_version: 2.14.1
     name: upstream
     patches: null
     release_inc: '3'
     release_repo_url: null
-    release_tag: :{version}
+    release_tag: kilted-:{version}
     ros_distro: kilted
     vcs_type: git
     vcs_uri: https://github.com/moveit/moveit2.git
