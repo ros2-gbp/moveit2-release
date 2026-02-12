@@ -2,8 +2,34 @@
 Changelog for package moveit_servo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.14.1 (2025-09-09)
+2.14.1 (2026-01-04)
 -------------------
+* Fix severe warning from class loader in servo (`#3577 <https://github.com/moveit/moveit2/issues/3577>`_) (`#3648 <https://github.com/moveit/moveit2/issues/3648>`_)
+  * Add class loader member variable instead of  creating on stack
+  * Fix formatting to satisfy clang
+  ---------
+  (cherry picked from commit 92654dd1b339a4d4963c89cdba3289d2b60ed52e)
+  Co-authored-by: bijoua29 <73511637+bijoua29@users.noreply.github.com>
+  Co-authored-by: AndyZe <andyz@utexas.edu>
+  Co-authored-by: Nathan Brooks <nathanbrooks@picknik.ai>
+* Contributors: mergify[bot]
+
+2.14.3 (2026-01-13)
+-------------------
+
+2.14.2 (2026-01-04)
+-------------------
+* 2.14.1
+* 2.14.1
+* Fix severe warning from class loader in servo (`#3577 <https://github.com/moveit/moveit2/issues/3577>`_) (`#3648 <https://github.com/moveit/moveit2/issues/3648>`_)
+  * Add class loader member variable instead of  creating on stack
+  * Fix formatting to satisfy clang
+  ---------
+  (cherry picked from commit 92654dd1b339a4d4963c89cdba3289d2b60ed52e)
+  Co-authored-by: bijoua29 <73511637+bijoua29@users.noreply.github.com>
+  Co-authored-by: AndyZe <andyz@utexas.edu>
+  Co-authored-by: Nathan Brooks <nathanbrooks@picknik.ai>
+* Contributors: Nathan Brooks, mergify[bot]
 
 2.14.0 (2025-06-13)
 -------------------
