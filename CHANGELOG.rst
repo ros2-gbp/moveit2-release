@@ -2,10 +2,17 @@
 Changelog for package moveit_ros_perception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.14.1 (2025-09-09)
+2.14.1 (2026-01-04)
 -------------------
-* More user-friendly log message for pointcloud_octomap_updater (`#3514 <https://github.com/moveit/moveit2/issues/3514>`_)
-* Contributors: Sergei Zobov
+
+2.14.3 (2026-01-13)
+-------------------
+
+2.14.2 (2026-01-04)
+-------------------
+* 2.14.1
+* 2.14.1
+* Contributors: Nathan Brooks
 
 2.14.0 (2025-06-13)
 -------------------
