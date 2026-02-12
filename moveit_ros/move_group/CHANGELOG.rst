@@ -2,10 +2,17 @@
 Changelog for package moveit_ros_move_group
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.14.1 (2025-09-09)
+2.14.1 (2026-01-04)
 -------------------
-* Fix link to fmt::fmt imported target (`#3507 <https://github.com/moveit/moveit2/issues/3507>`_)
-* Contributors: Silvio Traversaro
+
+2.14.3 (2026-01-13)
+-------------------
+
+2.14.2 (2026-01-04)
+-------------------
+* 2.14.1
+* 2.14.1
+* Contributors: Nathan Brooks
 
 2.14.0 (2025-06-13)
 -------------------
