@@ -1,0 +1,12 @@
+Source: ros-kilted-moveit-setup-app-plugins
+Section: misc
+Priority: optional
+Maintainer: David V. Lu!! <davidvlu@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), ros-kilted-ament-cmake-gtest <!nocheck>, ros-kilted-ament-cmake-ros, ros-kilted-ament-index-cpp, ros-kilted-moveit-configs-utils, ros-kilted-moveit-ros-visualization, ros-kilted-moveit-setup-framework, ros-kilted-pluginlib, ros-kilted-rclcpp, ros-kilted-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-kilted-moveit-setup-app-plugins
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-kilted-ament-index-cpp, ros-kilted-moveit-configs-utils, ros-kilted-moveit-ros-visualization, ros-kilted-moveit-setup-framework, ros-kilted-pluginlib, ros-kilted-rclcpp, ros-kilted-ros-workspace
+Description: Various specialty plugins for MoveIt Setup Assistant
