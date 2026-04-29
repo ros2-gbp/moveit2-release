@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-ros-visualization
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libeigen3-dev, libqt5opengl5-dev, pkg-config, qtbase5-dev, ros-lyrical-ament-cmake, ros-lyrical-class-loader, ros-lyrical-geometric-shapes, ros-lyrical-interactive-markers, ros-lyrical-moveit-common, ros-lyrical-moveit-ros-planning-interface, ros-lyrical-moveit-ros-robot-interaction, ros-lyrical-moveit-ros-warehouse, ros-lyrical-object-recognition-msgs, ros-lyrical-pluginlib (>= 1.11.2), ros-lyrical-rclcpp, ros-lyrical-rclpy, ros-lyrical-rviz2, ros-lyrical-tf2-eigen, ros-lyrical-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-ros-visualization
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-geometric-shapes, ros-lyrical-interactive-markers, ros-lyrical-moveit-common, ros-lyrical-moveit-ros-planning-interface, ros-lyrical-moveit-ros-robot-interaction, ros-lyrical-moveit-ros-warehouse, ros-lyrical-object-recognition-msgs, ros-lyrical-pluginlib (>= 1.11.2), ros-lyrical-rclcpp, ros-lyrical-rclpy, ros-lyrical-rviz2, ros-lyrical-tf2-eigen, ros-lyrical-ros-workspace
+Description: Components of MoveIt that offer visualization
