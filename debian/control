@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-ros-perception
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), freeglut3-dev, libeigen3-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libomp-dev, ros-lyrical-ament-cmake, ros-lyrical-cv-bridge, ros-lyrical-image-transport, ros-lyrical-message-filters, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-moveit-msgs, ros-lyrical-moveit-ros-occupancy-map-monitor, ros-lyrical-moveit-ros-planning, ros-lyrical-object-recognition-msgs, ros-lyrical-pluginlib (>= 1.11.2), ros-lyrical-rclcpp, ros-lyrical-sensor-msgs, ros-lyrical-tf2, ros-lyrical-tf2-eigen, ros-lyrical-tf2-geometry-msgs, ros-lyrical-tf2-ros, ros-lyrical-urdf, ros-lyrical-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-ros-perception
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, freeglut3-dev, libgl1-mesa-dev, libglew-dev, libglu1-mesa-dev, libomp-dev, ros-lyrical-cv-bridge, ros-lyrical-image-transport, ros-lyrical-message-filters, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-moveit-msgs, ros-lyrical-moveit-ros-occupancy-map-monitor, ros-lyrical-moveit-ros-planning, ros-lyrical-object-recognition-msgs, ros-lyrical-pluginlib (>= 1.11.2), ros-lyrical-rclcpp, ros-lyrical-sensor-msgs, ros-lyrical-tf2, ros-lyrical-tf2-eigen, ros-lyrical-tf2-geometry-msgs, ros-lyrical-tf2-ros, ros-lyrical-urdf, ros-lyrical-ros-workspace
+Description: Components of MoveIt connecting to perception
