@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-servo
+Section: misc
+Priority: optional
+Maintainer: Blake Anderson <blakeanderson@utexas.edu>
+Build-Depends: debhelper (>= 9.0.0), ros-lyrical-ament-cmake, ros-lyrical-ament-cmake-gtest <!nocheck>, ros-lyrical-control-msgs, ros-lyrical-generate-parameter-library, ros-lyrical-geometry-msgs, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-moveit-msgs, ros-lyrical-moveit-resources-panda-moveit-config <!nocheck>, ros-lyrical-moveit-ros-planning, ros-lyrical-moveit-ros-planning-interface, ros-lyrical-pluginlib, ros-lyrical-realtime-tools, ros-lyrical-ros-testing <!nocheck>, ros-lyrical-sensor-msgs, ros-lyrical-std-msgs, ros-lyrical-std-srvs, ros-lyrical-tf2-eigen, ros-lyrical-trajectory-msgs, ros-lyrical-ros-workspace
+Homepage: https://moveit.github.io/moveit_tutorials
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-servo
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-control-msgs, ros-lyrical-controller-manager, ros-lyrical-generate-parameter-library, ros-lyrical-geometry-msgs, ros-lyrical-joint-state-broadcaster, ros-lyrical-joint-trajectory-controller, ros-lyrical-joy, ros-lyrical-launch-param-builder, ros-lyrical-moveit-common, ros-lyrical-moveit-configs-utils, ros-lyrical-moveit-core, ros-lyrical-moveit-msgs, ros-lyrical-moveit-ros-planning, ros-lyrical-moveit-ros-planning-interface, ros-lyrical-moveit-ros-visualization, ros-lyrical-pluginlib, ros-lyrical-realtime-tools, ros-lyrical-robot-state-publisher, ros-lyrical-sensor-msgs, ros-lyrical-std-msgs, ros-lyrical-std-srvs, ros-lyrical-tf2-eigen, ros-lyrical-tf2-ros, ros-lyrical-trajectory-msgs, ros-lyrical-ros-workspace
+Description: Provides real-time manipulator Cartesian and joint servoing.
