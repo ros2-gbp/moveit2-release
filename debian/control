@@ -1,0 +1,12 @@
+Source: ros-lyrical-pilz-industrial-motion-planner
+Section: misc
+Priority: optional
+Maintainer: Christian Henkel <c.henkel@pilz.de>
+Build-Depends: debhelper (>= 9.0.0), libboost-all-dev <!nocheck>, ros-lyrical-ament-cmake, ros-lyrical-ament-cmake-gmock <!nocheck>, ros-lyrical-ament-cmake-gtest <!nocheck>, ros-lyrical-eigen3-cmake-module, ros-lyrical-generate-parameter-library, ros-lyrical-geometry-msgs, ros-lyrical-launch-param-builder <!nocheck>, ros-lyrical-moveit-common, ros-lyrical-moveit-configs-utils <!nocheck>, ros-lyrical-moveit-core, ros-lyrical-moveit-msgs, ros-lyrical-moveit-resources-panda-moveit-config <!nocheck>, ros-lyrical-moveit-resources-prbt-moveit-config <!nocheck>, ros-lyrical-moveit-resources-prbt-pg70-support <!nocheck>, ros-lyrical-moveit-resources-prbt-support <!nocheck>, ros-lyrical-moveit-ros-move-group, ros-lyrical-moveit-ros-planning, ros-lyrical-orocos-kdl-vendor, ros-lyrical-pilz-industrial-motion-planner-testutils <!nocheck>, ros-lyrical-pluginlib, ros-lyrical-rclcpp, ros-lyrical-ros-testing <!nocheck>, ros-lyrical-tf2, ros-lyrical-tf2-eigen, ros-lyrical-tf2-eigen-kdl, ros-lyrical-tf2-geometry-msgs, ros-lyrical-tf2-kdl, ros-lyrical-tf2-ros, ros-lyrical-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-pilz-industrial-motion-planner
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-eigen3-cmake-module, ros-lyrical-generate-parameter-library, ros-lyrical-geometry-msgs, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-moveit-msgs, ros-lyrical-moveit-ros-move-group, ros-lyrical-moveit-ros-planning, ros-lyrical-orocos-kdl-vendor, ros-lyrical-pluginlib, ros-lyrical-rclcpp, ros-lyrical-tf2, ros-lyrical-tf2-eigen, ros-lyrical-tf2-eigen-kdl, ros-lyrical-tf2-geometry-msgs, ros-lyrical-tf2-kdl, ros-lyrical-tf2-ros, ros-lyrical-ros-workspace
+Description: MoveIt plugin to generate industrial trajectories PTP, LIN, CIRC and sequences thereof.
