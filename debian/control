@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-ros-benchmarks
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libboost-date-time-dev, libboost-dev, libboost-filesystem-dev, ros-lyrical-ament-cmake, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-moveit-ros-planning, ros-lyrical-moveit-ros-warehouse, ros-lyrical-pluginlib (>= 1.11.2), ros-lyrical-rclcpp, ros-lyrical-tf2-eigen, ros-lyrical-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-ros-benchmarks
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libboost-date-time1.83.0, libboost-filesystem1.83.0, ros-lyrical-launch-param-builder, ros-lyrical-moveit-common, ros-lyrical-moveit-configs-utils, ros-lyrical-moveit-ros-planning, ros-lyrical-moveit-ros-warehouse, ros-lyrical-pluginlib (>= 1.11.2), ros-lyrical-rclcpp, ros-lyrical-tf2-eigen, ros-lyrical-ros-workspace
+Description: Enhanced tools for benchmarks in MoveIt
