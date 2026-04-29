@@ -1,1 +1,1 @@
-{"base": "d0d5a3d17d44", "parent": "debian/rolling/moveit_ros_robot_interaction", "previous": "5f22564aa391", "trim": "", "trimbase": ""}
+{"base": "92fccf73e", "parent": "debian/lyrical/moveit_ros_robot_interaction", "previous": "96dafd19c", "trim": "", "trimbase": ""}
