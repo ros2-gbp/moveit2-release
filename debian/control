@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-py
+Section: misc
+Priority: optional
+Maintainer: Peter David Fagan <peterdavidfagan@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python3-pytest <!nocheck>, ros-lyrical-ament-cmake, ros-lyrical-ament-cmake-pytest <!nocheck>, ros-lyrical-geometry-msgs, ros-lyrical-moveit-core, ros-lyrical-moveit-ros-planning, ros-lyrical-moveit-ros-planning-interface, ros-lyrical-octomap-msgs, ros-lyrical-pybind11-vendor, ros-lyrical-rclcpp, ros-lyrical-rclpy, ros-lyrical-ros-workspace
+Homepage: https://index.ros.org/p/moveit_py/#lyrical
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-py
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-ament-index-python, ros-lyrical-geometry-msgs, ros-lyrical-moveit-core, ros-lyrical-moveit-ros-planning, ros-lyrical-moveit-ros-planning-interface, ros-lyrical-octomap-msgs, ros-lyrical-rclcpp, ros-lyrical-rclpy, ros-lyrical-ros-workspace
+Description: Python binding for MoveIt 2
