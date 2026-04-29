@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-setup-controllers
+Section: misc
+Priority: optional
+Maintainer: David V. Lu!! <davidvlu@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), ros-lyrical-ament-cmake-gtest <!nocheck>, ros-lyrical-ament-cmake-ros, ros-lyrical-ament-index-cpp, ros-lyrical-moveit-configs-utils <!nocheck>, ros-lyrical-moveit-resources-fanuc-moveit-config <!nocheck>, ros-lyrical-moveit-resources-panda-moveit-config <!nocheck>, ros-lyrical-moveit-setup-framework, ros-lyrical-pluginlib, ros-lyrical-rclcpp, ros-lyrical-ros-workspace
+Homepage: https://index.ros.org/p/moveit_setup_controllers/#lyrical
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-setup-controllers
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-ament-index-cpp, ros-lyrical-moveit-setup-framework, ros-lyrical-pluginlib, ros-lyrical-rclcpp, ros-lyrical-ros-workspace
+Description: MoveIt Setup Steps for ROS 2 Control
