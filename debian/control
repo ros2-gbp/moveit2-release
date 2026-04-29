@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-planners
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ros-lyrical-ament-cmake, ros-lyrical-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-planners
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-moveit-planners-chomp, ros-lyrical-moveit-planners-ompl, ros-lyrical-moveit-planners-stomp, ros-lyrical-pilz-industrial-motion-planner, ros-lyrical-ros-workspace
+Description: Meta package that installs all available planners for MoveIt
