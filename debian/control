@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-planners-chomp
+Section: misc
+Priority: optional
+Maintainer: Chittaranjan Srinivas Swaminathan <chitt@live.in>
+Build-Depends: debhelper (>= 9.0.0), ros-lyrical-ament-cmake, ros-lyrical-chomp-motion-planner, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-pluginlib, ros-lyrical-rclcpp, ros-lyrical-ros-workspace
+Homepage: https://index.ros.org/p/moveit_planners_chomp/#lyrical
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-planners-chomp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-chomp-motion-planner, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-pluginlib, ros-lyrical-rclcpp, ros-lyrical-ros-workspace
+Description: The interface for using CHOMP within MoveIt
