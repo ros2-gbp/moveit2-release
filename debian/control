@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-simple-controller-manager
+Section: misc
+Priority: optional
+Maintainer: Michael Görner <me@v4hn.de>
+Build-Depends: debhelper (>= 9.0.0), ros-lyrical-ament-cmake, ros-lyrical-control-msgs, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-pluginlib (>= 1.11.2), ros-lyrical-rclcpp, ros-lyrical-rclcpp-action, ros-lyrical-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-simple-controller-manager
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-control-msgs, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-pluginlib (>= 1.11.2), ros-lyrical-rclcpp, ros-lyrical-rclcpp-action, ros-lyrical-ros-workspace
+Description: A generic, simple controller manager plugin for MoveIt.
