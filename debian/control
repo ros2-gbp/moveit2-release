@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-setup-assistant
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), qtbase5-dev, ros-lyrical-ament-cmake, ros-lyrical-ament-cmake-gtest <!nocheck>, ros-lyrical-ament-index-cpp, ros-lyrical-moveit-resources-panda-moveit-config <!nocheck>, ros-lyrical-moveit-setup-framework, ros-lyrical-moveit-setup-srdf-plugins, ros-lyrical-pluginlib, ros-lyrical-rclcpp, ros-lyrical-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-setup-assistant
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, qtbase5-dev, ros-lyrical-ament-index-cpp, ros-lyrical-moveit-configs-utils, ros-lyrical-moveit-setup-app-plugins, ros-lyrical-moveit-setup-controllers, ros-lyrical-moveit-setup-core-plugins, ros-lyrical-moveit-setup-framework, ros-lyrical-moveit-setup-srdf-plugins, ros-lyrical-pluginlib, ros-lyrical-rclcpp, ros-lyrical-ros-workspace
+Description: Generates a configuration package that makes it easy to use MoveIt
