@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-ros
+Section: misc
+Priority: optional
+Maintainer: Michael Görner <me@v4hn.de>
+Build-Depends: debhelper (>= 9.0.0), ros-lyrical-ament-cmake, ros-lyrical-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-ros
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-moveit-ros-benchmarks, ros-lyrical-moveit-ros-move-group, ros-lyrical-moveit-ros-planning, ros-lyrical-moveit-ros-planning-interface, ros-lyrical-moveit-ros-robot-interaction, ros-lyrical-moveit-ros-visualization, ros-lyrical-moveit-ros-warehouse, ros-lyrical-ros-workspace
+Description: Components of MoveIt that use ROS
