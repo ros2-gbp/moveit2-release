@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-planners-stomp
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), ros-lyrical-ament-cmake, ros-lyrical-generate-parameter-library, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-rsl, ros-lyrical-std-msgs, ros-lyrical-stomp, ros-lyrical-tf2-eigen, ros-lyrical-visualization-msgs, ros-lyrical-ros-workspace
+Homepage: https://index.ros.org/p/moveit_planners_stomp/#lyrical
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-planners-stomp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-generate-parameter-library, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-rsl, ros-lyrical-std-msgs, ros-lyrical-stomp, ros-lyrical-tf2-eigen, ros-lyrical-visualization-msgs, ros-lyrical-ros-workspace
+Description: STOMP Motion Planner for MoveIt
