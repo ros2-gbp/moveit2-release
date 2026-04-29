@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-ros-trajectory-cache
+Section: misc
+Priority: optional
+Maintainer: Brandon Ong <methylDragon@intrinsic.ai>
+Build-Depends: debhelper (>= 9.0.0), python3-pytest <!nocheck>, ros-lyrical-ament-cmake, ros-lyrical-ament-cmake-pytest <!nocheck>, ros-lyrical-ament-cmake-uncrustify <!nocheck>, ros-lyrical-geometry-msgs, ros-lyrical-launch-pytest <!nocheck>, ros-lyrical-launch-testing-ament-cmake <!nocheck>, ros-lyrical-moveit-common, ros-lyrical-moveit-configs-utils <!nocheck>, ros-lyrical-moveit-planners-ompl <!nocheck>, ros-lyrical-moveit-resources <!nocheck>, ros-lyrical-moveit-ros-planning-interface, ros-lyrical-rclcpp, ros-lyrical-rclcpp-action, ros-lyrical-rmf-utils <!nocheck>, ros-lyrical-robot-state-publisher <!nocheck>, ros-lyrical-ros2-control <!nocheck>, ros-lyrical-tf2-ros, ros-lyrical-trajectory-msgs, ros-lyrical-warehouse-ros-sqlite <!nocheck>, ros-lyrical-ros-workspace
+Homepage: https://index.ros.org/p/moveit_ros_trajectory_cache/#lyrical
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-ros-trajectory-cache
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python3-yaml, ros-lyrical-geometry-msgs, ros-lyrical-moveit-common, ros-lyrical-moveit-ros, ros-lyrical-moveit-ros-planning-interface, ros-lyrical-rclcpp, ros-lyrical-rclcpp-action, ros-lyrical-tf2-ros, ros-lyrical-trajectory-msgs, ros-lyrical-xacro, ros-lyrical-ros-workspace
+Description: A trajectory cache for MoveIt 2 motion plans and cartesian plans.
