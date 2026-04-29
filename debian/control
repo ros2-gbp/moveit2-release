@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-resources-prbt-pg70-support
+Section: misc
+Priority: optional
+Maintainer: Alexander Gutenkunst <a.gutenkunst@pilz.de>
+Build-Depends: debhelper (>= 9.0.0), ros-lyrical-ament-cmake, ros-lyrical-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-resources-prbt-pg70-support
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-moveit-resources-prbt-ikfast-manipulator-plugin, ros-lyrical-moveit-resources-prbt-moveit-config, ros-lyrical-moveit-resources-prbt-support, ros-lyrical-xacro, ros-lyrical-ros-workspace
+Description: PRBT support for Schunk pg70 gripper.
