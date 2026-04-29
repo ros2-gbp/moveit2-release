@@ -1,0 +1,12 @@
+Source: ros-lyrical-chomp-motion-planner
+Section: misc
+Priority: optional
+Maintainer: Chittaranjan Srinivas Swaminathan <chitt@live.in>
+Build-Depends: debhelper (>= 9.0.0), ros-lyrical-ament-cmake, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-rclcpp, ros-lyrical-rsl, ros-lyrical-trajectory-msgs, ros-lyrical-ros-workspace
+Homepage: http://ros.org/wiki/chomp_motion_planner
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-chomp-motion-planner
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-rclcpp, ros-lyrical-rsl, ros-lyrical-trajectory-msgs, ros-lyrical-ros-workspace
+Description: chomp_motion_planner
