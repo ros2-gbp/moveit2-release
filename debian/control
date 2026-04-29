@@ -1,0 +1,12 @@
+Source: ros-lyrical-moveit-kinematics
+Section: misc
+Priority: optional
+Maintainer: Henning Kayser <henningkayser@picknik.ai>
+Build-Depends: debhelper (>= 9.0.0), libeigen3-dev, ros-lyrical-ament-cmake, ros-lyrical-ament-cmake-gtest <!nocheck>, ros-lyrical-class-loader, ros-lyrical-generate-parameter-library, ros-lyrical-launch-param-builder <!nocheck>, ros-lyrical-moveit-common, ros-lyrical-moveit-configs-utils <!nocheck>, ros-lyrical-moveit-core, ros-lyrical-moveit-msgs, ros-lyrical-moveit-resources-fanuc-description <!nocheck>, ros-lyrical-moveit-resources-fanuc-moveit-config <!nocheck>, ros-lyrical-moveit-resources-panda-description <!nocheck>, ros-lyrical-moveit-resources-panda-moveit-config <!nocheck>, ros-lyrical-moveit-ros-planning, ros-lyrical-orocos-kdl-vendor, ros-lyrical-pluginlib, ros-lyrical-ros-testing <!nocheck>, ros-lyrical-rsl, ros-lyrical-tf2, ros-lyrical-tf2-kdl, ros-lyrical-ros-workspace
+Homepage: http://moveit.ros.org
+Standards-Version: 3.9.2
+
+Package: ros-lyrical-moveit-kinematics
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libeigen3-dev, python3-lxml, ros-lyrical-class-loader, ros-lyrical-generate-parameter-library, ros-lyrical-moveit-common, ros-lyrical-moveit-core, ros-lyrical-moveit-msgs, ros-lyrical-moveit-ros-planning, ros-lyrical-orocos-kdl-vendor, ros-lyrical-pluginlib, ros-lyrical-rsl, ros-lyrical-tf2, ros-lyrical-tf2-kdl, ros-lyrical-urdfdom, ros-lyrical-ros-workspace
+Description: Package for all inverse kinematics solvers in MoveIt
