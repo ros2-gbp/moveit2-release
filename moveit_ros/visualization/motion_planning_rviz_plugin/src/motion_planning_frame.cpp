@@ -36,6 +36,8 @@
 
 #include <functional>
 
+#include <rclcpp/version.h>
+
 #include <moveit/common_planning_interface_objects/common_objects.hpp>
 #include <moveit/motion_planning_rviz_plugin/motion_planning_frame.hpp>
 #include <moveit/motion_planning_rviz_plugin/motion_planning_frame_joints_widget.hpp>
@@ -47,7 +49,13 @@
 
 #include <rviz_common/display_context.hpp>
 #include <rviz_common/frame_manager_iface.hpp>
+// For Rolling, Kilted, and newer
+#if RCLCPP_VERSION_GTE(29, 6, 0)
+#include <tf2_ros/buffer.hpp>
+// For Jazzy and older
+#else
 #include <tf2_ros/buffer.h>
+#endif
 
 #include <std_srvs/srv/empty.hpp>
 
@@ -58,6 +66,8 @@
 #include <QShortcut>
 
 #include "ui_motion_planning_rviz_plugin_frame.h"
+
+#include <cmath>
 
 namespace moveit_rviz_plugin
 {
@@ -196,7 +206,7 @@ MotionPlanningFrame::MotionPlanningFrame(MotionPlanningDisplay* pdisplay, rviz_c
   connect(ui_->wsize_y, SIGNAL(valueChanged(double)), this, SIGNAL(configChanged()));
   connect(ui_->wsize_z, SIGNAL(valueChanged(double)), this, SIGNAL(configChanged()));
 
-  QShortcut* copy_object_shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_C), ui_->collision_objects_list);
+  QShortcut* copy_object_shortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_C), ui_->collision_objects_list);
   connect(copy_object_shortcut, SIGNAL(activated()), this, SLOT(copySelectedCollisionObject()));
 
   ui_->reset_db_button->hide();
@@ -377,7 +387,7 @@ void MotionPlanningFrame::changePlanningGroupHelper()
   std::string group = planning_display_->getCurrentPlanningGroup();
   planning_display_->addMainLoopJob([&view = *ui_->planner_param_treeview, group] { view.setGroupName(group); });
   planning_display_->addMainLoopJob(
-      [=]() { ui_->planning_group_combo_box->setCurrentText(QString::fromStdString(group)); });
+      [this, group]() { ui_->planning_group_combo_box->setCurrentText(QString::fromStdString(group)); });
 
   if (!group.empty() && robot_model)
   {
@@ -414,7 +424,8 @@ void MotionPlanningFrame::changePlanningGroupHelper()
       move_group_->allowLooking(ui_->allow_looking->isChecked());
       move_group_->allowReplanning(ui_->allow_replanning->isChecked());
       bool has_unique_endeffector = !move_group_->getEndEffectorLink().empty();
-      planning_display_->addMainLoopJob([=]() { ui_->use_cartesian_path->setEnabled(has_unique_endeffector); });
+      planning_display_->addMainLoopJob(
+          [this, has_unique_endeffector]() { ui_->use_cartesian_path->setEnabled(has_unique_endeffector); });
       std::vector<moveit_msgs::msg::PlannerInterfaceDescription> desc;
       if (move_group_->getInterfaceDescriptions(desc))
         planning_display_->addMainLoopJob([this, desc] { populatePlannersList(desc); });
@@ -678,10 +689,15 @@ void MotionPlanningFrame::tabChanged(int index)
   }
 }
 
-void MotionPlanningFrame::updateSceneMarkers(double /*wall_dt*/, double /*ros_dt*/)
+void MotionPlanningFrame::updateSceneMarkers(std::chrono::nanoseconds /*wall_dt*/, std::chrono::nanoseconds /*ros_dt*/)
 {
   if (scene_marker_)
     scene_marker_->update();
+}
+
+void MotionPlanningFrame::updateSceneMarkers(double wall_dt, double ros_dt)
+{
+  updateSceneMarkers(std::chrono::nanoseconds(std::lround(wall_dt)), std::chrono::nanoseconds(std::lround(ros_dt)));
 }
 
 void MotionPlanningFrame::updateExternalCommunication()
