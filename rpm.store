@@ -1,1 +1,1 @@
-{"base": "36ff505ab02a", "parent": "release/rolling/moveit_setup_srdf_plugins/2.14.1-2", "previous": "a668ed26c38f", "trim": "", "trimbase": ""}
+{"base": "06278da04", "parent": "release/rolling/moveit_setup_srdf_plugins", "previous": "1a2b553c5", "trim": "", "trimbase": ""}
