@@ -1,0 +1,8 @@
+ros-humble-moveit-py (2.5.10-1jammy) jammy; urgency=high
+
+  * Backport MoveItPy to Humble (#3487 <https://github.com/moveit/moveit2/issues/3487>)
+  * Contributors: Samuele Sandrini, Robert Haschke
+
+ -- "Peter David Fagan" <peterdavidfagan@gmail.com>  Mon, 31 Aug 2026 22:00:00 -0000
+
+
