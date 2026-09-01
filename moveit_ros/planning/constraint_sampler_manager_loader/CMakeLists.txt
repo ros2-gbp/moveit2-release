@@ -1,10 +1,17 @@
-add_library(moveit_constraint_sampler_manager_loader SHARED
-            src/constraint_sampler_manager_loader.cpp)
+set(MOVEIT_LIB_NAME moveit_constraint_sampler_manager_loader)
 
-set_target_properties(moveit_constraint_sampler_manager_loader
-                      PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
-target_link_libraries(
-  moveit_constraint_sampler_manager_loader moveit_rdf_loader
-  moveit_core::moveit_core rclcpp::rclcpp Boost::headers pluginlib::pluginlib)
+add_library(${MOVEIT_LIB_NAME} SHARED
+    src/constraint_sampler_manager_loader.cpp)
 
-install(DIRECTORY include/ DESTINATION include/moveit_ros_planning)
+set_target_properties(${MOVEIT_LIB_NAME} PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
+ament_target_dependencies(${MOVEIT_LIB_NAME}
+  moveit_core
+  rclcpp
+  Boost
+  pluginlib
+)
+target_link_libraries(${MOVEIT_LIB_NAME}
+  moveit_rdf_loader
+)
+
+install(DIRECTORY include/ DESTINATION include)

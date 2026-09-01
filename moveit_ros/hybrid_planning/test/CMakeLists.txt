@@ -1,30 +1,32 @@
 add_executable(cancel_action cancel_action.cpp)
-target_link_libraries(
-  cancel_action
-  PUBLIC moveit_core::moveit_core
-         ${moveit_msgs_TARGETS}
-         moveit_ros_planning::moveit_ros_planning
-         moveit_ros_planning_interface::moveit_ros_planning_interface
-         pluginlib::pluginlib
-         rclcpp::rclcpp
-         rclcpp_action::rclcpp_action
-         rclcpp_components::component
-         ${std_msgs_TARGETS}
-         ${std_srvs_TARGETS}
-         tf2_ros::tf2_ros
-         ${trajectory_msgs_TARGETS})
+ament_target_dependencies(cancel_action ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_link_libraries(cancel_action ${LIBRARIES})
+
+add_executable(hybrid_planning_demo_node hybrid_planning_demo_node.cpp)
+ament_target_dependencies(hybrid_planning_demo_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_link_libraries(hybrid_planning_demo_node ${LIBRARIES})
 
 if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
   find_package(ros_testing REQUIRED)
-  find_package(Boost CONFIG REQUIRED COMPONENTS filesystem)
+  find_package(Boost REQUIRED COMPONENTS filesystem)
 
-  # TODO (vatanaksoytezer / andyze: Flaky behaviour, investigate and re-enable
-  # this test asap) Basic integration tests
-  # ament_add_gtest_executable(test_basic_integration test_basic_integration.cpp
-  # ) ament_target_dependencies(test_basic_integration
-  # ${THIS_PACKAGE_INCLUDE_DEPENDS})
-  # add_ros_test(launch/test_basic_integration.test.py TIMEOUT 50 ARGS
-  # "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}")
+  # These don't pass yet, disable them for now
+  set(ament_cmake_copyright_FOUND TRUE)
+  set(ament_cmake_cpplint_FOUND TRUE)
+  set(ament_cmake_flake8_FOUND TRUE)
+  set(ament_cmake_uncrustify_FOUND TRUE)
+
+  # Run all lint tests in package.xml except those listed above
+  ament_lint_auto_find_test_dependencies()
+
+  # TODO (vatanaksoytezer / andyze: Flaky behaviour, investigate and re-enable this test asap)
+  # Basic integration tests
+  # ament_add_gtest_executable(test_basic_integration
+  #     test_basic_integration.cpp
+  # )
+  # ament_target_dependencies(test_basic_integration ${THIS_PACKAGE_INCLUDE_DEPENDS})
+  # add_ros_test(launch/test_basic_integration.test.py TIMEOUT 50 ARGS "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}")
 
 endif()

@@ -34,9 +34,9 @@
 
 /* Author: Martin Pecka */
 
-#include <moveit/robot_model/aabb.hpp>
-#include <moveit/robot_model/robot_model.hpp>
-#include <moveit/robot_state/robot_state.hpp>
+#include <moveit/robot_model/aabb.h>
+#include <moveit/robot_model/robot_model.h>
+#include <moveit/robot_state/robot_state.h>
 #include <urdf_parser/urdf_parser.h>
 #include <fstream>
 #include <string>
@@ -48,7 +48,7 @@
 #else
 #include <tf2/LinearMath/Vector3.h>
 #endif
-#include <moveit/utils/robot_model_test_utils.hpp>
+#include <moveit/utils/robot_model_test_utils.h>
 
 // To visualize bbox of the PR2, set this to 1.
 #ifndef VISUALIZE_PR2_RVIZ
@@ -160,7 +160,7 @@ TEST_F(TestAABB, TestPR2)
   auto pub_aabb =
       node->create_publisher<visualization_msgs::msg::Marker>("/visualization_aabb", rmw_qos_profile_default);
   auto pub_obb = node->create_publisher<visualization_msgs::msg::Marker>("/visualization_obb", rmw_qos_profile_default);
-  rclcpp::WallRate loop_rate(10);
+  rclcpp::Rate loop_rate(10);
 
   // Wait for the publishers to establish connections
   sleep(5);

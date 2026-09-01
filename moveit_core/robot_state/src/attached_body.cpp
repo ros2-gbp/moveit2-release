@@ -34,7 +34,7 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/robot_state/attached_body.hpp>
+#include <moveit/robot_state/attached_body.h>
 #include <geometric_shapes/check_isometry.h>
 #include <geometric_shapes/shapes.h>
 
@@ -88,10 +88,8 @@ void AttachedBody::setScale(double scale)
   for (shapes::ShapeConstPtr& shape : shapes_)
   {
     // if this shape is only owned here (and because this is a non-const function), we can safely const-cast:
-    if (shape.use_count() == 1)
-    {
+    if (shape.unique())
       const_cast<shapes::Shape*>(shape.get())->scale(scale);
-    }
     else
     {
       // if the shape is owned elsewhere, we make a copy:
@@ -122,10 +120,8 @@ void AttachedBody::setPadding(double padding)
   for (shapes::ShapeConstPtr& shape : shapes_)
   {
     // if this shape is only owned here (and because this is a non-const function), we can safely const-cast:
-    if (shape.use_count() == 1)
-    {
+    if (shape.unique())
       const_cast<shapes::Shape*>(shape.get())->padd(padding);
-    }
     else
     {
       // if the shape is owned elsewhere, we make a copy:

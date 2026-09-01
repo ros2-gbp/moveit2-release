@@ -35,10 +35,10 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/common_planning_interface_objects/common_objects.hpp>
-#include <moveit/planning_scene_rviz_plugin/planning_scene_display.hpp>
-#include <moveit/rviz_plugin_render_tools/robot_state_visualization.hpp>
-#include <moveit/rviz_plugin_render_tools/octomap_render.hpp>
+#include <moveit/common_planning_interface_objects/common_objects.h>
+#include <moveit/planning_scene_rviz_plugin/planning_scene_display.h>
+#include <moveit/rviz_plugin_render_tools/robot_state_visualization.h>
+#include <moveit/rviz_plugin_render_tools/octomap_render.h>
 
 #include <rviz_common/transformation/transformation_manager.hpp>
 #include <rviz_default_plugins/robot/robot.hpp>
@@ -50,32 +50,21 @@
 #include <rviz_common/properties/color_property.hpp>
 #include <rviz_common/properties/enum_property.hpp>
 #include <rviz_common/display_context.hpp>
-// For Rolling, Kilted, and newer
-#if RCLCPP_VERSION_GTE(29, 6, 0)
-#include <tf2_ros/buffer.hpp>
-// For Jazzy and older
-#else
 #include <tf2_ros/buffer.h>
-#endif
 
 #include <OgreSceneManager.h>
 #include <OgreSceneNode.h>
 
-#include <moveit/utils/rclcpp_utils.hpp>
-#include <moveit/utils/logger.hpp>
-
-#include <cmath>
+#include <moveit/utils/rclcpp_utils.h>
 
 namespace moveit_rviz_plugin
 {
+static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_ros_visualization.planning_scene_display");
 // ******************************************************************************************
 // Base class constructor
 // ******************************************************************************************
 PlanningSceneDisplay::PlanningSceneDisplay(bool listen_to_planning_scene, bool show_scene_robot)
-  : Display()
-  , planning_scene_needs_render_(true)
-  , current_scene_time_(0.0f)
-  , logger_(moveit::getLogger("moveit.ros.planning_scene_display"))
+  : Display(), planning_scene_needs_render_(true), current_scene_time_(0.0f)
 {
   move_group_ns_property_ = new rviz_common::properties::StringProperty("Move Group Namespace", "",
                                                                         "The name of the ROS namespace in "
@@ -86,17 +75,13 @@ PlanningSceneDisplay::PlanningSceneDisplay(bool listen_to_planning_scene, bool s
       this, SLOT(changedRobotDescription()), this);
 
   if (listen_to_planning_scene)
-  {
     planning_scene_topic_property_ = new rviz_common::properties::RosTopicProperty(
         "Planning Scene Topic", "/monitored_planning_scene",
         rosidl_generator_traits::data_type<moveit_msgs::msg::PlanningScene>(),
         "The topic on which the moveit_msgs::msg::PlanningScene messages are received", this,
         SLOT(changedPlanningSceneTopic()), this);
-  }
   else
-  {
     planning_scene_topic_property_ = nullptr;
-  }
 
   // Planning scene category -------------------------------------------------------------------------------------------
   scene_category_ = new rviz_common::properties::Property("Scene Geometry", QVariant(), "", this);
@@ -284,7 +269,7 @@ void PlanningSceneDisplay::executeMainLoopJobs()
     }
     catch (std::exception& ex)
     {
-      RCLCPP_ERROR(logger_, "Exception caught executing main loop job: %s", ex.what());
+      RCLCPP_ERROR(LOGGER, "Exception caught executing main loop job: %s", ex.what());
     }
     main_loop_jobs_lock_.lock();
   }
@@ -305,9 +290,7 @@ const std::string PlanningSceneDisplay::getMoveGroupNS() const
 const moveit::core::RobotModelConstPtr& PlanningSceneDisplay::getRobotModel() const
 {
   if (planning_scene_monitor_)
-  {
     return planning_scene_monitor_->getRobotModel();
-  }
   else
   {
     static moveit::core::RobotModelConstPtr empty;
@@ -386,7 +369,7 @@ void PlanningSceneDisplay::renderPlanningScene()
   }
   catch (std::exception& ex)
   {
-    RCLCPP_ERROR(logger_, "Caught %s while rendering planning scene", ex.what());
+    RCLCPP_ERROR(LOGGER, "Caught %s while rendering planning scene", ex.what());
   }
   planning_scene_render_->getGeometryNode()->setVisible(scene_enabled_property_->getBool());
 }
@@ -413,15 +396,11 @@ void PlanningSceneDisplay::changedPlanningSceneTopic()
     std::string service_name = planning_scene_monitor::PlanningSceneMonitor::DEFAULT_PLANNING_SCENE_SERVICE;
     if (!getMoveGroupNS().empty())
       service_name = rclcpp::names::append(getMoveGroupNS(), service_name);
-    auto bg_func = [this, service_name]() {
+    auto bg_func = [=]() {
       if (planning_scene_monitor_->requestPlanningSceneState(service_name))
-      {
         addMainLoopJob([this] { onNewPlanningSceneState(); });
-      }
       else
-      {
         setStatus(rviz_common::properties::StatusProperty::Warn, "PlanningScene", "Requesting initial scene failed");
-      }
     };
     addBackgroundJob(bg_func, "requestPlanningSceneState");
   }
@@ -669,21 +648,6 @@ void PlanningSceneDisplay::queueRenderSceneGeometry()
   planning_scene_needs_render_ = true;
 }
 
-// For Rolling, L-turtle, and newer
-#if RCLCPP_VERSION_GTE(30, 0, 0)
-void PlanningSceneDisplay::update(std::chrono::nanoseconds wall_dt, std::chrono::nanoseconds ros_dt)
-{
-  Display::update(wall_dt, ros_dt);
-
-  executeMainLoopJobs();
-
-  calculateOffsetPosition();
-
-  if (planning_scene_monitor_)
-    updateInternal(wall_dt, ros_dt);
-}
-// For Kilted and older
-#else
 void PlanningSceneDisplay::update(float wall_dt, float ros_dt)
 {
   Display::update(wall_dt, ros_dt);
@@ -695,11 +659,10 @@ void PlanningSceneDisplay::update(float wall_dt, float ros_dt)
   if (planning_scene_monitor_)
     updateInternal(wall_dt, ros_dt);
 }
-#endif
 
-void PlanningSceneDisplay::updateInternal(std::chrono::nanoseconds wall_dt, std::chrono::nanoseconds /*ros_dt*/)
+void PlanningSceneDisplay::updateInternal(float wall_dt, float /*ros_dt*/)
 {
-  current_scene_time_ += std::chrono::duration_cast<std::chrono::duration<double>>(wall_dt).count();
+  current_scene_time_ += wall_dt;
   if (planning_scene_render_ &&
       ((current_scene_time_ > scene_display_time_property_->getFloat() && robot_state_needs_render_) ||
        planning_scene_needs_render_))
@@ -709,11 +672,6 @@ void PlanningSceneDisplay::updateInternal(std::chrono::nanoseconds wall_dt, std:
     robot_state_needs_render_ = false;
     planning_scene_needs_render_ = false;
   }
-}
-
-void PlanningSceneDisplay::updateInternal(double wall_dt, double ros_dt)
-{
-  updateInternal(std::chrono::nanoseconds(std::lround(wall_dt)), std::chrono::nanoseconds(std::lround(ros_dt)));
 }
 
 void PlanningSceneDisplay::load(const rviz_common::Config& config)

@@ -53,29 +53,25 @@ void XmlSyntaxHighlighter::addTag(const QString& tag, const QTextCharFormat& for
   if (!parent.isEmpty())
   {
     QString parent_start = start_pattern.arg(parent);
-    rule.parent = std::find_if(rules_.begin(), rules_.end(), [&](const std::pair<int, Rule>& rule) {
+    rule.parent = std::find_if(rules.begin(), rules.end(), [&](const std::pair<int, Rule>& rule) {
       return rule.second.start.pattern() == parent_start;
     });
   }
   else
-    rule.parent = rules_.end();
+    rule.parent = rules.end();
 
-  rules_.insert(std::make_pair(rules_.size(), rule));
+  rules.insert(std::make_pair(rules.size(), rule));
 }
 
 XmlSyntaxHighlighter::Rules::const_iterator
-XmlSyntaxHighlighter::highlight(Rules::const_iterator active, QStringView text, int start, bool search_end, int& end)
+XmlSyntaxHighlighter::highlight(Rules::const_iterator active, QStringRef text, int start, bool search_end, int& end)
 {
   int offset = end;    // when passed, end indicates the end of the opening expression
   auto next = active;  // return value: active rule at end of text
 
   if (search_end)  // find end of active rule
   {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-    auto match = active->second.end.matchView(text);
-#else
     auto match = active->second.end.match(text);
-#endif
     // when returned, end indicates the end of the closing expression
     end = match.hasMatch() ? match.capturedEnd() : text.size();
     setFormat(start, end, active->second.format);
@@ -91,7 +87,7 @@ XmlSyntaxHighlighter::highlight(Rules::const_iterator active, QStringView text, 
     return next;  // early return
 
   // highlight remaining text using active's children's rules
-  for (auto it = rules_.begin(); it != rules_.end(); ++it)
+  for (auto it = rules.begin(); it != rules.end(); ++it)
   {
     const auto& rule = it->second;
     if (rule.parent != active)
@@ -100,11 +96,7 @@ XmlSyntaxHighlighter::highlight(Rules::const_iterator active, QStringView text, 
     offset = 0;   // (re)start at beginning of (clipped) text
     while (true)  // process all matches of rule
     {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-      auto match = rule.start.matchView(text, offset);
-#else
       auto match = rule.start.match(text, offset);
-#endif
       if (!match.hasMatch())
         break;
 
@@ -127,10 +119,10 @@ XmlSyntaxHighlighter::highlight(Rules::const_iterator active, QStringView text, 
 
 void XmlSyntaxHighlighter::highlightBlock(const QString& text)
 {
-  Rules::const_iterator active = previousBlockState() < 0 ? rules_.end() : rules_.find(previousBlockState());
+  Rules::const_iterator active = previousBlockState() < 0 ? rules.end() : rules.find(previousBlockState());
   int unused = 0;
-  active = highlight(active, QStringView(text), 0, active != rules_.cend(), unused);
-  setCurrentBlockState(active != rules_.cend() ? active->first : -1);
+  active = highlight(active, QStringRef(&text, 0, text.size()), 0, active != rules.cend(), unused);
+  setCurrentBlockState(active != rules.cend() ? active->first : -1);
 }
 
 }  // namespace moveit_setup

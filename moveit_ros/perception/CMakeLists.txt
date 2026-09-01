@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(moveit_ros_perception LANGUAGES CXX)
+project(moveit_ros_perception)
 
 # Common cmake code applied to all moveit packages
 find_package(moveit_common REQUIRED)
@@ -15,10 +15,10 @@ if(WITH_OPENGL)
   find_package(OpenGL REQUIRED)
   find_package(GLEW REQUIRED)
 
-  set(GL_LIBS ${GL_LIBS} ${OPENGL_LIBRARIES})
+  set(gl_LIBS ${gl_LIBS} ${OPENGL_LIBRARIES})
   if(APPLE)
     find_package(FreeGLUT REQUIRED)
-    set(SYSTEM_GL_LIBRARIES GLEW::GLEW FreeGLUT::freeglut)
+    set(SYSTEM_GL_LIBRARIES ${GLEW_LIBRARIES} GLEW::GLEW FreeGLUT::freeglut)
   else()
     find_package(GLUT REQUIRED)
     if(WIN32)
@@ -27,8 +27,7 @@ if(WITH_OPENGL)
       set(SYSTEM_GL_LIBRARIES ${GLEW_LIBRARIES} GLUT::GLUT)
     endif()
   endif()
-  set(PERCEPTION_GL_INCLUDE_DIRS "mesh_filter/include"
-                                 "depth_image_octomap_updater/include")
+  set(perception_GL_INCLUDE_DIRS "mesh_filter/include" "depth_image_octomap_updater/include")
   set(SYSTEM_GL_INCLUDE_DIRS ${GLEW_INCLUDE_DIR} ${GLUT_INCLUDE_DIR})
 endif()
 
@@ -53,9 +52,6 @@ find_package(sensor_msgs REQUIRED)
 find_package(moveit_msgs REQUIRED)
 find_package(moveit_ros_occupancy_map_monitor REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(geometric_shapes REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(visualization_msgs REQUIRED)
 find_package(OpenMP REQUIRED)
 find_package(OpenCV)
 
@@ -63,39 +59,46 @@ find_package(OpenCV)
 include(ConfigExtras.cmake)
 
 set(THIS_PACKAGE_INCLUDE_DIRS
-    depth_image_octomap_updater/include
-    lazy_free_space_updater/include
-    mesh_filter/include
-    point_containment_filter/include
-    pointcloud_octomap_updater/include
-    semantic_world/include
-    ${PERCEPTION_GL_INCLUDE_DIRS})
+  depth_image_octomap_updater/include
+  lazy_free_space_updater/include
+  mesh_filter/include
+  point_containment_filter/include
+  pointcloud_octomap_updater/include
+  semantic_world/include
+  ${perception_GL_INCLUDE_DIRS}
+)
 
 set(THIS_PACKAGE_LIBRARIES
-    moveit_depth_image_octomap_updater
-    moveit_depth_image_octomap_updater_core
-    moveit_lazy_free_space_updater
-    moveit_mesh_filter
-    moveit_point_containment_filter
-    moveit_pointcloud_octomap_updater
-    moveit_pointcloud_octomap_updater_core
-    moveit_semantic_world)
+  moveit_depth_image_octomap_updater
+  moveit_depth_image_octomap_updater_core
+  moveit_lazy_free_space_updater
+  moveit_mesh_filter
+  moveit_point_containment_filter
+  moveit_pointcloud_octomap_updater
+  moveit_pointcloud_octomap_updater_core
+  moveit_semantic_world
+)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
-    image_transport
-    moveit_core
-    moveit_msgs
-    moveit_ros_occupancy_map_monitor
-    object_recognition_msgs
-    rclcpp
-    sensor_msgs
-    tf2_geometry_msgs
-    Eigen3)
+  image_transport
+  moveit_core
+  moveit_msgs
+  moveit_ros_occupancy_map_monitor
+  object_recognition_msgs
+  rclcpp
+  sensor_msgs
+  tf2_geometry_msgs
+  Eigen3
+)
 
 include_directories(${THIS_PACKAGE_INCLUDE_DIRS})
-include_directories(
-  SYSTEM ${Boost_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS}
-  ${SYSTEM_GL_INCLUDE_DIR} ${X11_INCLUDE_DIR})
+include_directories(SYSTEM
+  ${Boost_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
+  ${SYSTEM_GL_INCLUDE_DIR}
+  ${X11_INCLUDE_DIR}
+)
 
 add_subdirectory(lazy_free_space_updater)
 add_subdirectory(point_containment_filter)
@@ -107,28 +110,31 @@ endif()
 
 add_subdirectory(semantic_world)
 
-# Create an umbrella INTERFACE target so downstream packages can use
-# moveit_ros_perception::moveit_ros_perception to link all libraries at once.
-add_library(moveit_ros_perception INTERFACE)
-target_link_libraries(moveit_ros_perception INTERFACE ${THIS_PACKAGE_LIBRARIES})
-
 install(
-  TARGETS moveit_ros_perception ${THIS_PACKAGE_LIBRARIES}
-  EXPORT moveit_ros_perceptionTargets
+  TARGETS ${THIS_PACKAGE_LIBRARIES}
+  EXPORT export_${PROJECT_NAME}
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin
-  INCLUDES
-  DESTINATION include/moveit_ros_perception)
+  INCLUDES DESTINATION include
+)
 
-ament_export_targets(moveit_ros_perceptionTargets HAS_LIBRARY_TARGET)
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
-pluginlib_export_plugin_description_file(
-  moveit_ros_occupancy_map_monitor
-  "pointcloud_octomap_updater_plugin_description.xml")
-pluginlib_export_plugin_description_file(
-  moveit_ros_occupancy_map_monitor
-  "depth_image_octomap_updater_plugin_description.xml")
+pluginlib_export_plugin_description_file(moveit_ros_occupancy_map_monitor "pointcloud_octomap_updater_plugin_description.xml")
+pluginlib_export_plugin_description_file(moveit_ros_occupancy_map_monitor "depth_image_octomap_updater_plugin_description.xml")
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+
+  # These don't pass yet, disable them for now
+  set(ament_cmake_copyright_FOUND TRUE)
+  set(ament_cmake_cpplint_FOUND TRUE)
+  set(ament_cmake_uncrustify_FOUND TRUE)
+
+  # Run all lint tests in package.xml except those listed above
+  ament_lint_auto_find_test_dependencies()
+endif()
 
 ament_package(CONFIG_EXTRAS ConfigExtras.cmake)

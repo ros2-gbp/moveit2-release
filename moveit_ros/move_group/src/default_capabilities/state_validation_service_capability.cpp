@@ -34,16 +34,16 @@
 
 /* Author: Ioan Sucan */
 
-#include "state_validation_service_capability.hpp"
-#include <moveit/collision_detection/collision_tools.hpp>
-#include <moveit/move_group/capability_names.hpp>
-#include <moveit/moveit_cpp/moveit_cpp.hpp>
-#include <moveit/robot_state/conversions.hpp>
-#include <moveit/utils/message_checks.hpp>
+#include "state_validation_service_capability.h"
+#include <moveit/moveit_cpp/moveit_cpp.h>
+#include <moveit/robot_state/conversions.h>
+#include <moveit/utils/message_checks.h>
+#include <moveit/collision_detection/collision_tools.h>
+#include <moveit/move_group/capability_names.h>
 
 namespace move_group
 {
-MoveGroupStateValidationService::MoveGroupStateValidationService() : MoveGroupCapability("state_validation_service")
+MoveGroupStateValidationService::MoveGroupStateValidationService() : MoveGroupCapability("StateValidationService")
 {
 }
 
@@ -87,7 +87,6 @@ bool MoveGroupStateValidationService::isStateValid(
     valid = false;
     for (collision_detection::CollisionResult::ContactMap::const_iterator it = cres.contacts.begin();
          it != cres.contacts.end(); ++it)
-    {
       for (const collision_detection::Contact& contact : it->second)
       {
         contacts.resize(contacts.size() + 1);
@@ -95,7 +94,6 @@ bool MoveGroupStateValidationService::isStateValid(
         contacts.back().header.frame_id = ls->getPlanningFrame();
         contacts.back().header.stamp = time_now;
       }
-    }
   }
 
   // copy cost sources

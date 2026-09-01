@@ -192,20 +192,12 @@ bool ROS2ControllersConfig::GeneratedControllersConfig::writeYaml(YAML::Emitter&
       emitter << YAML::Value;
       emitter << YAML::BeginMap;
       {
-        // A GripperActionController commands a single joint, so it takes a
-        // `joint` parameter instead of the `joints` list. Humble/Iron ship it
-        // as position_controllers/GripperActionController; Jazzy and newer use
-        // parallel_gripper_action_controller/GripperActionController.
-        const bool is_gripper_controller = ci.type_ == "position_controllers/GripperActionController" ||
-                                           ci.type_ == "parallel_gripper_action_controller/GripperActionController";
-        if (!is_gripper_controller)
+        if (ci.type_ != "position_controllers/GripperActionController")
         {
           emitter << YAML::Key << "joints" << YAML::Value << ci.joints_;
         }
-        else if (!ci.joints_.empty())
+        else
         {
-          // GripperActionController controls a single joint; guard against an
-          // empty joint list so we never index joints_[0] out of bounds.
           emitter << YAML::Key << "joint" << YAML::Value << ci.joints_[0];
         }
 
@@ -214,7 +206,6 @@ bool ROS2ControllersConfig::GeneratedControllersConfig::writeYaml(YAML::Emitter&
           const ControlInterfaces interfaces = parent_.getControlInterfaces(ci.joints_);
           emitter << YAML::Key << "command_interfaces" << YAML::Value << interfaces.command_interfaces;
           emitter << YAML::Key << "state_interfaces" << YAML::Value << interfaces.state_interfaces;
-          emitter << YAML::Key << "allow_nonzero_velocity_at_trajectory_end" << YAML::Value << true;
         }
       }
       emitter << YAML::EndMap;

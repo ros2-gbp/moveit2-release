@@ -34,18 +34,11 @@
 
 /* Author: Tyler Weaver */
 
-#include <moveit/occupancy_map_monitor/occupancy_map_monitor.hpp>
+#include <moveit/occupancy_map_monitor/occupancy_map_monitor.h>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <rclcpp/version.h>
-// For Rolling, Kilted, and newer
-#if RCLCPP_VERSION_GTE(29, 6, 0)
-#include <tf2_ros/buffer.hpp>
-// For Jazzy and older
-#else
 #include <tf2_ros/buffer.h>
-#endif
 
 #include <memory>
 #include <string>

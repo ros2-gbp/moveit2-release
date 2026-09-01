@@ -1,11 +1,13 @@
-# ghcr.io/moveit/moveit2:${ROS_DISTRO}-ci
+# ghcr.io/ros-planning/moveit2:${ROS_DISTRO}-ci
 # ROS base image augmented with all MoveIt dependencies to use for CI
 
 ARG ROS_DISTRO=rolling
 FROM ros:${ROS_DISTRO}-ros-base
-LABEL maintainer="Robert Haschke rhaschke@techfak.uni-bielefeld.de"
+LABEL maintainer Robert Haschke rhaschke@techfak.uni-bielefeld.de
 
-ENV TERM=xterm
+ENV TERM xterm
+# Allow non-interactive installation of ros-humble-rmw-connextdds
+ENV RTI_NC_LICENSE_ACCEPTED yes
 
 # Setup (temporary) ROS workspace
 WORKDIR /root/ws_moveit
@@ -18,14 +20,14 @@ COPY . src/moveit2
 RUN \
     # Update apt package list as previous containers clear the cache
     apt-get -q update && \
-    apt-get -q -y upgrade && \
+    apt-get -q -y upgrade --with-new-pkgs && \
     #
     # Install some base dependencies
     apt-get -q install --no-install-recommends -y \
         # Some basic requirements
         wget git sudo curl \
         # Preferred build tools
-        clang clang-format clang-tidy clang-tools \
+        clang clang-format-14 clang-tidy clang-tools \
         ccache && \
     #
     # Globally disable git security
@@ -39,7 +41,7 @@ RUN \
     # Download all dependencies of MoveIt
     rosdep update && \
     DEBIAN_FRONTEND=noninteractive \
-    rosdep install -y -r --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} --as-root=apt:false || true && \
+    rosdep install -y --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} --as-root=apt:false && \
     # Remove the source code from this container
     rm -rf src && \
     #

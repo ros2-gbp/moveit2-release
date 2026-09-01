@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(moveit_setup_controllers LANGUAGES CXX)
+project(moveit_setup_controllers)
 
 # Common cmake code applied to all moveit packages
 find_package(moveit_common REQUIRED)
@@ -8,20 +8,6 @@ moveit_package()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(ament_index_cpp REQUIRED)
-# rviz switched to Qt6 in 15.1.14: https://github.com/ros2/rviz/pull/1635
-# (merged 2025-12-08, first released in the 15.1.14 tag on 2025-12-17 -- 15.1.0
-# through 15.1.13 are still Qt5)
-find_package(rviz2 QUIET)
-if(rviz2_VERSION VERSION_GREATER_EQUAL 15.1.14)
-  find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
-  set(QT_VERSION_MAJOR 6)
-  # Hint for transitive deps that use find_package(QT NAMES Qt6 Qt5 ...) which
-  # may incorrectly resolve to Qt5 due to CMake's ascending path order
-  set(QT_DIR "${Qt6_DIR}")
-else()
-  find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
-  set(QT_VERSION_MAJOR 5)
-endif()
 find_package(moveit_setup_framework REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -30,55 +16,69 @@ find_package(rclcpp REQUIRED)
 set(CMAKE_AUTOMOC ON)
 add_definitions(-DQT_NO_KEYWORDS)
 
-add_library(
-  moveit_setup_controllers
-  src/control_xacro_config.cpp
-  src/controller_edit_widget.cpp
-  src/controllers.cpp
-  src/controllers_widget.cpp
-  src/controllers_config.cpp
-  src/modified_urdf_config.cpp
-  src/moveit_controllers_config.cpp
-  src/moveit_controllers_widget.cpp
-  src/ros2_controllers_config.cpp
-  src/ros2_controllers_widget.cpp
-  src/urdf_modifications.cpp
-  src/urdf_modifications_widget.cpp
-  include/moveit_setup_controllers/controller_edit_widget.hpp
-  include/moveit_setup_controllers/controllers_widget.hpp
-  include/moveit_setup_controllers/urdf_modifications_widget.hpp)
-target_include_directories(
-  moveit_setup_controllers
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-         $<INSTALL_INTERFACE:include/moveit_setup_controllers>)
-target_link_libraries(
-  moveit_setup_controllers ament_index_cpp::ament_index_cpp
-  moveit_setup_framework::moveit_setup_framework pluginlib::pluginlib
-  rclcpp::rclcpp)
+qt5_wrap_cpp(MOC_FILES
+    include/moveit_setup_controllers/controller_edit_widget.hpp
+    include/moveit_setup_controllers/controllers_widget.hpp
+    include/moveit_setup_controllers/urdf_modifications_widget.hpp
+)
+
+add_library(${PROJECT_NAME}
+    src/control_xacro_config.cpp
+    src/controller_edit_widget.cpp
+    src/controllers.cpp
+    src/controllers_widget.cpp
+    src/controllers_config.cpp
+    src/modified_urdf_config.cpp
+    src/moveit_controllers_config.cpp
+    src/moveit_controllers_widget.cpp
+    src/ros2_controllers_config.cpp
+    src/ros2_controllers_widget.cpp
+    src/urdf_modifications.cpp
+    src/urdf_modifications_widget.cpp
+    ${MOC_FILES}
+)
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(${PROJECT_NAME}
+  ament_index_cpp
+  moveit_setup_framework
+  pluginlib
+  rclcpp
+)
 
 if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+
   find_package(ament_cmake_gtest REQUIRED)
   ament_add_gtest(test_controllers test/test_controllers.cpp)
-  target_link_libraries(test_controllers moveit_setup_controllers)
+  target_link_libraries(test_controllers ${PROJECT_NAME})
 endif()
 
-install(DIRECTORY templates DESTINATION share/moveit_setup_controllers)
+install(DIRECTORY templates DESTINATION share/${PROJECT_NAME})
 
-install(
-  TARGETS moveit_setup_controllers
-  EXPORT moveit_setup_controllersTargets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES
-  DESTINATION include/moveit_setup_controllers)
+install(TARGETS ${PROJECT_NAME}
+        EXPORT export_${PROJECT_NAME}
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+)
 install(FILES moveit_setup_framework_plugins.xml
-        DESTINATION share/moveit_setup_controllers)
-install(DIRECTORY include/ DESTINATION include/moveit_setup_controllers)
-install(DIRECTORY launch DESTINATION share/moveit_setup_controllers)
+        DESTINATION share/${PROJECT_NAME}
+)
+install(DIRECTORY include/
+        DESTINATION include
+)
 
-ament_export_targets(moveit_setup_controllersTargets HAS_LIBRARY_TARGET)
-pluginlib_export_plugin_description_file(moveit_setup_framework
-                                         moveit_setup_framework_plugins.xml)
+install(DIRECTORY launch
+        DESTINATION share/${PROJECT_NAME}
+)
+ament_export_include_directories(include)
+
+ament_export_libraries(${PROJECT_NAME})
+ament_export_targets(export_${PROJECT_NAME})
+pluginlib_export_plugin_description_file(moveit_setup_framework moveit_setup_framework_plugins.xml)
 
 ament_package()

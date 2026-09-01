@@ -36,26 +36,17 @@
 
 #include <functional>
 
-#include <rclcpp/version.h>
-
-#include <moveit/common_planning_interface_objects/common_objects.hpp>
-#include <moveit/motion_planning_rviz_plugin/motion_planning_frame.hpp>
-#include <moveit/motion_planning_rviz_plugin/motion_planning_frame_joints_widget.hpp>
-#include <moveit/motion_planning_rviz_plugin/motion_planning_display.hpp>
-#include <moveit/move_group/capability_names.hpp>
-#include <moveit/utils/logger.hpp>
+#include <moveit/common_planning_interface_objects/common_objects.h>
+#include <moveit/motion_planning_rviz_plugin/motion_planning_frame.h>
+#include <moveit/motion_planning_rviz_plugin/motion_planning_frame_joints_widget.h>
+#include <moveit/motion_planning_rviz_plugin/motion_planning_display.h>
+#include <moveit/move_group/capability_names.h>
 
 #include <geometric_shapes/shape_operations.h>
 
 #include <rviz_common/display_context.hpp>
 #include <rviz_common/frame_manager_iface.hpp>
-// For Rolling, Kilted, and newer
-#if RCLCPP_VERSION_GTE(29, 6, 0)
-#include <tf2_ros/buffer.hpp>
-// For Jazzy and older
-#else
 #include <tf2_ros/buffer.h>
-#endif
 
 #include <std_srvs/srv/empty.hpp>
 
@@ -67,24 +58,18 @@
 
 #include "ui_motion_planning_rviz_plugin_frame.h"
 
-#include <cmath>
-
 namespace moveit_rviz_plugin
 {
+static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_ros_visualization.motion_planning_frame");
 
 MotionPlanningFrame::MotionPlanningFrame(MotionPlanningDisplay* pdisplay, rviz_common::DisplayContext* context,
                                          QWidget* parent)
-  : QWidget(parent)
-  , planning_display_(pdisplay)
-  , context_(context)
-  , ui_(new Ui::MotionPlanningUI())
-  , logger_(moveit::getLogger("moveit.ros.motion_planning_frame"))
-  , first_time_(true)
+  : QWidget(parent), planning_display_(pdisplay), context_(context), ui_(new Ui::MotionPlanningUI()), first_time_(true)
 {
   auto ros_node_abstraction = context_->getRosNodeAbstraction().lock();
   if (!ros_node_abstraction)
   {
-    RCLCPP_INFO(logger_, "Unable to lock weak_ptr from DisplayContext in MotionPlanningFrame constructor");
+    RCLCPP_INFO(LOGGER, "Unable to lock weak_ptr from DisplayContext in MotionPlanningFrame constructor");
     return;
   }
   node_ = ros_node_abstraction->get_raw_node();
@@ -110,137 +95,104 @@ MotionPlanningFrame::MotionPlanningFrame(MotionPlanningDisplay* pdisplay, rviz_c
   // add more tabs
   joints_tab_ = new MotionPlanningFrameJointsWidget(planning_display_, ui_->tabWidget);
   ui_->tabWidget->insertTab(2, joints_tab_, "Joints");
-  connect(planning_display_, &MotionPlanningDisplay::queryStartStateChanged, joints_tab_,
-          &MotionPlanningFrameJointsWidget::queryStartStateChanged);
-  connect(planning_display_, &MotionPlanningDisplay::queryGoalStateChanged, joints_tab_,
-          &MotionPlanningFrameJointsWidget::queryGoalStateChanged);
+  connect(planning_display_, SIGNAL(queryStartStateChanged()), joints_tab_, SLOT(queryStartStateChanged()));
+  connect(planning_display_, SIGNAL(queryGoalStateChanged()), joints_tab_, SLOT(queryGoalStateChanged()));
 
   // connect buttons to actions; each action usually registers the function pointer for the actual computation,
   // to keep the GUI more responsive (using the background job processing)
-  connect(ui_->plan_button, &QPushButton::clicked, this, &MotionPlanningFrame::planButtonClicked);
-  connect(ui_->execute_button, &QPushButton::clicked, this, &MotionPlanningFrame::executeButtonClicked);
-  connect(ui_->plan_and_execute_button, &QPushButton::clicked, this, &MotionPlanningFrame::planAndExecuteButtonClicked);
-  connect(ui_->stop_button, &QPushButton::clicked, this, &MotionPlanningFrame::stopButtonClicked);
-  connect(ui_->start_state_combo_box, &QComboBox::textActivated, this, &MotionPlanningFrame::startStateTextChanged);
-  connect(ui_->goal_state_combo_box, &QComboBox::textActivated, this, &MotionPlanningFrame::goalStateTextChanged);
-  connect(ui_->planning_group_combo_box, &QComboBox::textActivated, this,
-          &MotionPlanningFrame::planningGroupTextChanged);
-  connect(ui_->database_connect_button, &QPushButton::clicked, this, &MotionPlanningFrame::databaseConnectButtonClicked);
-  connect(ui_->save_scene_button, &QPushButton::clicked, this, &MotionPlanningFrame::saveSceneButtonClicked);
-  connect(ui_->save_query_button, &QPushButton::clicked, this, &MotionPlanningFrame::saveQueryButtonClicked);
-  connect(ui_->delete_scene_button, &QPushButton::clicked, this, &MotionPlanningFrame::deleteSceneButtonClicked);
-  connect(ui_->delete_query_button, &QPushButton::clicked, this, &MotionPlanningFrame::deleteQueryButtonClicked);
-  connect(ui_->planning_scene_tree, &QTreeWidget::itemSelectionChanged, this,
-          &MotionPlanningFrame::planningSceneItemClicked);
-  connect(ui_->load_scene_button, &QPushButton::clicked, this, &MotionPlanningFrame::loadSceneButtonClicked);
-  connect(ui_->load_query_button, &QPushButton::clicked, this, &MotionPlanningFrame::loadQueryButtonClicked);
-  connect(ui_->allow_looking, &QCheckBox::toggled, this, &MotionPlanningFrame::allowLookingToggled);
-  connect(ui_->allow_replanning, &QCheckBox::toggled, this, &MotionPlanningFrame::allowReplanningToggled);
-  connect(ui_->allow_external_program, &QCheckBox::toggled, this,
-          &MotionPlanningFrame::allowExternalProgramCommunication);
-  connect(ui_->planning_pipeline_combo_box, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-          &MotionPlanningFrame::planningPipelineIndexChanged);
-  connect(ui_->planning_algorithm_combo_box, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-          &MotionPlanningFrame::planningAlgorithmIndexChanged);
-  connect(ui_->clear_scene_button, &QPushButton::clicked, this, &MotionPlanningFrame::clearScene);
-  connect(ui_->scene_scale, QOverload<int>::of(&QSlider::valueChanged), this, &MotionPlanningFrame::sceneScaleChanged);
-  connect(ui_->scene_scale, &QSlider::sliderPressed, this, &MotionPlanningFrame::sceneScaleStartChange);
-  connect(ui_->scene_scale, &QSlider::sliderReleased, this, &MotionPlanningFrame::sceneScaleEndChange);
-  connect(ui_->remove_object_button, &QPushButton::clicked, this, &MotionPlanningFrame::removeSceneObject);
-  connect(ui_->object_x, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::objectPoseValueChanged);
-  connect(ui_->object_y, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::objectPoseValueChanged);
-  connect(ui_->object_z, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::objectPoseValueChanged);
-  connect(ui_->object_rx, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::objectPoseValueChanged);
-  connect(ui_->object_ry, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::objectPoseValueChanged);
-  connect(ui_->object_rz, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::objectPoseValueChanged);
-  connect(ui_->publish_current_scene_button, &QPushButton::clicked, this, &MotionPlanningFrame::publishScene);
-  connect(ui_->collision_objects_list, &QListWidget::itemSelectionChanged, this,
-          &MotionPlanningFrame::selectedCollisionObjectChanged);
-  connect(ui_->collision_objects_list, &QListWidget::itemChanged, this, &MotionPlanningFrame::collisionObjectChanged);
-  connect(ui_->path_constraints_combo_box, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-          &MotionPlanningFrame::pathConstraintsIndexChanged);
-  connect(ui_->clear_octomap_button, &QPushButton::clicked, this, &MotionPlanningFrame::onClearOctomapClicked);
-  connect(ui_->planning_scene_tree, &QTreeWidget::itemChanged, this, &MotionPlanningFrame::warehouseItemNameChanged);
-  connect(ui_->reset_db_button, &QPushButton::clicked, this, &MotionPlanningFrame::resetDbButtonClicked);
+  connect(ui_->plan_button, SIGNAL(clicked()), this, SLOT(planButtonClicked()));
+  connect(ui_->execute_button, SIGNAL(clicked()), this, SLOT(executeButtonClicked()));
+  connect(ui_->plan_and_execute_button, SIGNAL(clicked()), this, SLOT(planAndExecuteButtonClicked()));
+  connect(ui_->stop_button, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
+  connect(ui_->start_state_combo_box, SIGNAL(activated(QString)), this, SLOT(startStateTextChanged(QString)));
+  connect(ui_->goal_state_combo_box, SIGNAL(activated(QString)), this, SLOT(goalStateTextChanged(QString)));
+  connect(ui_->planning_group_combo_box, SIGNAL(currentIndexChanged(QString)), this,
+          SLOT(planningGroupTextChanged(QString)));
+  connect(ui_->database_connect_button, SIGNAL(clicked()), this, SLOT(databaseConnectButtonClicked()));
+  connect(ui_->save_scene_button, SIGNAL(clicked()), this, SLOT(saveSceneButtonClicked()));
+  connect(ui_->save_query_button, SIGNAL(clicked()), this, SLOT(saveQueryButtonClicked()));
+  connect(ui_->delete_scene_button, SIGNAL(clicked()), this, SLOT(deleteSceneButtonClicked()));
+  connect(ui_->delete_query_button, SIGNAL(clicked()), this, SLOT(deleteQueryButtonClicked()));
+  connect(ui_->planning_scene_tree, SIGNAL(itemSelectionChanged()), this, SLOT(planningSceneItemClicked()));
+  connect(ui_->load_scene_button, SIGNAL(clicked()), this, SLOT(loadSceneButtonClicked()));
+  connect(ui_->load_query_button, SIGNAL(clicked()), this, SLOT(loadQueryButtonClicked()));
+  connect(ui_->allow_looking, SIGNAL(toggled(bool)), this, SLOT(allowLookingToggled(bool)));
+  connect(ui_->allow_replanning, SIGNAL(toggled(bool)), this, SLOT(allowReplanningToggled(bool)));
+  connect(ui_->allow_external_program, SIGNAL(toggled(bool)), this, SLOT(allowExternalProgramCommunication(bool)));
+  connect(ui_->planning_pipeline_combo_box, SIGNAL(currentIndexChanged(int)), this,
+          SLOT(planningPipelineIndexChanged(int)));
+  connect(ui_->planning_algorithm_combo_box, SIGNAL(currentIndexChanged(int)), this,
+          SLOT(planningAlgorithmIndexChanged(int)));
+  connect(ui_->clear_scene_button, SIGNAL(clicked()), this, SLOT(clearScene()));
+  connect(ui_->scene_scale, SIGNAL(valueChanged(int)), this, SLOT(sceneScaleChanged(int)));
+  connect(ui_->scene_scale, SIGNAL(sliderPressed()), this, SLOT(sceneScaleStartChange()));
+  connect(ui_->scene_scale, SIGNAL(sliderReleased()), this, SLOT(sceneScaleEndChange()));
+  connect(ui_->remove_object_button, SIGNAL(clicked()), this, SLOT(removeSceneObject()));
+  connect(ui_->object_x, SIGNAL(valueChanged(double)), this, SLOT(objectPoseValueChanged(double)));
+  connect(ui_->object_y, SIGNAL(valueChanged(double)), this, SLOT(objectPoseValueChanged(double)));
+  connect(ui_->object_z, SIGNAL(valueChanged(double)), this, SLOT(objectPoseValueChanged(double)));
+  connect(ui_->object_rx, SIGNAL(valueChanged(double)), this, SLOT(objectPoseValueChanged(double)));
+  connect(ui_->object_ry, SIGNAL(valueChanged(double)), this, SLOT(objectPoseValueChanged(double)));
+  connect(ui_->object_rz, SIGNAL(valueChanged(double)), this, SLOT(objectPoseValueChanged(double)));
+  connect(ui_->publish_current_scene_button, SIGNAL(clicked()), this, SLOT(publishScene()));
+  connect(ui_->collision_objects_list, SIGNAL(itemSelectionChanged()), this, SLOT(selectedCollisionObjectChanged()));
+  connect(ui_->collision_objects_list, SIGNAL(itemChanged(QListWidgetItem*)), this,
+          SLOT(collisionObjectChanged(QListWidgetItem*)));
+  connect(ui_->path_constraints_combo_box, SIGNAL(currentIndexChanged(int)), this,
+          SLOT(pathConstraintsIndexChanged(int)));
+  connect(ui_->clear_octomap_button, SIGNAL(clicked()), this, SLOT(onClearOctomapClicked()));
+  connect(ui_->planning_scene_tree, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this,
+          SLOT(warehouseItemNameChanged(QTreeWidgetItem*, int)));
+  connect(ui_->reset_db_button, SIGNAL(clicked()), this, SLOT(resetDbButtonClicked()));
 
   connect(ui_->add_object_button, &QPushButton::clicked, this, &MotionPlanningFrame::addSceneObject);
   connect(ui_->shapes_combo_box, &QComboBox::currentTextChanged, this, &MotionPlanningFrame::shapesComboBoxChanged);
-  connect(ui_->export_scene_geometry_text_button, &QPushButton::clicked, this,
-          &MotionPlanningFrame::exportGeometryAsTextButtonClicked);
-  connect(ui_->import_scene_geometry_text_button, &QPushButton::clicked, this,
-          &MotionPlanningFrame::importGeometryFromTextButtonClicked);
-  connect(ui_->load_state_button, &QPushButton::clicked, this, &MotionPlanningFrame::loadStateButtonClicked);
-  connect(ui_->save_start_state_button, &QPushButton::clicked, this, &MotionPlanningFrame::saveStartStateButtonClicked);
-  connect(ui_->save_goal_state_button, &QPushButton::clicked, this, &MotionPlanningFrame::saveGoalStateButtonClicked);
-  connect(ui_->set_as_start_state_button, &QPushButton::clicked, this,
-          &MotionPlanningFrame::setAsStartStateButtonClicked);
-  connect(ui_->set_as_goal_state_button, &QPushButton::clicked, this, &MotionPlanningFrame::setAsGoalStateButtonClicked);
-  connect(ui_->remove_state_button, &QPushButton::clicked, this, &MotionPlanningFrame::removeStateButtonClicked);
-  connect(ui_->clear_states_button, &QPushButton::clicked, this, &MotionPlanningFrame::clearStatesButtonClicked);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 9, 0)
-  connect(ui_->approximate_ik, &QCheckBox::checkStateChanged, this, &MotionPlanningFrame::approximateIKChanged);
-#else
-  connect(ui_->approximate_ik, &QCheckBox::stateChanged, this, &MotionPlanningFrame::approximateIKChanged);
-#endif
+  connect(ui_->export_scene_geometry_text_button, SIGNAL(clicked()), this, SLOT(exportGeometryAsTextButtonClicked()));
+  connect(ui_->import_scene_geometry_text_button, SIGNAL(clicked()), this, SLOT(importGeometryFromTextButtonClicked()));
+  connect(ui_->load_state_button, SIGNAL(clicked()), this, SLOT(loadStateButtonClicked()));
+  connect(ui_->save_start_state_button, SIGNAL(clicked()), this, SLOT(saveStartStateButtonClicked()));
+  connect(ui_->save_goal_state_button, SIGNAL(clicked()), this, SLOT(saveGoalStateButtonClicked()));
+  connect(ui_->set_as_start_state_button, SIGNAL(clicked()), this, SLOT(setAsStartStateButtonClicked()));
+  connect(ui_->set_as_goal_state_button, SIGNAL(clicked()), this, SLOT(setAsGoalStateButtonClicked()));
+  connect(ui_->remove_state_button, SIGNAL(clicked()), this, SLOT(removeStateButtonClicked()));
+  connect(ui_->clear_states_button, SIGNAL(clicked()), this, SLOT(clearStatesButtonClicked()));
+  connect(ui_->approximate_ik, SIGNAL(stateChanged(int)), this, SLOT(approximateIKChanged(int)));
 
-  connect(ui_->detect_objects_button, &QPushButton::clicked, this, &MotionPlanningFrame::detectObjectsButtonClicked);
-  connect(ui_->pick_button, &QPushButton::clicked, this, &MotionPlanningFrame::pickObjectButtonClicked);
-  connect(ui_->place_button, &QPushButton::clicked, this, &MotionPlanningFrame::placeObjectButtonClicked);
-  connect(ui_->detected_objects_list, &QListWidget::itemSelectionChanged, this,
-          &MotionPlanningFrame::selectedDetectedObjectChanged);
-  connect(ui_->detected_objects_list, &QListWidget::itemChanged, this, &MotionPlanningFrame::detectedObjectChanged);
-  connect(ui_->support_surfaces_list, &QListWidget::itemSelectionChanged, this,
-          &MotionPlanningFrame::selectedSupportSurfaceChanged);
+  connect(ui_->detect_objects_button, SIGNAL(clicked()), this, SLOT(detectObjectsButtonClicked()));
+  connect(ui_->pick_button, SIGNAL(clicked()), this, SLOT(pickObjectButtonClicked()));
+  connect(ui_->place_button, SIGNAL(clicked()), this, SLOT(placeObjectButtonClicked()));
+  connect(ui_->detected_objects_list, SIGNAL(itemSelectionChanged()), this, SLOT(selectedDetectedObjectChanged()));
+  connect(ui_->detected_objects_list, SIGNAL(itemChanged(QListWidgetItem*)), this,
+          SLOT(detectedObjectChanged(QListWidgetItem*)));
+  connect(ui_->support_surfaces_list, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSupportSurfaceChanged()));
 
-  connect(ui_->tabWidget, &QTabWidget::currentChanged, this, &MotionPlanningFrame::tabChanged);
+  connect(ui_->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 
   /* Notice changes to be safed in config file */
-  connect(ui_->database_host, &QLineEdit::textChanged, this, &MotionPlanningFrame::configChanged);
-  connect(ui_->database_port, QOverload<int>::of(&QSpinBox::valueChanged), this, &MotionPlanningFrame::configChanged);
+  connect(ui_->database_host, SIGNAL(textChanged(QString)), this, SIGNAL(configChanged()));
+  connect(ui_->database_port, SIGNAL(valueChanged(int)), this, SIGNAL(configChanged()));
 
-  connect(ui_->planning_time, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::configChanged);
-  connect(ui_->planning_attempts, QOverload<int>::of(&QSpinBox::valueChanged), this,
-          &MotionPlanningFrame::configChanged);
-  connect(ui_->velocity_scaling_factor, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::configChanged);
-  connect(ui_->acceleration_scaling_factor, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::configChanged);
+  connect(ui_->planning_time, SIGNAL(valueChanged(double)), this, SIGNAL(configChanged()));
+  connect(ui_->planning_attempts, SIGNAL(valueChanged(int)), this, SIGNAL(configChanged()));
+  connect(ui_->velocity_scaling_factor, SIGNAL(valueChanged(double)), this, SIGNAL(configChanged()));
+  connect(ui_->acceleration_scaling_factor, SIGNAL(valueChanged(double)), this, SIGNAL(configChanged()));
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 9, 0)
-  connect(ui_->allow_replanning, &QCheckBox::checkStateChanged, this, &MotionPlanningFrame::configChanged);
-  connect(ui_->allow_looking, &QCheckBox::checkStateChanged, this, &MotionPlanningFrame::configChanged);
-  connect(ui_->allow_external_program, &QCheckBox::checkStateChanged, this, &MotionPlanningFrame::configChanged);
-  connect(ui_->use_cartesian_path, &QCheckBox::checkStateChanged, this, &MotionPlanningFrame::configChanged);
-  connect(ui_->collision_aware_ik, &QCheckBox::checkStateChanged, this, &MotionPlanningFrame::configChanged);
-  connect(ui_->approximate_ik, &QCheckBox::checkStateChanged, this, &MotionPlanningFrame::configChanged);
-#else
-  connect(ui_->allow_replanning, &QCheckBox::stateChanged, this, &MotionPlanningFrame::configChanged);
-  connect(ui_->allow_looking, &QCheckBox::stateChanged, this, &MotionPlanningFrame::configChanged);
-  connect(ui_->allow_external_program, &QCheckBox::stateChanged, this, &MotionPlanningFrame::configChanged);
-  connect(ui_->use_cartesian_path, &QCheckBox::stateChanged, this, &MotionPlanningFrame::configChanged);
-  connect(ui_->collision_aware_ik, &QCheckBox::stateChanged, this, &MotionPlanningFrame::configChanged);
-  connect(ui_->approximate_ik, &QCheckBox::stateChanged, this, &MotionPlanningFrame::configChanged);
-#endif
+  connect(ui_->allow_replanning, SIGNAL(stateChanged(int)), this, SIGNAL(configChanged()));
+  connect(ui_->allow_looking, SIGNAL(stateChanged(int)), this, SIGNAL(configChanged()));
+  connect(ui_->allow_external_program, SIGNAL(stateChanged(int)), this, SIGNAL(configChanged()));
+  connect(ui_->use_cartesian_path, SIGNAL(stateChanged(int)), this, SIGNAL(configChanged()));
+  connect(ui_->collision_aware_ik, SIGNAL(stateChanged(int)), this, SIGNAL(configChanged()));
+  connect(ui_->approximate_ik, SIGNAL(stateChanged(int)), this, SIGNAL(configChanged()));
 
-  connect(ui_->wcenter_x, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::configChanged);
-  connect(ui_->wcenter_y, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::configChanged);
-  connect(ui_->wcenter_z, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-          &MotionPlanningFrame::configChanged);
-  connect(ui_->wsize_x, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MotionPlanningFrame::configChanged);
-  connect(ui_->wsize_y, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MotionPlanningFrame::configChanged);
-  connect(ui_->wsize_z, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MotionPlanningFrame::configChanged);
+  connect(ui_->wcenter_x, SIGNAL(valueChanged(double)), this, SIGNAL(configChanged()));
+  connect(ui_->wcenter_y, SIGNAL(valueChanged(double)), this, SIGNAL(configChanged()));
+  connect(ui_->wcenter_z, SIGNAL(valueChanged(double)), this, SIGNAL(configChanged()));
+  connect(ui_->wsize_x, SIGNAL(valueChanged(double)), this, SIGNAL(configChanged()));
+  connect(ui_->wsize_y, SIGNAL(valueChanged(double)), this, SIGNAL(configChanged()));
+  connect(ui_->wsize_z, SIGNAL(valueChanged(double)), this, SIGNAL(configChanged()));
 
-  QShortcut* copy_object_shortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_C), ui_->collision_objects_list);
-  connect(copy_object_shortcut, &QShortcut::activated, this, &MotionPlanningFrame::copySelectedCollisionObject);
+  QShortcut* copy_object_shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_C), ui_->collision_objects_list);
+  connect(copy_object_shortcut, SIGNAL(activated()), this, SLOT(copySelectedCollisionObject()));
 
   ui_->reset_db_button->hide();
   ui_->background_job_progress->hide();
@@ -259,7 +211,7 @@ MotionPlanningFrame::MotionPlanningFrame(MotionPlanningDisplay* pdisplay, rviz_c
   {
     if (!object_recognition_client_->wait_for_action_server(std::chrono::seconds(3)))
     {
-      RCLCPP_ERROR(logger_, "Action server: %s not available", OBJECT_RECOGNITION_ACTION.c_str());
+      RCLCPP_ERROR(LOGGER, "Action server: %s not available", OBJECT_RECOGNITION_ACTION.c_str());
       object_recognition_client_.reset();
     }
   }
@@ -281,7 +233,7 @@ MotionPlanningFrame::MotionPlanningFrame(MotionPlanningDisplay* pdisplay, rviz_c
   //  }
   //  catch (std::exception& ex)
   //  {
-  //    RCLCPP_ERROR(logger_, "Failed to get semantic world: %s", ex.what());
+  //    RCLCPP_ERROR(LOGGER, "Failed to get semantic world: %s", ex.what());
   //  }
 }
 
@@ -420,19 +372,19 @@ void MotionPlanningFrame::changePlanningGroupHelper()
   std::string group = planning_display_->getCurrentPlanningGroup();
   planning_display_->addMainLoopJob([&view = *ui_->planner_param_treeview, group] { view.setGroupName(group); });
   planning_display_->addMainLoopJob(
-      [this, group]() { ui_->planning_group_combo_box->setCurrentText(QString::fromStdString(group)); });
+      [=]() { ui_->planning_group_combo_box->setCurrentText(QString::fromStdString(group)); });
 
   if (!group.empty() && robot_model)
   {
-    RCLCPP_INFO(logger_, "group %s", group.c_str());
+    RCLCPP_INFO(LOGGER, "group %s", group.c_str());
     if (move_group_ && move_group_->getName() == group)
       return;
-    RCLCPP_INFO(logger_, "Constructing new MoveGroup connection for group '%s' in namespace '%s'", group.c_str(),
+    RCLCPP_INFO(LOGGER, "Constructing new MoveGroup connection for group '%s' in namespace '%s'", group.c_str(),
                 planning_display_->getMoveGroupNS().c_str());
     moveit::planning_interface::MoveGroupInterface::Options opt(
         group, moveit::planning_interface::MoveGroupInterface::ROBOT_DESCRIPTION, planning_display_->getMoveGroupNS());
-    opt.robot_model = robot_model;
-    opt.robot_description.clear();
+    opt.robot_model_ = robot_model;
+    opt.robot_description_.clear();
     try
     {
 #ifdef RVIZ_TF1
@@ -449,7 +401,7 @@ void MotionPlanningFrame::changePlanningGroupHelper()
     }
     catch (std::exception& ex)
     {
-      RCLCPP_ERROR(logger_, "%s", ex.what());
+      RCLCPP_ERROR(LOGGER, "%s", ex.what());
     }
     planning_display_->addMainLoopJob([&view = *ui_->planner_param_treeview, this] { view.setMoveGroup(move_group_); });
     if (move_group_)
@@ -457,8 +409,7 @@ void MotionPlanningFrame::changePlanningGroupHelper()
       move_group_->allowLooking(ui_->allow_looking->isChecked());
       move_group_->allowReplanning(ui_->allow_replanning->isChecked());
       bool has_unique_endeffector = !move_group_->getEndEffectorLink().empty();
-      planning_display_->addMainLoopJob(
-          [this, has_unique_endeffector]() { ui_->use_cartesian_path->setEnabled(has_unique_endeffector); });
+      planning_display_->addMainLoopJob([=]() { ui_->use_cartesian_path->setEnabled(has_unique_endeffector); });
       std::vector<moveit_msgs::msg::PlannerInterfaceDescription> desc;
       if (move_group_->getInterfaceDescriptions(desc))
         planning_display_->addMainLoopJob([this, desc] { populatePlannersList(desc); });
@@ -542,16 +493,12 @@ void MotionPlanningFrame::addSceneObject()
     case shapes::MESH:
     {
       QUrl url;
-      if (ui_->shapes_combo_box->currentText().contains("file"))
-      {  // open from file
+      if (ui_->shapes_combo_box->currentText().contains("file"))  // open from file
         url = QFileDialog::getOpenFileUrl(this, tr("Import Object Mesh"), QString(),
                                           "CAD files (*.stl *.obj *.dae);;All files (*.*)");
-      }
-      else
-      {  // open from URL
+      else  // open from URL
         url = QInputDialog::getText(this, tr("Import Object Mesh"), tr("URL for file to import from:"),
                                     QLineEdit::Normal, QString("http://"));
-      }
       if (!url.isEmpty())
         shape = loadMeshResource(url.toString().toStdString());
       if (!shape)
@@ -647,7 +594,7 @@ void MotionPlanningFrame::enable()
   const std::string new_ns = planning_display_->getMoveGroupNS();
   if (node_->get_namespace() != new_ns)
   {
-    RCLCPP_INFO(logger_, "MoveGroup namespace changed: %s -> %s. Reloading params.", node_->get_namespace(),
+    RCLCPP_INFO(LOGGER, "MoveGroup namespace changed: %s -> %s. Reloading params.", node_->get_namespace(),
                 new_ns.c_str());
     initFromMoveGroupNS();
   }
@@ -713,24 +660,15 @@ void MotionPlanningFrame::disable()
 void MotionPlanningFrame::tabChanged(int index)
 {
   if (scene_marker_ && ui_->tabWidget->tabText(index).toStdString() != TAB_OBJECTS)
-  {
     scene_marker_.reset();
-  }
   else if (ui_->tabWidget->tabText(index).toStdString() == TAB_OBJECTS)
-  {
     selectedCollisionObjectChanged();
-  }
 }
 
-void MotionPlanningFrame::updateSceneMarkers(std::chrono::nanoseconds /*wall_dt*/, std::chrono::nanoseconds /*ros_dt*/)
+void MotionPlanningFrame::updateSceneMarkers(float /*wall_dt*/, float /*ros_dt*/)
 {
   if (scene_marker_)
     scene_marker_->update();
-}
-
-void MotionPlanningFrame::updateSceneMarkers(double wall_dt, double ros_dt)
-{
-  updateSceneMarkers(std::chrono::nanoseconds(std::lround(wall_dt)), std::chrono::nanoseconds(std::lround(ros_dt)));
 }
 
 void MotionPlanningFrame::updateExternalCommunication()

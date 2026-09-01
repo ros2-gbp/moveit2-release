@@ -2,19 +2,18 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>moveit</name>
-  <version>2.15.1</version>
+  <version>2.5.10</version>
   <description>Meta package that contains all essential packages of MoveIt 2</description>
   <maintainer email="henningkayser@picknik.ai">Henning Kayser</maintainer>
   <maintainer email="tyler@picknik.ai">Tyler Weaver</maintainer>
   <maintainer email="me@v4hn.de">Michael Görner</maintainer>
   <maintainer email="rhaschke@techfak.uni-bielefeld.de">Robert Haschke</maintainer>
-  <maintainer email="nathanbrooks@picknik.ai">Nathan Brooks</maintainer>
 
-  <license>BSD-3-Clause</license>
+  <license>BSD</license>
 
-  <url type="website">https://moveit.ai</url>
-  <url type="repository">https://github.com/moveit/moveit2</url>
-  <url type="bugtracker">https://github.com/moveit/moveit2/issues</url>
+  <url type="website">http://moveit.ai</url>
+  <url type="repository">https://github.com/ros-planning/moveit2</url>
+  <url type="bugtracker">https://github.com/ros-planning/moveit2/issues</url>
 
   <author email="isucan@google.com">Ioan Sucan</author>
   <author email="robot.moveit@gmail.com">Sachin Chitta</author>
@@ -30,6 +29,10 @@
   <exec_depend>moveit_plugins</exec_depend>
   <exec_depend>moveit_ros</exec_depend>
   <exec_depend>moveit_setup_assistant</exec_depend>
+
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

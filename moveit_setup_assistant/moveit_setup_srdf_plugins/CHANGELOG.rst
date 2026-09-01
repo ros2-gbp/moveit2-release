@@ -2,113 +2,29 @@
 Changelog for package moveit_setup_srdf_plugins
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.15.1 (2026-08-29)
--------------------
-* Fix CI on Ubuntu 26.04 (`#3818 <https://github.com/moveit/moveit2/issues/3818>`_)
-* Fix Qt deprecations
-* Contributors: Robert Haschke
-
-2.15.0 (2026-08-12)
--------------------
-* moveit_setup_srdf_plugins: make test_srdf fail loudly instead of segfaulting (`#3810 <https://github.com/moveit/moveit2/issues/3810>`_)
-* Fix rviz Qt6 threshold: 15.1 -> 15.1.14 (`#3807 <https://github.com/moveit/moveit2/issues/3807>`_)
-  Corrects the gate added in #3707: rviz_common 15.1.0-15.1.13 are still Qt5.
-* Remove use of ament_target_dependencies: Take 2 (`#3726 <https://github.com/moveit/moveit2/issues/3726>`_)
-  ament_target_dependencies is replaced by exported CMake targets. Downstream
-  packages should link the namespaced targets (e.g. moveit_ros_planning::moveit_ros_planning).
-* Migrate from deprecated QVariant::Type::Int to QMetaType::Int (`#3712 <https://github.com/moveit/moveit2/issues/3712>`_)
-* Use Qt6 on Rolling and newer distros (`#3707 <https://github.com/moveit/moveit2/issues/3707>`_)
-  rviz switched to Qt6 in rviz_common 15.1.14. Downstream rviz plugins must build
-  against the same Qt major version as the rviz they link.
-* Contributors: Nathan Brooks
-
-2.14.1 (2025-09-09)
+2.5.10 (2026-09-01)
 -------------------
 
-2.14.0 (2025-06-13)
--------------------
-
-2.13.2 (2025-04-16)
--------------------
-
-2.13.1 (2025-04-15)
--------------------
-* Use ament_cmake_ros build tool in moveit_setup_assistant packages (`#3441 <https://github.com/ros-planning/moveit2/issues/3441>`_)
-* Contributors: Sebastian Castro
-
-2.13.0 (2025-02-15)
--------------------
-
-2.12.0 (2024-11-29)
--------------------
-* Enhancement/use hpp for headers (`#3113 <https://github.com/ros-planning/moveit2/issues/3113>`_)
-* Contributors: Tom Noble
-
-2.11.0 (2024-09-16)
--------------------
-
-2.10.0 (2024-06-13)
--------------------
-* Apply clang-tidy fixes
-* Unify log names (`#2720 <https://github.com/moveit/moveit2/issues/2720>`_)
-  Co-authored-by: Abishalini Sivaraman <abi.gpuram@gmail.com>
-* CMake format and lint in pre-commit (`#2683 <https://github.com/moveit/moveit2/issues/2683>`_)
-* Contributors: Robert Haschke, Sebastian Jahr, Tyler Weaver
-
-2.9.0 (2024-01-09)
-------------------
-* Node logging for the rest of MoveIt (`#2599 <https://github.com/ros-planning/moveit2/issues/2599>`_)
-* fix typos in compute_default_collisions.cpp (`#2461 <https://github.com/ros-planning/moveit2/issues/2461>`_)
-  * fix typos in compute_default_collisions.cpp
-  * Fix typo
-  ---------
-  Co-authored-by: Sebastian Jahr <sebastian.jahr@tuta.io>
-* Merge branch 'main' into dependabot/github_actions/SonarSource/sonarcloud-github-c-cpp-2
-* Contributors: Sebastian Jahr, Surav Shrestha, Tyler Weaver
-
-2.8.0 (2023-09-10)
+2.5.9 (2025-04-15)
 ------------------
 
-2.7.4 (2023-05-18)
+2.5.8 (2025-02-09)
 ------------------
 
-2.7.3 (2023-04-24)
-------------------
-* Replace Variable PROJECT_NAME in CMakeLists.txt with the actual name (`#2020 <https://github.com/ros-planning/moveit2/issues/2020>`_)
-* Contributors: Shobuj Paul
-
-2.7.2 (2023-04-18)
+2.5.7 (2024-12-29)
 ------------------
 
-2.7.1 (2023-03-23)
+2.5.6 (2024-11-17)
 ------------------
-* Fix member naming (`#1949 <https://github.com/ros-planning/moveit2/issues/1949>`_)
-  * Update clang-tidy rules for readability-identifier-naming
+
+2.5.5 (2023-09-10)
+------------------
+
+2.5.4 (2022-11-04)
+------------------
+* Improve CMake usage (`#1550 <https://github.com/ros-planning/moveit2/issues/1550>`_) (`#1555 <https://github.com/ros-planning/moveit2/issues/1555>`_)
   Co-authored-by: Sebastian Jahr <sebastian.jahr@picknik.ai>
-* Contributors: Robert Haschke
-
-2.7.0 (2023-01-29)
-------------------
-* Fix BSD license in package.xml (`#1796 <https://github.com/ros-planning/moveit2/issues/1796>`_)
-  * fix BSD license in package.xml
-  * this must also be spdx compliant
-* Minimize use of `this->` (`#1784 <https://github.com/ros-planning/moveit2/issues/1784>`_)
-  It's often unnecessary. MoveIt already avoids this in most cases
-  so this PR better cements that existing pattern.
-* Enable `-Wold-style-cast` (`#1770 <https://github.com/ros-planning/moveit2/issues/1770>`_)
-* Add braces around blocks. (`#999 <https://github.com/ros-planning/moveit2/issues/999>`_)
-* Contributors: Chris Thrasher, Christian Henkel, Cory Crean
-
-2.6.0 (2022-11-10)
-------------------
-* Merge PR `#1553 <https://github.com/ros-planning/moveit2/issues/1553>`_: Improve cmake files
-* Cleanup cmake files
-  - Replace ament_export_libraries() -> ament_export_targets(HAS_LIBRARY_TARGET)
-  - Replace ament_export_include_directories() -> INCLUDES DESTINATION include
-  See https://docs.ros.org/en/foxy/How-To-Guides/Ament-CMake-Documentation.html#building-a-library
-* Use standard exported targets: export\_${PROJECT_NAME} -> ${PROJECT_NAME}Targets
-* Improve CMake usage (`#1550 <https://github.com/ros-planning/moveit2/issues/1550>`_)
-* Contributors: Robert Haschke, Sebastian Jahr
+* Contributors: mergify[bot]
 
 2.5.3 (2022-07-28)
 ------------------

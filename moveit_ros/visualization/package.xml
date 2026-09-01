@@ -2,18 +2,18 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>moveit_ros_visualization</name>
-  <version>2.15.1</version>
+  <version>2.5.10</version>
   <description>Components of MoveIt that offer visualization</description>
   <maintainer email="henningkayser@picknik.ai">Henning Kayser</maintainer>
   <maintainer email="tyler@picknik.ai">Tyler Weaver</maintainer>
   <maintainer email="jon.binney@gmail.com">Jon Binney</maintainer>
   <maintainer email="moveit_releasers@googlegroups.com">MoveIt Release Team</maintainer>
 
-  <license>BSD-3-Clause</license>
+  <license>BSD</license>
 
-  <url type="website">https://moveit.ai</url>
-  <url type="bugtracker">https://github.com/moveit/moveit2/issues</url>
-  <url type="repository">https://github.com/moveit/moveit2</url>
+  <url type="website">http://moveit.ai</url>
+  <url type="bugtracker">https://github.com/ros-planning/moveit2/issues</url>
+  <url type="repository">https://github.com/ros-planning/moveit2</url>
 
   <author email="isucan@google.com">Ioan Sucan</author>
   <author email="dave@picknik.ai">Dave Coleman</author>
@@ -25,9 +25,8 @@
 
   <build_depend>class_loader</build_depend>
   <build_depend>eigen</build_depend>
-  <build_depend condition="$ROS_DISTRO == humble or $ROS_DISTRO == jazzy or $ROS_DISTRO == kilted">qtbase5-dev</build_depend>
-  <build_depend condition="$ROS_DISTRO == humble or $ROS_DISTRO == jazzy or $ROS_DISTRO == kilted">libqt5-opengl-dev</build_depend>
-  <build_depend condition="$ROS_DISTRO != humble and $ROS_DISTRO != jazzy and $ROS_DISTRO != kilted">qt6-base-dev</build_depend>
+  <build_depend>libqt5-opengl-dev</build_depend>
+  <build_depend>qtbase5-dev</build_depend>
 
   <depend>geometric_shapes</depend>
   <depend>interactive_markers</depend>
@@ -42,6 +41,9 @@
   <depend>rclpy</depend>
   <depend>rviz2</depend>
   <depend>tf2_eigen</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

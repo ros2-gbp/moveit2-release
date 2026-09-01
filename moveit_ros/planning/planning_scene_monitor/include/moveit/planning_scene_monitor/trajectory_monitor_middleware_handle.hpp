@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include <moveit/planning_scene_monitor/trajectory_monitor.hpp>
+#include <moveit/planning_scene_monitor/trajectory_monitor.h>
 #include <rclcpp/rclcpp.hpp>
 
 namespace planning_scene_monitor
@@ -66,6 +66,6 @@ public:
   void sleep() override;
 
 private:
-  std::unique_ptr<rclcpp::WallRate> rate_;
+  std::unique_ptr<rclcpp::Rate> rate_;
 };
 }  // namespace planning_scene_monitor

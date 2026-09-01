@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(moveit_setup_assistant LANGUAGES CXX)
+project(moveit_setup_assistant)
 
 # Common cmake code applied to all moveit packages
 find_package(moveit_common REQUIRED)
@@ -8,94 +8,94 @@ moveit_package()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_index_cpp REQUIRED)
-find_package(Boost CONFIG REQUIRED program_options)
-# rviz switched to Qt6 in 15.1.14: https://github.com/ros2/rviz/pull/1635
-# (merged 2025-12-08, first released in the 15.1.14 tag on 2025-12-17 -- 15.1.0
-# through 15.1.13 are still Qt5)
-find_package(rviz2 QUIET)
-if(rviz2_VERSION VERSION_GREATER_EQUAL 15.1.14)
-  find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
-  set(QT_VERSION_MAJOR 6)
-  # Hint for transitive deps that use find_package(QT NAMES Qt6 Qt5 ...) which
-  # may incorrectly resolve to Qt5 due to CMake's ascending path order
-  set(QT_DIR "${Qt6_DIR}")
-else()
-  find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
-  set(QT_VERSION_MAJOR 5)
-endif()
+find_package(Boost REQUIRED program_options)
 find_package(moveit_setup_framework REQUIRED)
 find_package(moveit_setup_srdf_plugins REQUIRED)
 find_package(pluginlib REQUIRED)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Widgets REQUIRED)
 find_package(rclcpp REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
-    ament_index_cpp
-    moveit_setup_framework
-    moveit_setup_srdf_plugins
-    pluginlib
-    Qt${QT_VERSION_MAJOR}Core
-    Qt${QT_VERSION_MAJOR}Widgets
-    rclcpp)
+  ament_index_cpp
+  moveit_setup_framework
+  moveit_setup_srdf_plugins
+  pluginlib
+  Qt5Core
+  Qt5Widgets
+  rclcpp
+)
 
 # Header files that need Qt Moc pre-processing for use with Qt signals, etc:
-set(HEADERS include/moveit_setup_assistant/navigation_widget.hpp
-            include/moveit_setup_assistant/setup_assistant_widget.hpp)
+set(HEADERS
+  include/moveit_setup_assistant/navigation_widget.hpp
+  include/moveit_setup_assistant/setup_assistant_widget.hpp
+)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 add_definitions(-DQT_NO_KEYWORDS)
 
-add_executable(
-  moveit_setup_assistant src/main.cpp src/setup_assistant_widget.cpp
-                         src/navigation_widget.cpp ${HEADERS})
-target_include_directories(
+qt5_wrap_cpp(MOC_FILES
+  ${HEADERS}
+)
+
+add_executable(moveit_setup_assistant
+    src/main.cpp
+    src/setup_assistant_widget.cpp
+    src/navigation_widget.cpp
+    ${MOC_FILES}
+)
+target_include_directories(moveit_setup_assistant PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(
   moveit_setup_assistant
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-         $<INSTALL_INTERFACE:include/moveit_setup_assistant>)
-target_link_libraries(
-  moveit_setup_assistant
+  ${THIS_PACKAGE_INCLUDE_DEPENDS}
+)
+target_link_libraries(moveit_setup_assistant
   ${Boost_LIBRARIES}
-  ament_index_cpp::ament_index_cpp
-  moveit_setup_framework::moveit_setup_framework
-  moveit_setup_srdf_plugins::moveit_setup_srdf_plugins
-  pluginlib::pluginlib
-  Qt${QT_VERSION_MAJOR}::Core
-  Qt${QT_VERSION_MAJOR}::Widgets
-  rclcpp::rclcpp)
+)
 
-add_executable(moveit_setup_assistant_updater src/collisions_updater.cpp)
-target_include_directories(
-  moveit_setup_assistant_updater
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-         $<INSTALL_INTERFACE:include/moveit_setup_assistant>)
+add_executable(${PROJECT_NAME}_updater src/collisions_updater.cpp)
+target_include_directories(${PROJECT_NAME}_updater PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(
-  moveit_setup_assistant_updater
-  ${Boost_LIBRARIES}
-  ament_index_cpp::ament_index_cpp
-  moveit_setup_framework::moveit_setup_framework
-  moveit_setup_srdf_plugins::moveit_setup_srdf_plugins
-  pluginlib::pluginlib
-  Qt${QT_VERSION_MAJOR}::Core
-  Qt${QT_VERSION_MAJOR}::Widgets
-  rclcpp::rclcpp)
+ament_target_dependencies(
+  ${PROJECT_NAME}_updater
+  ${THIS_PACKAGE_INCLUDE_DEPENDS}
+)
 
-set_target_properties(moveit_setup_assistant_updater
-                      PROPERTIES OUTPUT_NAME collisions_updater PREFIX "")
+set_target_properties(
+  ${PROJECT_NAME}_updater
+  PROPERTIES OUTPUT_NAME collisions_updater
+  PREFIX ""
+)
 
 install(
-  TARGETS moveit_setup_assistant moveit_setup_assistant_updater
-  EXPORT moveit_setup_assistantTargets
+  TARGETS
+    moveit_setup_assistant
+    ${PROJECT_NAME}_updater
+  EXPORT ${PROJECT_NAME}Targets
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION lib/moveit_setup_assistant
-  INCLUDES
-  DESTINATION include/moveit_setup_assistant)
-install(DIRECTORY include/ DESTINATION include/moveit_setup_assistant)
-
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+  INCLUDES DESTINATION include
+)
+install(DIRECTORY include/
+        DESTINATION include
+)
 ament_export_include_directories(include)
-install(DIRECTORY launch DESTINATION share/moveit_setup_assistant)
-install(DIRECTORY resources DESTINATION share/moveit_setup_assistant)
-ament_export_targets(moveit_setup_assistantTargets HAS_LIBRARY_TARGET)
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY resources DESTINATION share/${PROJECT_NAME})
+ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
+
+# Unit tests
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
 ament_package()

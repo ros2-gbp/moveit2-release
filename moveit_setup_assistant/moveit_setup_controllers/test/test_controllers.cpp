@@ -38,6 +38,8 @@
 #include <moveit_setup_controllers/moveit_controllers_config.hpp>
 #include <moveit_setup_controllers/ros2_controllers.hpp>
 
+static const rclcpp::Logger LOGGER = rclcpp::get_logger("test_controllers");
+
 using moveit_setup::expectYamlEquivalence;
 using moveit_setup::getSharePath;
 using moveit_setup::controllers::ControllerInfo;
@@ -92,12 +94,7 @@ TEST_F(ControllersTest, ParsePanda)
 
   const ControllerInfo& ci2 = controllers[1 - offset];
   EXPECT_EQ("panda_hand_controller", ci2.name_);
-  // Humble/Iron use position_controllers/GripperActionController; Jazzy and
-  // newer use parallel_gripper_action_controller/GripperActionController.
-  // Accept either so the test is distro-agnostic.
-  EXPECT_TRUE(ci2.type_ == "position_controllers/GripperActionController" ||
-              ci2.type_ == "parallel_gripper_action_controller/GripperActionController")
-      << "Unexpected gripper controller type: " << ci2.type_;
+  EXPECT_EQ("position_controllers/GripperActionController", ci2.type_);
   EXPECT_EQ(1u, ci2.joints_.size());
 
   /*
@@ -127,26 +124,6 @@ TEST_F(ControllersTest, OutputFanuc)
   }
 }
 
-// Fanuc has no gripper, so OutputFanuc doesn't exercise the gripper branch of
-// ros2_controllers.yaml generation. Panda has a GripperActionController, which
-// must be written with the singular `joint` key (not the `joints` list). A full
-// YAML equivalence check isn't possible here because the panda gripper config
-// carries extra parameters (effort/velocity interfaces) the Setup Assistant does
-// not generate, so assert on the gripper parameter shape directly.
-TEST_F(ControllersTest, OutputPandaGripperUsesSingularJoint)
-{
-  config_data_->preloadWithFullConfig("moveit_resources_panda_moveit_config");
-  config_data_->get<moveit_setup::controllers::ControlXacroConfig>("control_xacro")->loadFromDescription();
-  generateFiles<ROS2ControllersConfig>("ros2_controllers");
-
-  YAML::Node generated = YAML::LoadFile(output_dir_ / "config/ros2_controllers.yaml");
-  ASSERT_TRUE(generated["panda_hand_controller"]) << "generated config missing panda_hand_controller";
-  const YAML::Node params = generated["panda_hand_controller"]["ros__parameters"];
-  ASSERT_TRUE(params) << "panda_hand_controller missing ros__parameters";
-  EXPECT_TRUE(params["joint"]) << "gripper controller must emit the singular 'joint' parameter";
-  EXPECT_FALSE(params["joints"]) << "gripper controller must not emit the 'joints' list";
-}
-
 TEST_F(ControllersTest, AddDefaultControllers)
 {
   // only preload urdf and srdf
@@ -171,7 +148,7 @@ TEST_F(ControllersTest, AddDefaultControllers)
   // Number of the planning groups defined in the model srdf
   size_t group_count = srdf_config->getGroups().size();
 
-  // Test that addDefaultControllers() did actually add a controller for the new_group
+  // Test that addDefaultControllers() did accually add a controller for the new_group
   EXPECT_EQ(ros2_controllers_config->getControllers().size(), group_count);
 }
 

@@ -35,30 +35,10 @@
 /* Author: Ioan Sucan, Mathias Lüdtke, Dave Coleman */
 
 // MoveIt
-#include <moveit/rdf_loader/rdf_loader.hpp>
+#include <moveit/rdf_loader/rdf_loader.h>
 #include <std_msgs/msg/string.hpp>
 #include <ament_index_cpp/get_package_prefix.hpp>
-// ament_index_cpp's get_package_share_directory API changed twice.
-// Guard on ament_index_cpp's own version — not rclcpp — because the
-// changes live in ament_index_cpp and its release cadence is independent
-// of rclcpp's.
-//   1.14+ (Rolling on Resolute):
-//     get_package_share_directory.hpp REMOVED, replaced with
-//     get_package_share_path.hpp exposing get_package_share_path(pkg)
-//     returning std::filesystem::path directly.
-//   1.5+ (Jazzy 1.8.4, Kilted 1.11.4, Lyrical 1.13.3, Rolling-on-Noble 1.13.1):
-//     2-arg out-param overload get_package_share_directory(pkg, path)
-//     available; the 1-arg form is deprecated starting in 1.13.
-//   Older (Humble 1.4.1):
-//     only the non-deprecated 1-arg get_package_share_directory(pkg)
-//     returning std::string is available.
-#include <ament_index_cpp/version.h>
-#if AMENT_INDEX_CPP_VERSION_GTE(1, 14, 0)
-#include <ament_index_cpp/get_package_share_path.hpp>
-#else
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#endif
-#include <moveit/utils/logger.hpp>
 
 #include <rclcpp/duration.hpp>
 #include <rclcpp/logger.hpp>
@@ -75,13 +55,7 @@
 
 namespace rdf_loader
 {
-namespace
-{
-rclcpp::Logger getLogger()
-{
-  return moveit::getLogger("moveit.ros.rdf_loader");
-}
-}  // namespace
+static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_rdf_loader.rdf_loader");
 
 RDFLoader::RDFLoader(const std::shared_ptr<rclcpp::Node>& node, const std::string& ros_name,
                      bool default_continuous_value, double default_timeout)
@@ -103,7 +77,7 @@ RDFLoader::RDFLoader(const std::shared_ptr<rclcpp::Node>& node, const std::strin
     return;
   }
 
-  RCLCPP_INFO_STREAM(getLogger(), "Loaded robot model in " << (node->now() - start).seconds() << " seconds");
+  RCLCPP_INFO_STREAM(LOGGER, "Loaded robot model in " << (node->now() - start).seconds() << " seconds");
 }
 
 RDFLoader::RDFLoader(const std::string& urdf_string, const std::string& srdf_string)
@@ -120,14 +94,14 @@ bool RDFLoader::loadFromStrings()
   std::unique_ptr<urdf::Model> urdf = std::make_unique<urdf::Model>();
   if (!urdf->initString(urdf_string_))
   {
-    RCLCPP_INFO(getLogger(), "Unable to parse URDF");
+    RCLCPP_INFO(LOGGER, "Unable to parse URDF");
     return false;
   }
 
   srdf::ModelSharedPtr srdf = std::make_shared<srdf::Model>();
   if (!srdf->initString(*urdf, srdf_string_))
   {
-    RCLCPP_ERROR(getLogger(), "Unable to parse SRDF");
+    RCLCPP_ERROR(LOGGER, "Unable to parse SRDF");
     return false;
   }
 
@@ -148,20 +122,20 @@ bool RDFLoader::loadFileToString(std::string& buffer, const std::string& path)
 {
   if (path.empty())
   {
-    RCLCPP_ERROR(getLogger(), "Path is empty");
+    RCLCPP_ERROR(LOGGER, "Path is empty");
     return false;
   }
 
   if (!std::filesystem::exists(path))
   {
-    RCLCPP_ERROR(getLogger(), "File does not exist");
+    RCLCPP_ERROR(LOGGER, "File does not exist");
     return false;
   }
 
   std::ifstream stream(path.c_str());
   if (!stream.good())
   {
-    RCLCPP_ERROR(getLogger(), "Unable to load path");
+    RCLCPP_ERROR(LOGGER, "Unable to load path");
     return false;
   }
 
@@ -181,13 +155,13 @@ bool RDFLoader::loadXacroFileToString(std::string& buffer, const std::string& pa
   buffer.clear();
   if (path.empty())
   {
-    RCLCPP_ERROR(getLogger(), "Path is empty");
+    RCLCPP_ERROR(LOGGER, "Path is empty");
     return false;
   }
 
   if (!std::filesystem::exists(path))
   {
-    RCLCPP_ERROR(getLogger(), "File does not exist");
+    RCLCPP_ERROR(LOGGER, "File does not exist");
     return false;
   }
 
@@ -203,7 +177,7 @@ bool RDFLoader::loadXacroFileToString(std::string& buffer, const std::string& pa
 #endif
   if (!pipe)
   {
-    RCLCPP_ERROR(getLogger(), "Unable to load path");
+    RCLCPP_ERROR(LOGGER, "Unable to load path");
     return false;
   }
 
@@ -236,23 +210,18 @@ bool RDFLoader::loadXmlFileToString(std::string& buffer, const std::string& path
 bool RDFLoader::loadPkgFileToString(std::string& buffer, const std::string& package_name,
                                     const std::string& relative_path, const std::vector<std::string>& xacro_args)
 {
-  std::filesystem::path path;
+  std::string package_path;
   try
   {
-#if AMENT_INDEX_CPP_VERSION_GTE(1, 14, 0)
-    path = ament_index_cpp::get_package_share_path(package_name);
-#elif AMENT_INDEX_CPP_VERSION_GTE(1, 5, 0)
-    ament_index_cpp::get_package_share_directory(package_name, path);
-#else
-    path = ament_index_cpp::get_package_share_directory(package_name);
-#endif
+    package_path = ament_index_cpp::get_package_share_directory(package_name);
   }
   catch (const ament_index_cpp::PackageNotFoundError& e)
   {
-    RCLCPP_ERROR(getLogger(), "ament_index_cpp: %s", e.what());
+    RCLCPP_ERROR(LOGGER, "ament_index_cpp: %s", e.what());
     return false;
   }
 
+  std::filesystem::path path(package_path);
   path = path / relative_path;
 
   return loadXmlFileToString(buffer, path.string(), xacro_args);
