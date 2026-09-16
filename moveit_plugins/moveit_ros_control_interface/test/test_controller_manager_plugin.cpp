@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
+#include <unordered_set>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -39,7 +40,7 @@
 #include <controller_manager_msgs/srv/detail/list_controllers__struct.hpp>
 #include <controller_manager_msgs/srv/detail/switch_controller__struct.hpp>
 #include <eigen3/Eigen/Eigen>
-#include <moveit/controller_manager/controller_manager.h>
+#include <moveit/controller_manager/controller_manager.hpp>
 #include <pluginlib/class_loader.hpp>
 
 class MockControllersManagerService final : public rclcpp::Node

@@ -38,7 +38,7 @@
 #include <pybind11/stl.h>
 #include <moveit_py/moveit_py_utils/ros_msg_typecasters.hpp>
 #include <moveit_msgs/msg/robot_state.hpp>
-#include <moveit/robot_state/conversions.h>
+#include <moveit/robot_state/conversions.hpp>
 
 namespace moveit_py
 {
@@ -67,13 +67,13 @@ void update(moveit::core::RobotState* self, bool force, std::string& category)
 Eigen::MatrixXd getFrameTransform(const moveit::core::RobotState* self, std::string& frame_id)
 {
   bool frame_found;
-  auto transformation = self->getFrameTransform(frame_id, &frame_found);
+  const auto& transformation = self->getFrameTransform(frame_id, &frame_found);
   return transformation.matrix();
 }
 
 Eigen::MatrixXd getGlobalLinkTransform(const moveit::core::RobotState* self, std::string& link_name)
 {
-  auto transformation = self->getGlobalLinkTransform(link_name);
+  const auto& transformation = self->getGlobalLinkTransform(link_name);
   return transformation.matrix();
 }
 

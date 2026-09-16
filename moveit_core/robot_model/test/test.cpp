@@ -34,12 +34,12 @@
 
 /* Author: Ioan Sucan */
 
-#include <moveit/robot_model/robot_model.h>
+#include <moveit/robot_model/robot_model.hpp>
 #include <urdf_parser/urdf_parser.h>
 #include <fstream>
 #include <gtest/gtest.h>
 
-#include <moveit/utils/robot_model_test_utils.h>
+#include <moveit/utils/robot_model_test_utils.hpp>
 
 class LoadPlanningModelsPr2 : public testing::Test
 {
@@ -169,6 +169,61 @@ TEST(FloatingJointTest, interpolation_test)
     // Check that the resulting distances match with the interpolation value
     EXPECT_NEAR(d1, t_total * t, 1e-6);
     EXPECT_NEAR(d2, t_total * (1.0 - t), 1e-6);
+  }
+}
+
+TEST(FloatingJointTest, maximum_extent_test)
+{
+  // Create a simple floating joint model with some dummy parameters (these are not used by the test)
+  moveit::core::FloatingJointModel fjm("joint", 0, 0);
+
+  // Bound the translation between -1 and 1 in all dimensions, as above.
+  moveit::core::JointModel::Bounds bounds;
+  bounds = fjm.getVariableBounds();
+  bounds[0].min_position_ = -1.0;
+  bounds[0].max_position_ = 1.0;
+  bounds[1].min_position_ = -1.0;
+  bounds[1].max_position_ = 1.0;
+  bounds[2].min_position_ = -1.0;
+  bounds[2].max_position_ = 1.0;
+
+  // Opposite corners of the translation bounds, half a turn apart in rotation. This is the
+  // largest value distance() can report for these bounds, so getMaximumExtent() must cover it.
+  const double jv1[7] = { -1.0, -1.0, -1.0, 0.0, 0.0, 0.0, 1.0 };
+  const double jv2[7] = { 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+
+  EXPECT_LE(fjm.distance(jv1, jv2), fjm.getMaximumExtent(bounds));
+}
+
+TEST(PlanarJointTest, ComputeVariablePositionsNormalizeYaw)
+{
+  // Create a simple planar joint model with some dummy parameters
+  moveit::core::PlanarJointModel pjm("joint", 0, 0);
+
+  // Test various angles for normalization
+  std::vector<double> test_angles = { 0.0, M_PI / 2, -M_PI / 2, M_PI, -M_PI, 3.0, -3.0, 4.1, -4.1 };
+  for (double angle : test_angles)
+  {
+    // Create a transform with the given yaw angle
+    Eigen::Isometry3d transform = Eigen::Isometry3d::Identity();
+    Eigen::AngleAxisd q = Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitZ());
+    transform.linear() = q.toRotationMatrix();
+
+    // Compute the variable positions from the transform
+    double joint_values[3];
+    pjm.computeVariablePositions(transform, joint_values);
+
+    // Check that the x and y values are zero (since we didn't set any translation)
+    EXPECT_NEAR(joint_values[0], 0.0, 1e-6);
+    EXPECT_NEAR(joint_values[1], 0.0, 1e-6);
+
+    // The yaw value should be normalized to the range [-pi, pi]
+    double normalized_angle = angle;
+    while (normalized_angle > M_PI)
+      normalized_angle -= 2.0 * M_PI;
+    while (normalized_angle < -M_PI)
+      normalized_angle += 2.0 * M_PI;
+    EXPECT_NEAR(joint_values[2], normalized_angle, 1e-6);
   }
 }
 
