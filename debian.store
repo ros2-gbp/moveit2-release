@@ -1,1 +1,1 @@
-{"base": "bf2477580", "parent": "debian/rolling/moveit_kinematics", "previous": "e12b6ce51", "trim": "", "trimbase": ""}
+{"base": "58b01ae5f5", "parent": "debian/rolling/moveit_kinematics", "previous": "22a3f913d8", "trim": "", "trimbase": ""}
